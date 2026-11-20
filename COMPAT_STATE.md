@@ -91,7 +91,7 @@ Paper 仓库当前状态：默认分支 `gradle.properties` = `mcVersion=26.3`�
 | --- | --- | --- | --- |
 | 1.21.8 | （基线工作树，无分支） | 基线构建 success | `applyAllPatches` + `createMojmapLeavesclipJar` 均 BUILD SUCCESSFUL，见 §5 |
 | 1.21.9 | `compat/1.21.9` | **conflict-needs-review**（10/10 轮已用满） | 见 §7：语义冲突（上游删除 `Entity.getServer()`），已提交部分成果 `8e0597c`，未合并 |
-| 1.21.10 | `compat/1.21.10` | pending | 未开始 |
+| 1.21.10 | `compat/1.21.10` | **conflict-needs-review**（第 9 轮，未合并） | 见 §8：语义冲突（Paper 1.21.10 把 `spigot { enabled = false }` 改为 `enabled = true`），api 层已适配完成 |
 | 1.21.11 | `compat/1.21.11` | pending | 未开始 |
 | 26.1 | `compat/26.1` | skipped-no-paper-base | 人工裁决：Paper 无精确基线（§3），不算失败、不触发停止 |
 | 26.1.1 | `compat/26.1.1` | pending | 未开始 |
@@ -99,7 +99,7 @@ Paper 仓库当前状态：默认分支 `gradle.properties` = `mcVersion=26.3`�
 | 26.2 | `compat/26.2` | pending | 未开始 |
 | 26.3 | `compat/26.3` | pending | 未开始 |
 
-连续非 success 计数：**1**（1.21.9）。再出现 1 个非 success 版本即按规则 6 停止整个推演。
+连续非 success 计数：**2**（1.21.9、1.21.10；26.1 记为 `skipped-no-paper-base`，不计入）。按规则 6，整个推演已**停止（halted）**，等待人工裁决两处语义分歧后再恢复：①`Entity.getServer()` 被上游删除后的处理方式；②Paper 1.21.10 重新启用 Spigot 层后 Leaves 的「禁用 spigot」意图如何表达。
 
 ## 5. 基线构建记录
 
@@ -145,4 +145,31 @@ Paper 仓库当前状态：默认分支 `gradle.properties` = `mcVersion=26.3`�
 - 只读参照（不搬运）：上游 Leaves `master`（1.21.11）的 `0003-Leaves-Utils.patch` 已不再含 Entity hunk，改为对 `Level.java` 与 `LevelAccessor.java` 的 `getServer()` 加注解 —— 说明上游同样面对这一删除并做了自己的改写选择，可作为人工评审参考。
 
 结论：`compat/1.21.9` = `conflict-needs-review`，需人工裁决后再继续；分支已推送，部分成果保留，未合并到 `master`。
+
+## 8. 推演日志 · compat/1.21.10（2026-11-21，分支 `compat/1.21.10`，基于 `8e0597c`）
+
+工作树 `E:\mc\leaves-work\Leaves-1.21.10`，起点 `8e0597c`（复用 `compat/1.21.9` 的机械性修复，不搬运上游提交），`gradle.properties` 改为 `mcVersion=1.21.10` / `paperRef=bae47d3e6b11c789a603935162b749db559091e4` / `version=1.21.10-R0.1-SNAPSHOT`，无 `apiVersion`。
+
+已完成的机械性适配：
+
+- `leaves-api/paper-patches/features`（9 个补丁）：原先 `git am` 报 `sha1 information is lacking` + `Patch failed at 0001 Delete Timings`。根因是补丁文件在工作树里被 checkout 成 CRLF（补丁头带 `\r` → 作者字段非法），归一化后仍失败；真正原因是这些补丁位于上游仓库子目录 `paper-api` 内，`git am` 按仓库根解析路径会 `Skipped patch`。改用 `git apply --reject --directory=paper-api` + 按真实源码重锚，9/9 落地（HEAD `c43d923ac`），再用 `git diff` 重新生成 9 个补丁文件（路径去掉 `paper-api/` 前缀，内容逐字不变，行号对齐 1.21.10）。
+- `leaves-api/build.gradle.kts.patch`（single-file patch，头形如 `@@ -90,19 +_,33 @@`）：paperweight 自带 patcher 报 4 个 hunk FAILURE。按其格式做容错重锚（上游改动的上下文行保留真实内容，被删除的行必须仍真实存在）→ 全部定位成功。
+- `:applyPaperApiFeaturePatches`、`:applyPaperApiFilePatches` 不再报错；`applyAllPatches` 推进到 `:applyPaperSingleFilePatches`，失败在 `leaves-server/build.gradle.kts.patch`。
+
+阻塞点（语义冲突，按规则 3 停止，不猜测改写）：
+
+- 该补丁的 hunk（原 `@@ -10,24 +_,36 @@` 之后）要求删除 `spigot { enabled = false }` 并替换为注释掉的 `// enabled = true // Leaves - disable`，同时把 `buildDataRef` 固定为 `436eac9815c211be1a2a6ca0702615f995e81c44`、`packageVersion = "v1_21_R5"`。
+- 已核实 Paper 1.21.10 的 `paper-server/build.gradle.kts` 第 29–33 行实际为：
+  ```
+  spigot {
+      enabled = true
+      buildDataRef = "42d18d4c4653ffc549778dbe223f6994a031d69e"
+      packageVersion = "v1_21_R6" // also needs to be updated in MappingEnvironment
+  }
+  ```
+  即 Paper 在 1.21.10 重新启用了 Spigot 层，补丁要删除的那一行在新源码中不存在（`removed line missing at line 29: enabled = false`）。
+- 这不是行号偏移或改名：把 `enabled = true` 改成注释掉的写法，属于对 Paper 构建配置的语义改写（涉及 Spigot 层是否参与构建、`buildDataRef`/`packageVersion` 取值），按规则 3 与「不改 Paper/Spigot 层」的要求停止，不做猜测。
+- `leaves-server/build.gradle.kts.patch` 未被修改，保持原样；api 层的重生成补丁已随分支提交保留。
+
+结论：`compat/1.21.10` = `conflict-needs-review`，连续第 2 个非 success 版本 → 按规则 6 停止整个推演。
 
