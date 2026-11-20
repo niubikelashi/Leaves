@@ -90,14 +90,16 @@ Paper 仓库当前状态：默认分支 `gradle.properties` = `mcVersion=26.3`�
 | 版本 | 分支 | 状态 | 备注 |
 | --- | --- | --- | --- |
 | 1.21.8 | （基线工作树，无分支） | 基线构建 success | `applyAllPatches` + `createMojmapLeavesclipJar` 均 BUILD SUCCESSFUL，见 §5 |
-| 1.21.9 | `compat/1.21.9` | pending | 未开始 |
+| 1.21.9 | `compat/1.21.9` | **conflict-needs-review**（10/10 轮已用满） | 见 §7：语义冲突（上游删除 `Entity.getServer()`），已提交部分成果 `8e0597c`，未合并 |
 | 1.21.10 | `compat/1.21.10` | pending | 未开始 |
 | 1.21.11 | `compat/1.21.11` | pending | 未开始 |
-| 26.1 | `compat/26.1` | pending | Paper 无精确基线，见 §3 |
+| 26.1 | `compat/26.1` | skipped-no-paper-base | 人工裁决：Paper 无精确基线（§3），不算失败、不触发停止 |
 | 26.1.1 | `compat/26.1.1` | pending | 未开始 |
 | 26.1.2 | `compat/26.1.2` | pending | 未开始 |
 | 26.2 | `compat/26.2` | pending | 未开始 |
 | 26.3 | `compat/26.3` | pending | 未开始 |
+
+连续非 success 计数：**1**（1.21.9）。再出现 1 个非 success 版本即按规则 6 停止整个推演。
 
 ## 5. 基线构建记录
 
@@ -123,3 +125,24 @@ Paper 仓库当前状态：默认分支 `gradle.properties` = `mcVersion=26.3`�
 6. 连续 2 个版本非 `success` → 停止整个推演。
 7. 外部信息拿不到时记录事实并保守判断，不编造版本变更内容。
 8. GitHub token 只存在本机 `Workspace/github-token.txt`，绝不进入仓库、提交、README 或回复。
+## 7. 推演日志 · compat/1.21.9（2026-11-20，分支 `compat/1.21.9`，提交 `8e0597c`）
+
+工作树 `E:\mc\leaves-work\Leaves-1.21.9`，起点 `d93e976`（基线 1.21.8），`gradle.properties` 改为 `mcVersion=1.21.9` / `paperRef=6950f05d…` / `version=1.21.9-R0.1-SNAPSHOT`，无 `apiVersion`（该字段在 1.21.11 才出现）。
+
+已完成的机械性适配（不含语义改动）：
+
+- 补丁文件规范化：去掉陈旧 `index …` 行（旧 blob 在 1.21.9 源码树中不存在，导致 `Repository lacks necessary blobs to fall back on 3-way merge`），统一 LF；三个 Leaves 仓库设 `core.autocrlf=false`（本机 `autocrlf=true` 会把补丁 checkout 成 CRLF，是此前所有 `patch does not apply` 的根因）。
+- `leaves-api` 层：`0001-Delete-Timings` 出现 modify/delete 冲突（上游已删除 `co/aikar/util/LoadingMap.java`）；核实无引用后按删除处理并 `rebuildPaperApiPatches` 重生成（6/9 补丁被重写为对齐 1.21.9）。
+- 两个 `build.gradle.kts.patch`：行号偏移与依赖版本机械更新（mache `1.21.9+build.1`、concurrentutil `0.0.5`），逐项对照 Paper 1.21.9 真实文件核实。
+- `leaves-server/paper-patches`：17 个补丁全部应用（`0012-Bytebuf-API` 的 `CraftPlayer.java` hunk 按真实文件末尾重锚，内容逐字不变）。
+- `leaves-server/minecraft-patches`：141 个补丁中前 2 个应用成功（`0001-Build-changes` 的 `DedicatedServer` hunk 行号偏移重锚；`0002` 插入锚点按上下文消歧）。
+
+阻塞点（第 10 轮，判 `conflict-needs-review`）：
+
+- `0003-Leaves-Utils.patch` hunk `@@ -4422,7 +4426,7 @@` 要把 `Entity.getServer()` 上的 `@Nullable` 改成 `@NotNull`。已核实：1.21.8 的 `Entity.java` 第 4476 行有 `public MinecraftServer getServer() { return this.level().getServer(); }`，而 1.21.9 的 `Entity.java`（5454 行）中该方法**整体不存在**（全树只有 `Level`/`LevelAccessor`/`ServerLevel`/`MinecraftServer` 等 8 处声明）。
+- 同时 Leaves 自身的源码仍以实例方式调用它：`leaves-server/src/main/java/org/leavesmc/leaves/bot/ServerBot.java`（`this.getServer()`）、`bot/agent/actions/ServerLookAction.java`（`player.getServer()`）、`protocol/servux/ServuxStructuresProtocol.java`（`player.getServer()`）、`replay/ServerPhotographer.java`（`this.getServer()`）。
+- 因此这不是行号偏移：需要决定「恢复 Entity.getServer()」还是「把调用改成 `level().getServer()`」，属于语义/行为决策，按规则 3 停止，不猜测改写，也不改 Paper/Spigot 层补丁。
+- 只读参照（不搬运）：上游 Leaves `master`（1.21.11）的 `0003-Leaves-Utils.patch` 已不再含 Entity hunk，改为对 `Level.java` 与 `LevelAccessor.java` 的 `getServer()` 加注解 —— 说明上游同样面对这一删除并做了自己的改写选择，可作为人工评审参考。
+
+结论：`compat/1.21.9` = `conflict-needs-review`，需人工裁决后再继续；分支已推送，部分成果保留，未合并到 `master`。
+
