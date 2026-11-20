@@ -5,7 +5,6 @@ Subject: [PATCH] Fix SculkCatalyst exp skip
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-index d74ce689380246eb176596f5905275fa5187aace..4e456eb1740a674eaf4e2ed37c16f6aa4714b11a 100644
 --- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
 @@ -862,7 +862,7 @@ public class CraftEventFactory {

@@ -6,7 +6,6 @@ Subject: [PATCH] Cache climbing check for activation
 This patch is Powered by Pufferfish(https://github.com/pufferfish-gg/Pufferfish)
 
 diff --git a/io/papermc/paper/entity/activation/ActivationRange.java b/io/papermc/paper/entity/activation/ActivationRange.java
-index ae2bb9a73106febfe5f0d090abd4252bbb5fd27e..b3e536400efa41ba754e52f1ee224365b69dcdab 100644
 --- a/io/papermc/paper/entity/activation/ActivationRange.java
 +++ b/io/papermc/paper/entity/activation/ActivationRange.java
 @@ -221,7 +221,7 @@ public final class ActivationRange {
@@ -19,7 +18,6 @@ index ae2bb9a73106febfe5f0d090abd4252bbb5fd27e..b3e536400efa41ba754e52f1ee224365
              }
              if (entity instanceof final Mob mob && mob.getTarget() != null) {
 diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
-index f0ff74a4f2831ead191bc12cb4873162a470c71f..33d14040a8ac97758881cd31a88d950a14a78450 100644
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
 @@ -2126,6 +2126,22 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin

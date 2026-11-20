@@ -5,7 +5,6 @@ Subject: [PATCH] Bedrock break list
 
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 4a427b80ad9bc387bd774e33c844b4d67836737c..952275263fca69dc55266348ead59dc3ca2b1520 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
 @@ -1752,6 +1752,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -17,7 +16,6 @@ index 4a427b80ad9bc387bd774e33c844b4d67836737c..952275263fca69dc55266348ead59dc3
          for (int i = 0; i < this.tickables.size(); i++) {
              this.tickables.get(i).run();
 diff --git a/net/minecraft/server/ServerScoreboard.java b/net/minecraft/server/ServerScoreboard.java
-index fc1c377ad05edcefacd407671801ae605f3fc31a..5c9f2a8476ff260ec7f0843f7c956c71e9b0d34d 100644
 --- a/net/minecraft/server/ServerScoreboard.java
 +++ b/net/minecraft/server/ServerScoreboard.java
 @@ -158,6 +158,7 @@ public class ServerScoreboard extends Scoreboard {
@@ -37,7 +35,6 @@ index fc1c377ad05edcefacd407671801ae605f3fc31a..5c9f2a8476ff260ec7f0843f7c956c71
              this.stopTrackingObjective(objective);
          }
 diff --git a/net/minecraft/world/level/block/piston/PistonBaseBlock.java b/net/minecraft/world/level/block/piston/PistonBaseBlock.java
-index 10484ee85482e86be5e0a09d8202df600a32092e..16aa9f5996dc6eda95541fddb01e00e41305357a 100644
 --- a/net/minecraft/world/level/block/piston/PistonBaseBlock.java
 +++ b/net/minecraft/world/level/block/piston/PistonBaseBlock.java
 @@ -74,6 +74,11 @@ public class PistonBaseBlock extends DirectionalBlock {

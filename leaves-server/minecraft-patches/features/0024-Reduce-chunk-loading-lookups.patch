@@ -6,7 +6,6 @@ Subject: [PATCH] Reduce chunk loading & lookups
 This patch is Powered by Pufferfish(https://github.com/pufferfish-gg/Pufferfish)
 
 diff --git a/net/minecraft/world/entity/monster/EnderMan.java b/net/minecraft/world/entity/monster/EnderMan.java
-index 4edd94ac765d2ab107612504b67e6e07da609313..6760bfd91f59139922768db5e5d362c5e7e4e473 100644
 --- a/net/minecraft/world/entity/monster/EnderMan.java
 +++ b/net/minecraft/world/entity/monster/EnderMan.java
 @@ -296,11 +296,28 @@ public class EnderMan extends Monster implements NeutralMob {

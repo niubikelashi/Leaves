@@ -6,7 +6,6 @@ Subject: [PATCH] MC Technical Survival Mode
 Will automatically overwrite some configuration after startup
 
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index 5f78a68170b390eb515af30e5cbe4559b1852706..51fd9298a931501ee15401b64f3194c72c00b00f 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
 @@ -1654,7 +1654,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
@@ -19,7 +18,6 @@ index 5f78a68170b390eb515af30e5cbe4559b1852706..51fd9298a931501ee15401b64f3194c7
  
      @Override
 diff --git a/net/minecraft/world/entity/boss/enderdragon/EndCrystal.java b/net/minecraft/world/entity/boss/enderdragon/EndCrystal.java
-index a0e0fad40838fa7d835f31e5ce4ae3ab40e0bfa4..d8effc3a9773d29319b8e2bd15abbf03f0996ce5 100644
 --- a/net/minecraft/world/entity/boss/enderdragon/EndCrystal.java
 +++ b/net/minecraft/world/entity/boss/enderdragon/EndCrystal.java
 @@ -65,7 +65,7 @@ public class EndCrystal extends Entity {
@@ -32,7 +30,6 @@ index a0e0fad40838fa7d835f31e5ce4ae3ab40e0bfa4..d8effc3a9773d29319b8e2bd15abbf03
                  || ((ServerLevel) this.level()).getDragonFight() == null
                  || ((ServerLevel) this.level()).getDragonFight().respawnStage == null
 diff --git a/net/minecraft/world/entity/item/PrimedTnt.java b/net/minecraft/world/entity/item/PrimedTnt.java
-index 17d54d38dcec39eefeb989cd576cc640a36e82f5..1d7a1739d6a3a55aacb33d57a58712350b150f64 100644
 --- a/net/minecraft/world/entity/item/PrimedTnt.java
 +++ b/net/minecraft/world/entity/item/PrimedTnt.java
 @@ -100,7 +100,7 @@ public class PrimedTnt extends Entity implements TraceableEntity {
@@ -45,7 +42,6 @@ index 17d54d38dcec39eefeb989cd576cc640a36e82f5..1d7a1739d6a3a55aacb33d57a5871235
          this.applyGravity();
          this.move(MoverType.SELF, this.getDeltaMovement());
 diff --git a/net/minecraft/world/level/NaturalSpawner.java b/net/minecraft/world/level/NaturalSpawner.java
-index 4f647507d06d45a65b4b1793219d90c65e110225..dac4646902a93eaaa287f5b6da324eea81ea3150 100644
 --- a/net/minecraft/world/level/NaturalSpawner.java
 +++ b/net/minecraft/world/level/NaturalSpawner.java
 @@ -82,7 +82,7 @@ public final class NaturalSpawner {
@@ -58,7 +54,6 @@ index 4f647507d06d45a65b4b1793219d90c65e110225..dac4646902a93eaaa287f5b6da324eea
                              entity.spawnReason == org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.CHUNK_GEN)) {
                          continue;
 diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-index 5f42af7c6fc82d6672ed06a2315254c9c5886ce4..e53b40c70c0a61cbe14a236a99725daa28512b0b 100644
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 @@ -275,7 +275,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen

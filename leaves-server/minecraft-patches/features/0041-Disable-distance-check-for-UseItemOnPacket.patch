@@ -5,7 +5,6 @@ Subject: [PATCH] Disable distance check for UseItemOnPacket
 
 
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 6622d11f970def6adc2a732187004413a9501c95..e0687743975db1832933661540650df86a911a80 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -2038,7 +2038,7 @@ public class ServerGamePacketListenerImpl

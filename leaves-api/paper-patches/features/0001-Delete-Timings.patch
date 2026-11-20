@@ -2368,7 +2368,7 @@ index 5753b9bce89db2ac378ec41f1b61907cc2e23335..00000000000000000000000000000000
 -}
 diff --git a/src/main/java/co/aikar/util/LoadingMap.java b/src/main/java/co/aikar/util/LoadingMap.java
 deleted file mode 100644
-index 1786eeb5cbeaad75602c9c5649bbcd9b2af5cf81..0000000000000000000000000000000000000000
+index 207b6853a0cb0185492b62c0c5d9602d48b7959c..0000000000000000000000000000000000000000
 --- a/src/main/java/co/aikar/util/LoadingMap.java
 +++ /dev/null
 @@ -1,369 +0,0 @@
@@ -2456,9 +2456,9 @@ index 1786eeb5cbeaad75602c9c5649bbcd9b2af5cf81..00000000000000000000000000000000
 -    /**
 -     * Creates a LoadingMap with an auto instantiating loader.
 -     *
--     * Will auto construct class of of Value when not found
+-     * Will auto construct class of Value when not found
 -     *
--     * Since this uses Reflection, It is more effecient to define your own static loader
+-     * Since this uses Reflection, It is more efficient to define your own static loader
 -     * than using this helper, but if performance is not critical, this is easier.
 -     *
 -     * @param backingMap Actual map being used.
@@ -2476,9 +2476,9 @@ index 1786eeb5cbeaad75602c9c5649bbcd9b2af5cf81..00000000000000000000000000000000
 -    /**
 -     * Creates a LoadingMap with an auto instantiating loader.
 -     *
--     * Will auto construct class of of Value when not found
+-     * Will auto construct class of Value when not found
 -     *
--     * Since this uses Reflection, It is more effecient to define your own static loader
+-     * Since this uses Reflection, It is more efficient to define your own static loader
 -     * than using this helper, but if performance is not critical, this is easier.
 -     *
 -     * @param backingMap Actual map being used.
@@ -2860,7 +2860,6 @@ index 3e61a926620a67daec3af54b72a1b911eaef2ed4..00000000000000000000000000000000
 -    }
 -}
 diff --git a/src/main/java/org/bukkit/command/Command.java b/src/main/java/org/bukkit/command/Command.java
-index 27a7c69f23084e821d945d5e97e51a94ddd94e58..d645ee8470a2dd9f7b8eff2b7ff2211aba9c342f 100644
 --- a/src/main/java/org/bukkit/command/Command.java
 +++ b/src/main/java/org/bukkit/command/Command.java
 @@ -32,16 +32,6 @@ public abstract class Command {
@@ -2881,7 +2880,6 @@ index 27a7c69f23084e821d945d5e97e51a94ddd94e58..d645ee8470a2dd9f7b8eff2b7ff2211a
      protected Command(@NotNull String name) {
          this(name, "", "/" + name, new ArrayList<String>());
 diff --git a/src/main/java/org/bukkit/command/FormattedCommandAlias.java b/src/main/java/org/bukkit/command/FormattedCommandAlias.java
-index 59fada9b1eb78238d280c6bbb711f52facba52c6..eb4d78c6111a530d015a0b91d14c40ad0eec9ca7 100644
 --- a/src/main/java/org/bukkit/command/FormattedCommandAlias.java
 +++ b/src/main/java/org/bukkit/command/FormattedCommandAlias.java
 @@ -14,7 +14,6 @@ public class FormattedCommandAlias extends Command {
@@ -2904,7 +2902,6 @@ index 59fada9b1eb78238d280c6bbb711f52facba52c6..eb4d78c6111a530d015a0b91d14c40ad
          return i >= j && i <= k;
      }
 diff --git a/src/main/java/org/bukkit/command/SimpleCommandMap.java b/src/main/java/org/bukkit/command/SimpleCommandMap.java
-index ad1330d87223dfcf3c9da40aa5ece8c21141f0d6..f561ac4ebd8d40266ae9f066e79045bb93113a53 100644
 --- a/src/main/java/org/bukkit/command/SimpleCommandMap.java
 +++ b/src/main/java/org/bukkit/command/SimpleCommandMap.java
 @@ -34,7 +34,6 @@ public class SimpleCommandMap implements CommandMap {
@@ -2942,7 +2939,6 @@ index ad1330d87223dfcf3c9da40aa5ece8c21141f0d6..f561ac4ebd8d40266ae9f066e79045bb
              server.getPluginManager().callEvent(new com.destroystokyo.paper.event.server.ServerExceptionEvent(new com.destroystokyo.paper.exception.ServerCommandException(ex, target, sender, args))); // Paper
              //target.timings.stopTiming(); // Spigot // Paper
 diff --git a/src/main/java/org/bukkit/plugin/SimplePluginManager.java b/src/main/java/org/bukkit/plugin/SimplePluginManager.java
-index dfc2d76403993640e6283f25f9f3647bb6d1a30c..cc2a208b7cb118134ca4088c622644b5d2fac1c0 100644
 --- a/src/main/java/org/bukkit/plugin/SimplePluginManager.java
 +++ b/src/main/java/org/bukkit/plugin/SimplePluginManager.java
 @@ -720,7 +720,6 @@ public final class SimplePluginManager implements PluginManager {
@@ -2974,7 +2970,6 @@ index dfc2d76403993640e6283f25f9f3647bb6d1a30c..cc2a208b7cb118134ca4088c622644b5
  
      // Paper start
 diff --git a/src/main/java/org/bukkit/plugin/java/JavaPluginLoader.java b/src/main/java/org/bukkit/plugin/java/JavaPluginLoader.java
-index 163e9a0e179dc88be93614ff66ee2be3eccc694f..f4f1a51a3b0c34b87270ba81b705a8ee5d615f8a 100644
 --- a/src/main/java/org/bukkit/plugin/java/JavaPluginLoader.java
 +++ b/src/main/java/org/bukkit/plugin/java/JavaPluginLoader.java
 @@ -290,22 +290,22 @@ public final class JavaPluginLoader implements PluginLoader {

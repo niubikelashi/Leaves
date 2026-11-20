@@ -5,7 +5,6 @@ Subject: [PATCH] Fix FallingBlockEntity Duplicate
 
 
 diff --git a/net/minecraft/world/entity/item/FallingBlockEntity.java b/net/minecraft/world/entity/item/FallingBlockEntity.java
-index 595dee03e3a7d98d703e48fb53d82d7f392a2b3d..0fd2c522a5fb038a8c002970af6feebd9dc9c436 100644
 --- a/net/minecraft/world/entity/item/FallingBlockEntity.java
 +++ b/net/minecraft/world/entity/item/FallingBlockEntity.java
 @@ -387,7 +387,7 @@ public class FallingBlockEntity extends Entity {

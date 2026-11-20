@@ -5,7 +5,6 @@ Subject: [PATCH] Old projectile explosion behavior
 
 
 diff --git a/net/minecraft/world/level/ServerExplosion.java b/net/minecraft/world/level/ServerExplosion.java
-index 87635f6db2f1e77edc7ba6a26e9818d070a9faf7..b4a63faf11d4bf153d079aba5cfea7ed022891f7 100644
 --- a/net/minecraft/world/level/ServerExplosion.java
 +++ b/net/minecraft/world/level/ServerExplosion.java
 @@ -551,7 +551,7 @@ public class ServerExplosion implements Explosion {

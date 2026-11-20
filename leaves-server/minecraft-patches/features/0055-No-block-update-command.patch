@@ -5,7 +5,6 @@ Subject: [PATCH] No block update command
 
 
 diff --git a/net/minecraft/server/level/ServerPlayerGameMode.java b/net/minecraft/server/level/ServerPlayerGameMode.java
-index 5d4eb61af0b0f39a5d4c37f4a303fa24b3a2936d..48bb795216ca3fb301813080de403a048bbfa98c 100644
 --- a/net/minecraft/server/level/ServerPlayerGameMode.java
 +++ b/net/minecraft/server/level/ServerPlayerGameMode.java
 @@ -381,7 +381,7 @@ public class ServerPlayerGameMode {
@@ -18,7 +17,6 @@ index 5d4eb61af0b0f39a5d4c37f4a303fa24b3a2936d..48bb795216ca3fb301813080de403a04
                  if (flag) {
                      block.destroy(this.level, pos, blockState1);
 diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Level.java
-index ef8a072838558caab19e8a85f4b59cac570c2635..590252ca203124f0b720a73f174c92fbe49bc685 100644
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
 @@ -1089,6 +1089,11 @@ public abstract class Level implements LevelAccessor, UUIDLookup<Entity>, AutoCl
@@ -60,7 +58,6 @@ index ef8a072838558caab19e8a85f4b59cac570c2635..590252ca203124f0b720a73f174c92fb
                  blockState.updateIndirectNeighbourShapes(this, pos, i, recursionLeft - 1); // Don't call an event for the old block to limit event spam
                  boolean cancelledUpdates = false; // Paper - Fix block place logic
 diff --git a/net/minecraft/world/level/block/piston/PistonBaseBlock.java b/net/minecraft/world/level/block/piston/PistonBaseBlock.java
-index 16aa9f5996dc6eda95541fddb01e00e41305357a..31ab92e0769aa4ce09da5073ad9b734eeebac9c5 100644
 --- a/net/minecraft/world/level/block/piston/PistonBaseBlock.java
 +++ b/net/minecraft/world/level/block/piston/PistonBaseBlock.java
 @@ -105,6 +105,7 @@ public class PistonBaseBlock extends DirectionalBlock {
@@ -72,7 +69,6 @@ index 16aa9f5996dc6eda95541fddb01e00e41305357a..31ab92e0769aa4ce09da5073ad9b734e
          boolean neighborSignal = this.getNeighborSignal(level, pos, direction);
          if (neighborSignal && !state.getValue(EXTENDED)) {
 diff --git a/net/minecraft/world/level/redstone/NeighborUpdater.java b/net/minecraft/world/level/redstone/NeighborUpdater.java
-index 263bf2b795057c2d5218bf9cfb684e526601aa77..da1e77ccd8805ac0cb0729720b4a1742da67d35c 100644
 --- a/net/minecraft/world/level/redstone/NeighborUpdater.java
 +++ b/net/minecraft/world/level/redstone/NeighborUpdater.java
 @@ -34,6 +34,11 @@ public interface NeighborUpdater {

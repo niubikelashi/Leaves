@@ -5,7 +5,6 @@ Subject: [PATCH] CCE update suppression
 
 
 diff --git a/net/minecraft/world/level/block/ShulkerBoxBlock.java b/net/minecraft/world/level/block/ShulkerBoxBlock.java
-index fef902077b69830b570d1adf86603f45b4f6a839..c34318fdc454ea31655c3c3aa5dbedd3d922ee24 100644
 --- a/net/minecraft/world/level/block/ShulkerBoxBlock.java
 +++ b/net/minecraft/world/level/block/ShulkerBoxBlock.java
 @@ -185,7 +185,9 @@ public class ShulkerBoxBlock extends BaseEntityBlock {

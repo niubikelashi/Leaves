@@ -5,7 +5,6 @@ Subject: [PATCH] Leaves Utils
 
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 70b6ea8ab35e88989b5b1f5ffd64490a9d743b56..ea616ff83c14dd582bdb49442bc0b9103fc8f1b3 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -372,6 +372,8 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -53,7 +52,6 @@ index 70b6ea8ab35e88989b5b1f5ffd64490a9d743b56..ea616ff83c14dd582bdb49442bc0b910
 +    // Leaves end - leaves ex data
  }
 diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Level.java
-index c41df4b1fff1f65532256e835dc30fadbb4f8c8b..9383d9f940163f42db8802f0a260925a83119160 100644
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
 @@ -962,7 +962,7 @@ public abstract class Level implements LevelAccessor, UUIDLookup<Entity>, AutoCl
@@ -66,7 +64,6 @@ index c41df4b1fff1f65532256e835dc30fadbb4f8c8b..9383d9f940163f42db8802f0a260925a
      public MinecraftServer getServer() {
          return null;
 diff --git a/net/minecraft/world/level/LevelAccessor.java b/net/minecraft/world/level/LevelAccessor.java
-index 5f28df24876f93866312c3c7d19cb6bcaf5e2f8b..049133cba588612127b45c1489f80d2fe6d6e330 100644
 --- a/net/minecraft/world/level/LevelAccessor.java
 +++ b/net/minecraft/world/level/LevelAccessor.java
 @@ -46,7 +46,7 @@ public interface LevelAccessor extends CommonLevelAccessor, LevelTimeAccess, Sch
@@ -79,7 +76,6 @@ index 5f28df24876f93866312c3c7d19cb6bcaf5e2f8b..049133cba588612127b45c1489f80d2f
  
      default Difficulty getDifficulty() {
 diff --git a/net/minecraft/world/level/block/Block.java b/net/minecraft/world/level/block/Block.java
-index be6f37f91569c659c609e5e8d38671ca86f8cd95..958914e40fceda5d67a98154817b4c5ce478a62d 100644
 --- a/net/minecraft/world/level/block/Block.java
 +++ b/net/minecraft/world/level/block/Block.java
 @@ -610,6 +610,13 @@ public class Block extends BlockBehaviour implements ItemLike {
@@ -97,7 +93,6 @@ index be6f37f91569c659c609e5e8d38671ca86f8cd95..958914e40fceda5d67a98154817b4c5c
          @Override
          public boolean equals(Object other) {
 diff --git a/net/minecraft/world/level/block/state/BlockBehaviour.java b/net/minecraft/world/level/block/state/BlockBehaviour.java
-index 834e27ef2f7b342b074ff9e1e390e02f3ca1c399..be66f0f1cb1b0bcec8f9489a1fdd8777df1adb6b 100644
 --- a/net/minecraft/world/level/block/state/BlockBehaviour.java
 +++ b/net/minecraft/world/level/block/state/BlockBehaviour.java
 @@ -763,7 +763,7 @@ public abstract class BlockBehaviour implements FeatureElement {

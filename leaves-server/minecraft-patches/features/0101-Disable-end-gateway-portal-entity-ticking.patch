@@ -5,7 +5,6 @@ Subject: [PATCH] Disable end gateway portal entity ticking
 
 
 diff --git a/net/minecraft/world/level/block/EndGatewayBlock.java b/net/minecraft/world/level/block/EndGatewayBlock.java
-index f22d502df5f444703a248fff50c864d2924c4549..356f074106d416c7e5b2524490a51cc83931c114 100644
 --- a/net/minecraft/world/level/block/EndGatewayBlock.java
 +++ b/net/minecraft/world/level/block/EndGatewayBlock.java
 @@ -123,11 +123,14 @@ public class EndGatewayBlock extends BaseEntityBlock implements Portal {

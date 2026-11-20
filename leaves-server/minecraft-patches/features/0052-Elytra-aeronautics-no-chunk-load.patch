@@ -5,7 +5,6 @@ Subject: [PATCH] Elytra aeronautics no chunk load
 
 
 diff --git a/net/minecraft/server/level/ChunkMap.java b/net/minecraft/server/level/ChunkMap.java
-index 019886669966c69936ae6591598c97a8afbfd3db..b6fb1f2ba8622d9d319210ea7cf0a984349444e6 100644
 --- a/net/minecraft/server/level/ChunkMap.java
 +++ b/net/minecraft/server/level/ChunkMap.java
 @@ -854,7 +854,8 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
@@ -27,7 +26,6 @@ index 019886669966c69936ae6591598c97a8afbfd3db..b6fb1f2ba8622d9d319210ea7cf0a984
  
          SectionPos lastSectionPos = player.getLastSectionPos();
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index 31fb5ea1e33672ae71210776a0302f0ef87c6814..e6de7ef46d197c14495d4b55d094af34816fc063 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
 @@ -837,6 +837,9 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
@@ -41,7 +39,6 @@ index 31fb5ea1e33672ae71210776a0302f0ef87c6814..e6de7ef46d197c14495d4b55d094af34
              this.tickBlockEntities();
          }
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 6e8e4b009a4dd52047bc8d8f8e2e27558e0d8dff..52ef9208da25022bbc8f375696ea4f3d4e4962a3 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -582,7 +582,7 @@ public class ServerGamePacketListenerImpl
@@ -62,7 +59,6 @@ index 6e8e4b009a4dd52047bc8d8f8e2e27558e0d8dff..52ef9208da25022bbc8f375696ea4f3d
                                  if (!allowMovement) {
                                      io.papermc.paper.event.player.PlayerFailMoveEvent event = fireFailMove(io.papermc.paper.event.player.PlayerFailMoveEvent.FailReason.CLIPPED_INTO_BLOCK,
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 7a82ab3b1a4a4cc7708cbec5d424b3bfcede87a9..6b3fcd3e02755ab187d075d868e9376718c218e5 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -1118,7 +1118,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -89,7 +85,6 @@ index 7a82ab3b1a4a4cc7708cbec5d424b3bfcede87a9..6b3fcd3e02755ab187d075d868e93767
      }
  
 diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
-index bc19f0bf079d6a7fa2fc8aaed6477da5e57d32da..1f0042d24a11c709f291a03e1699fcaf0d6571c6 100644
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
 @@ -3328,6 +3328,11 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
@@ -105,7 +100,6 @@ index bc19f0bf079d6a7fa2fc8aaed6477da5e57d32da..1f0042d24a11c709f291a03e1699fcaf
  
          if (this.isSleeping()) {
 diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
-index 0d046133ea2b6d47e089cb792cf3bc3abace70ba..0abdf0e520d1a0672917d60b79f467df4399e256 100644
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
 @@ -219,6 +219,7 @@ public abstract class Player extends LivingEntity {
@@ -117,7 +111,6 @@ index 0d046133ea2b6d47e089cb792cf3bc3abace70ba..0abdf0e520d1a0672917d60b79f467df
      // CraftBukkit start
      public boolean fauxSleeping;
 diff --git a/net/minecraft/world/entity/projectile/FireworkRocketEntity.java b/net/minecraft/world/entity/projectile/FireworkRocketEntity.java
-index d8dc196ef92e97f831cf97cd1536a46f81f9d5d1..92da11f86a95ff635277cbfcea73c48731080953 100644
 --- a/net/minecraft/world/entity/projectile/FireworkRocketEntity.java
 +++ b/net/minecraft/world/entity/projectile/FireworkRocketEntity.java
 @@ -324,7 +324,7 @@ public class FireworkRocketEntity extends Projectile implements ItemSupplier {
@@ -130,7 +123,6 @@ index d8dc196ef92e97f831cf97cd1536a46f81f9d5d1..92da11f86a95ff635277cbfcea73c487
          Fireworks fireworks = itemStack.get(DataComponents.FIREWORKS);
          return fireworks != null ? fireworks.explosions() : List.of();
 diff --git a/net/minecraft/world/item/FireworkRocketItem.java b/net/minecraft/world/item/FireworkRocketItem.java
-index f86b0579e707ecfa5c2074ea22bbe383b5e11841..0e4335bb2469a4698b303b598ec773b5c7cc73ce 100644
 --- a/net/minecraft/world/item/FireworkRocketItem.java
 +++ b/net/minecraft/world/item/FireworkRocketItem.java
 @@ -64,6 +64,24 @@ public class FireworkRocketItem extends Item implements ProjectileItem {

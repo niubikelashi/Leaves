@@ -5,7 +5,6 @@ Subject: [PATCH] Xaero Map Protocol
 
 
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index d4eb10d3734930a43b8270cdc7eb78bf40907c94..81a6b4d9c35056b3eda889800f61964ab522a8b9 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
 @@ -1318,6 +1318,7 @@ public abstract class PlayerList {

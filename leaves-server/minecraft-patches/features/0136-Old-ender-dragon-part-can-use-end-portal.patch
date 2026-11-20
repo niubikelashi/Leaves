@@ -26,7 +26,6 @@ This patch is Powered by CrystalCarpetAddition(https://github.com/Crystal0404/Cr
  */
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 05770bb17a37733c83464e1c90ce549d5e7771c5..ca017f5e483a4ff5bc497ad453f4cf63a0bb97f5 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -185,7 +185,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -65,7 +64,6 @@ index 05770bb17a37733c83464e1c90ce549d5e7771c5..ca017f5e483a4ff5bc497ad453f4cf63
          if (!this.isAlive() || !this.valid) return false; // Paper - Fix item duplication and teleport issues
          if (fromLevel.dimension() == Level.END && toLevel.dimension() == Level.OVERWORLD) {
 diff --git a/net/minecraft/world/entity/Mob.java b/net/minecraft/world/entity/Mob.java
-index 3b73d52ea902bb1c8bd615c77444c57917f8b645..5cab5889446d7d48259300cec96da4a4811967e5 100644
 --- a/net/minecraft/world/entity/Mob.java
 +++ b/net/minecraft/world/entity/Mob.java
 @@ -385,6 +385,16 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
@@ -86,7 +84,6 @@ index 3b73d52ea902bb1c8bd615c77444c57917f8b645..5cab5889446d7d48259300cec96da4a4
  
      protected void updateControlFlags() {
 diff --git a/net/minecraft/world/entity/PortalProcessor.java b/net/minecraft/world/entity/PortalProcessor.java
-index 88b07fbb96b20124777889830afa480673629d43..250c43fb38e2aabd0b58ef44c477f07eee48bce7 100644
 --- a/net/minecraft/world/entity/PortalProcessor.java
 +++ b/net/minecraft/world/entity/PortalProcessor.java
 @@ -7,7 +7,7 @@ import net.minecraft.world.level.block.Portal;

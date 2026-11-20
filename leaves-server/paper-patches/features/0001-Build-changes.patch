@@ -5,7 +5,6 @@ Subject: [PATCH] Build changes
 
 
 diff --git a/src/main/java/com/destroystokyo/paper/Metrics.java b/src/main/java/com/destroystokyo/paper/Metrics.java
-index 6abc57669e87f7f98f3b76af3c0e50825fea6eb1..c7ee6d3a158ca7d3de54bc12622affbf01584e7b 100644
 --- a/src/main/java/com/destroystokyo/paper/Metrics.java
 +++ b/src/main/java/com/destroystokyo/paper/Metrics.java
 @@ -593,7 +593,8 @@ public class Metrics {
@@ -93,7 +92,6 @@ index 6abc57669e87f7f98f3b76af3c0e50825fea6eb1..c7ee6d3a158ca7d3de54bc12622affbf
      }
  }
 diff --git a/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java b/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java
-index 74ffdc823e66fc5ec027c4b7c462382bcbfe2be2..f38f8e5851ec65a8f3f98018d55de74ea6ff165c 100644
 --- a/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java
 +++ b/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java
 @@ -30,7 +30,7 @@ public record ServerBuildInfoImpl(
@@ -106,7 +104,6 @@ index 74ffdc823e66fc5ec027c4b7c462382bcbfe2be2..f38f8e5851ec65a8f3f98018d55de74e
      private static final String BUILD_DEV = "DEV";
  
 diff --git a/src/main/java/io/papermc/paper/command/PaperVersionCommand.java b/src/main/java/io/papermc/paper/command/PaperVersionCommand.java
-index a7d1a959af6a810c0ce6d5baa08e4429e14d4f5b..88dbb30dd736b63f562918fb166678ba5f757fca 100644
 --- a/src/main/java/io/papermc/paper/command/PaperVersionCommand.java
 +++ b/src/main/java/io/papermc/paper/command/PaperVersionCommand.java
 @@ -45,7 +45,7 @@ public class PaperVersionCommand {
@@ -119,7 +116,6 @@ index a7d1a959af6a810c0ce6d5baa08e4429e14d4f5b..88dbb30dd736b63f562918fb166678ba
  
      public static LiteralCommandNode<CommandSourceStack> create() {
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index 7675acdca2162e403f4ff523bcdd6efe0cb42d49..a950bfb0c6aeb0b19150c59cea13337005c2752a 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
 @@ -231,7 +231,7 @@ public class Main {
@@ -132,7 +128,6 @@ index 7675acdca2162e403f4ff523bcdd6efe0cb42d49..a950bfb0c6aeb0b19150c59cea133370
                      }
                  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index c1aad9203af20102e560571435dfa75150b37c1b..ea97ea679b1ba64c9d33e52f39d010a923ef4385 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 @@ -481,7 +481,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
@@ -145,7 +140,6 @@ index c1aad9203af20102e560571435dfa75150b37c1b..ea97ea679b1ba64c9d33e52f39d010a9
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
-index 774556a62eb240da42e84db4502e2ed43495be17..fdef98a7796d84c7b0ee61241859e10cc514534c 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
 @@ -11,7 +11,7 @@ public final class Versioning {
@@ -158,7 +152,6 @@ index 774556a62eb240da42e84db4502e2ed43495be17..fdef98a7796d84c7b0ee61241859e10c
  
          if (stream != null) {
 diff --git a/src/main/java/org/spigotmc/WatchdogThread.java b/src/main/java/org/spigotmc/WatchdogThread.java
-index c77748061f1c8bb2b0dc8dbd80f608d431752015..7dac2652e3d4964682982e50f533bd4b38ee5b4b 100644
 --- a/src/main/java/org/spigotmc/WatchdogThread.java
 +++ b/src/main/java/org/spigotmc/WatchdogThread.java
 @@ -75,14 +75,14 @@ public class WatchdogThread extends ca.spottedleaf.moonrise.common.util.TickThre
@@ -204,14 +197,12 @@ index c77748061f1c8bb2b0dc8dbd80f608d431752015..7dac2652e3d4964682982e50f533bd4b
  
                  logger.log(Level.SEVERE, "------------------------------");
 diff --git a/src/main/resources/META-INF/services/ca.spottedleaf.moonrise.common.PlatformHooks b/src/main/resources/META-INF/services/ca.spottedleaf.moonrise.common.PlatformHooks
-index e57c3ca79677b1dfe7cf3db36f0406de7ea5bd0a..86edd824ec42e550dd1419fd57d93a21fe2d648d 100644
 --- a/src/main/resources/META-INF/services/ca.spottedleaf.moonrise.common.PlatformHooks
 +++ b/src/main/resources/META-INF/services/ca.spottedleaf.moonrise.common.PlatformHooks
 @@ -1 +1 @@
 -ca.spottedleaf.moonrise.paper.PaperHooks
 +org.leavesmc.leaves.region.LeavesHooks
 diff --git a/src/main/resources/logo.png b/src/main/resources/logo.png
-index 8b924977b7886df9ab8790b1e4ff9b1c04a2af45..e6a7ee1232cb34840f454187f50f44d17300ad9c 100644
 GIT binary patch
 literal 51130
 zcmeEt^;aCt^ECwb;BE`S-66QU1QvI9cPDso2n2WC#WlFQdvFLE+!yD|^Z6^@AKsa>

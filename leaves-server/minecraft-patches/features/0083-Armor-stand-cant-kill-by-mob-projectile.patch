@@ -5,7 +5,6 @@ Subject: [PATCH] Armor stand cant kill by mob projectile
 
 
 diff --git a/net/minecraft/world/entity/decoration/ArmorStand.java b/net/minecraft/world/entity/decoration/ArmorStand.java
-index d7725b5ca689e3d5b512baab04e113be77c0b2ee..39b056d73bbdd06ba5cdb5368efcbcc128dc79ae 100644
 --- a/net/minecraft/world/entity/decoration/ArmorStand.java
 +++ b/net/minecraft/world/entity/decoration/ArmorStand.java
 @@ -372,6 +372,15 @@ public class ArmorStand extends LivingEntity {

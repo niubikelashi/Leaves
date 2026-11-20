@@ -6,7 +6,6 @@ Subject: [PATCH] Optimize suffocation
 This patch is Powered by Pufferfish(https://github.com/pufferfish-gg/Pufferfish)
 
 diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
-index 7a7971ec03fcdf72ecaa1e934d5ab3c62113c251..f0ff74a4f2831ead191bc12cb4873162a470c71f 100644
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
 @@ -437,7 +437,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin

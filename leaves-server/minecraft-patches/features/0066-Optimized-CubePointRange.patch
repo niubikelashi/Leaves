@@ -6,7 +6,6 @@ Subject: [PATCH] Optimized CubePointRange
 This patch is Powered by Gale(https://github.com/GaleMC/Gale)
 
 diff --git a/net/minecraft/world/phys/shapes/CubePointRange.java b/net/minecraft/world/phys/shapes/CubePointRange.java
-index 62aea61c5f240aa59b8489dd0bbb3d1b69b54b1c..b8e06a2d7f3a42a1cec1c87b950242acda54b214 100644
 --- a/net/minecraft/world/phys/shapes/CubePointRange.java
 +++ b/net/minecraft/world/phys/shapes/CubePointRange.java
 @@ -3,23 +3,33 @@ package net.minecraft.world.phys.shapes;

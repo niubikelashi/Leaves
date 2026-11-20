@@ -5,7 +5,6 @@ Subject: [PATCH] Configurable vanilla random
 
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index d5051d8a2b0af5d8b63a0d10987c0a7ee7114ff0..e6457e07e7e8e7690d160020b92fbc6874c1ec82 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -281,7 +281,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -18,7 +17,6 @@ index d5051d8a2b0af5d8b63a0d10987c0a7ee7114ff0..e6457e07e7e8e7690d160020b92fbc68
      private int remainingFireTicks;
      public boolean wasTouchingWater;
 diff --git a/net/minecraft/world/entity/animal/Bee.java b/net/minecraft/world/entity/animal/Bee.java
-index 13f24836649790a34b988e2d63accb043e6ff080..d991660c990ca280a422154d4b3bde8dc0cdfd49 100644
 --- a/net/minecraft/world/entity/animal/Bee.java
 +++ b/net/minecraft/world/entity/animal/Bee.java
 @@ -802,7 +802,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
@@ -40,7 +38,6 @@ index 13f24836649790a34b988e2d63accb043e6ff080..d991660c990ca280a422154d4b3bde8d
          BeeGoToKnownFlowerGoal() {
              this.setFlags(EnumSet.of(Goal.Flag.MOVE));
 diff --git a/net/minecraft/world/entity/animal/Squid.java b/net/minecraft/world/entity/animal/Squid.java
-index 58e1bc90cbc32669fa6c66d214119f0c459ff38c..ea41360af5e5d49c96ca24e9c36bd52cfdd7d40c 100644
 --- a/net/minecraft/world/entity/animal/Squid.java
 +++ b/net/minecraft/world/entity/animal/Squid.java
 @@ -46,7 +46,7 @@ public class Squid extends AgeableWaterCreature {
@@ -53,7 +50,6 @@ index 58e1bc90cbc32669fa6c66d214119f0c459ff38c..ea41360af5e5d49c96ca24e9c36bd52c
      }
  
 diff --git a/net/minecraft/world/entity/item/ItemEntity.java b/net/minecraft/world/entity/item/ItemEntity.java
-index df24938d5136948b151d3c1c72ccb2ec97640478..af0467f60e5a873eeed7b741717c327272746a9a 100644
 --- a/net/minecraft/world/entity/item/ItemEntity.java
 +++ b/net/minecraft/world/entity/item/ItemEntity.java
 @@ -67,7 +67,13 @@ public class ItemEntity extends Entity implements TraceableEntity {
@@ -72,7 +68,6 @@ index df24938d5136948b151d3c1c72ccb2ec97640478..af0467f60e5a873eeed7b741717c3272
          // Paper end - Don't use level random in entity constructors
      }
 diff --git a/net/minecraft/world/entity/item/PrimedTnt.java b/net/minecraft/world/entity/item/PrimedTnt.java
-index 1d7a1739d6a3a55aacb33d57a58712350b150f64..87dff2fb5246d730feca82396a68b41150e2d383 100644
 --- a/net/minecraft/world/entity/item/PrimedTnt.java
 +++ b/net/minecraft/world/entity/item/PrimedTnt.java
 @@ -68,7 +68,7 @@ public class PrimedTnt extends Entity implements TraceableEntity {

@@ -5,7 +5,6 @@ Subject: [PATCH] Old wet tnt explode behavior
 
 
 diff --git a/net/minecraft/world/level/ServerExplosion.java b/net/minecraft/world/level/ServerExplosion.java
-index 07e4025ca6c9c31905db2e6921138a0ded479dde..87635f6db2f1e77edc7ba6a26e9818d070a9faf7 100644
 --- a/net/minecraft/world/level/ServerExplosion.java
 +++ b/net/minecraft/world/level/ServerExplosion.java
 @@ -729,6 +729,7 @@ public class ServerExplosion implements Explosion {

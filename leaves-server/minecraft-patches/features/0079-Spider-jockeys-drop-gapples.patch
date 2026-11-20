@@ -5,7 +5,6 @@ Subject: [PATCH] Spider jockeys drop gapples
 
 
 diff --git a/net/minecraft/world/entity/monster/Skeleton.java b/net/minecraft/world/entity/monster/Skeleton.java
-index 743bc2986b962d4aaef00d2e457117f375ca65c7..7a982b5720278ad6870446bfc1cffb220d08279e 100644
 --- a/net/minecraft/world/entity/monster/Skeleton.java
 +++ b/net/minecraft/world/entity/monster/Skeleton.java
 @@ -140,4 +140,16 @@ public class Skeleton extends AbstractSkeleton {
@@ -26,7 +25,6 @@ index 743bc2986b962d4aaef00d2e457117f375ca65c7..7a982b5720278ad6870446bfc1cffb22
 +    // Leaves end - spider jockeys drop gapples
  }
 diff --git a/net/minecraft/world/entity/monster/Spider.java b/net/minecraft/world/entity/monster/Spider.java
-index 60c4ac37bb491af13f9f9bf730b85bbe544cf81d..aaba82e591ac380314a1b7c59e4e04cca9864d31 100644
 --- a/net/minecraft/world/entity/monster/Spider.java
 +++ b/net/minecraft/world/entity/monster/Spider.java
 @@ -139,6 +139,18 @@ public class Spider extends Monster {

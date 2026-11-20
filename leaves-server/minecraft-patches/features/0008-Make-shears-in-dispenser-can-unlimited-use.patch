@@ -5,7 +5,6 @@ Subject: [PATCH] Make shears in dispenser can unlimited use
 
 
 diff --git a/net/minecraft/core/dispenser/ShearsDispenseItemBehavior.java b/net/minecraft/core/dispenser/ShearsDispenseItemBehavior.java
-index b4a9be09452a889c228612a466b8925cb3768102..38442a054bbe87db8dcfab20147d19b2c758d225 100644
 --- a/net/minecraft/core/dispenser/ShearsDispenseItemBehavior.java
 +++ b/net/minecraft/core/dispenser/ShearsDispenseItemBehavior.java
 @@ -45,7 +45,7 @@ public class ShearsDispenseItemBehavior extends OptionalDispenseItemBehavior {

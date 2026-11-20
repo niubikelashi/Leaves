@@ -7,7 +7,6 @@ caused by PaperMC/Paper#11765
 should remove when PaperMC/Paper#11831 merged
 
 diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
-index e3673ababa41a4d65b87adbc6d79d53a196564b7..6c9a7ae3e9a340de35ca4dfcd486cfe5818d2aa5 100644
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
 @@ -3945,11 +3945,11 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin

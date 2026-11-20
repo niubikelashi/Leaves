@@ -5,7 +5,6 @@ Subject: [PATCH] Disable offline warn if use proxy
 
 
 diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
-index bb6863ed3fdb7bcf73ddecc1a93f89d5f84b728e..6a6209750854f5bad7f069cd6694d339bd9ce834 100644
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -247,7 +247,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface

@@ -5,7 +5,6 @@ Subject: [PATCH] Disable packet limit
 
 
 diff --git a/net/minecraft/network/Connection.java b/net/minecraft/network/Connection.java
-index 3e9b8c5fb2157f767de8bddc3e767512c5f7651f..ce65b531ec2b8a5dd1955ee8d826520f9a9a5f3b 100644
 --- a/net/minecraft/network/Connection.java
 +++ b/net/minecraft/network/Connection.java
 @@ -245,8 +245,8 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
@@ -20,7 +19,6 @@ index 3e9b8c5fb2157f767de8bddc3e767512c5f7651f..ce65b531ec2b8a5dd1955ee8d826520f
                      synchronized (PACKET_LIMIT_LOCK) {
                          if (this.allPacketCounts != null) {
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index e4ea337185ed33b04fff0ea0974619bb27fa83bf..4b91a75e10161e69771a2779d3531e386a3fbde2 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -821,7 +821,7 @@ public class ServerGamePacketListenerImpl

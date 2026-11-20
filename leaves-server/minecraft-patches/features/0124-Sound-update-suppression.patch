@@ -5,7 +5,6 @@ Subject: [PATCH] Sound update suppression
 
 
 diff --git a/net/minecraft/world/level/block/SculkSensorBlock.java b/net/minecraft/world/level/block/SculkSensorBlock.java
-index fa9cb4c40a41eea7fd63a4513d0b0f39067de9ba..331276f4464d78dc86f35fe7d9c42864d7e73a6c 100644
 --- a/net/minecraft/world/level/block/SculkSensorBlock.java
 +++ b/net/minecraft/world/level/block/SculkSensorBlock.java
 @@ -97,7 +97,7 @@ public class SculkSensorBlock extends BaseEntityBlock implements SimpleWaterlogg
@@ -32,7 +31,6 @@ index fa9cb4c40a41eea7fd63a4513d0b0f39067de9ba..331276f4464d78dc86f35fe7d9c42864
          return state.getBlock() instanceof SculkSensorBlock &&  getPhase(state) == SculkSensorPhase.INACTIVE; // Paper - Check for a valid type
      }
 diff --git a/net/minecraft/world/level/block/entity/SculkSensorBlockEntity.java b/net/minecraft/world/level/block/entity/SculkSensorBlockEntity.java
-index 9a345fa3438b2d17a5de2fa0c0b0daef5a5183e1..f3f92666265e1b6dcb17124b5f52e84a6d62ccf2 100644
 --- a/net/minecraft/world/level/block/entity/SculkSensorBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/SculkSensorBlockEntity.java
 @@ -113,7 +113,7 @@ public class SculkSensorBlockEntity extends BlockEntity implements GameEventList

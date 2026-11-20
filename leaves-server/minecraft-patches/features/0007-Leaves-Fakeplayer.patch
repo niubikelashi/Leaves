@@ -5,7 +5,6 @@ Subject: [PATCH] Leaves Fakeplayer
 
 
 diff --git a/net/minecraft/advancements/critereon/SimpleCriterionTrigger.java b/net/minecraft/advancements/critereon/SimpleCriterionTrigger.java
-index a82d84283632342bd30bc3449983431ba43583e0..f59526f6bfa1b4af5b474f0b438513c96afb491c 100644
 --- a/net/minecraft/advancements/critereon/SimpleCriterionTrigger.java
 +++ b/net/minecraft/advancements/critereon/SimpleCriterionTrigger.java
 @@ -39,6 +39,7 @@ public abstract class SimpleCriterionTrigger<T extends SimpleCriterionTrigger.Si
@@ -17,7 +16,6 @@ index a82d84283632342bd30bc3449983431ba43583e0..f59526f6bfa1b4af5b474f0b438513c9
          Set<CriterionTrigger.Listener<T>> set = (Set) advancements.criterionData.get(this); // Paper - fix PlayerAdvancements leak
          if (set != null && !set.isEmpty()) {
 diff --git a/net/minecraft/network/Connection.java b/net/minecraft/network/Connection.java
-index 41005f6b9f53a9c1125ad5e08538d9f5aacb3571..3e9b8c5fb2157f767de8bddc3e767512c5f7651f 100644
 --- a/net/minecraft/network/Connection.java
 +++ b/net/minecraft/network/Connection.java
 @@ -96,7 +96,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
@@ -30,7 +28,6 @@ index 41005f6b9f53a9c1125ad5e08538d9f5aacb3571..3e9b8c5fb2157f767de8bddc3e767512
      private DisconnectionDetails disconnectionDetails;
      private boolean encrypted;
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index d6cd8ac3b44b170b5bb3a530deb406396d0fb7ae..367882c1cad3fd75c038931a1ecca729db27d0e5 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
 @@ -304,6 +304,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -85,7 +82,6 @@ index d6cd8ac3b44b170b5bb3a530deb406396d0fb7ae..367882c1cad3fd75c038931a1ecca729
          @Override
          public void close() {
 diff --git a/net/minecraft/server/PlayerAdvancements.java b/net/minecraft/server/PlayerAdvancements.java
-index fdeca41d40705f28864ce4443d01cd872c9d51b0..5c0e338dc1b0eb5724d10a73d6fc7975f9d2e5e5 100644
 --- a/net/minecraft/server/PlayerAdvancements.java
 +++ b/net/minecraft/server/PlayerAdvancements.java
 @@ -167,6 +167,11 @@ public class PlayerAdvancements {
@@ -101,7 +97,6 @@ index fdeca41d40705f28864ce4443d01cd872c9d51b0..5c0e338dc1b0eb5724d10a73d6fc7975
          AdvancementProgress orStartProgress = this.getOrStartProgress(advancement);
          boolean isDone = orStartProgress.isDone();
 diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
-index 414a8357a7498c69341fa634ada2e664e18ca03a..f85993fc507d699728e058b12bb49dcb7aaea44b 100644
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -162,6 +162,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
@@ -121,7 +116,6 @@ index 414a8357a7498c69341fa634ada2e664e18ca03a..f85993fc507d699728e058b12bb49dcb
          com.destroystokyo.paper.Metrics.PaperMetrics.startMetrics(); // Paper - start metrics // Leaves - down
  
 diff --git a/net/minecraft/server/level/ChunkMap.java b/net/minecraft/server/level/ChunkMap.java
-index eb352aa4296abc3ed4cf31c590bc0be66daf4de3..019886669966c69936ae6591598c97a8afbfd3db 100644
 --- a/net/minecraft/server/level/ChunkMap.java
 +++ b/net/minecraft/server/level/ChunkMap.java
 @@ -1317,6 +1317,13 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
@@ -139,7 +133,6 @@ index eb352aa4296abc3ed4cf31c590bc0be66daf4de3..019886669966c69936ae6591598c97a8
              }
          }
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index 364d5e28646ea341034921622354c7b19644b343..c61c0b6d58f96955bfbdad0caaeb56f073a95181 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
 @@ -214,6 +214,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
@@ -196,7 +189,6 @@ index 364d5e28646ea341034921622354c7b19644b343..c61c0b6d58f96955bfbdad0caaeb56f0
                  ServerLevel.this.updateSleepingPlayerList();
              }
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index 8f94c963f2c59668d72d162f46f7505d6a6b06a5..e808b8059af035d09c24286b1e5893733906dca4 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
 @@ -219,7 +219,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
@@ -221,7 +213,6 @@ index 8f94c963f2c59668d72d162f46f7505d6a6b06a5..e808b8059af035d09c24286b1e589373
                  org.bukkit.event.player.PlayerChangedWorldEvent changeEvent = new org.bukkit.event.player.PlayerChangedWorldEvent(this.getBukkitEntity(), serverLevel.getWorld());
                  this.level().getCraftServer().getPluginManager().callEvent(changeEvent);
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 2dffdc770529e048c4e8df7d70de59c94d3a77be..1135d32f1f275306792b95d10f76ac233e265e0d 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
 @@ -337,6 +337,19 @@ public abstract class PlayerList {
@@ -307,7 +298,6 @@ index 2dffdc770529e048c4e8df7d70de59c94d3a77be..1135d32f1f275306792b95d10f76ac23
  
      public boolean canBypassPlayerLimit(GameProfile profile) {
 diff --git a/net/minecraft/server/waypoints/ServerWaypointManager.java b/net/minecraft/server/waypoints/ServerWaypointManager.java
-index f9e7532f86122a379692561a639a209a126e8bba..2412f46837e967694222730e68e7d25ac32225cf 100644
 --- a/net/minecraft/server/waypoints/ServerWaypointManager.java
 +++ b/net/minecraft/server/waypoints/ServerWaypointManager.java
 @@ -22,6 +22,11 @@ public class ServerWaypointManager implements WaypointManager<WaypointTransmitte
@@ -335,7 +325,6 @@ index f9e7532f86122a379692561a639a209a126e8bba..2412f46837e967694222730e68e7d25a
  
          for (WaypointTransmitter waypointTransmitter : this.waypoints) {
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 61530843a32632f54f3d4ad913e649ee2dca3f38..d5051d8a2b0af5d8b63a0d10987c0a7ee7114ff0 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -1173,7 +1173,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -357,7 +346,6 @@ index 61530843a32632f54f3d4ad913e649ee2dca3f38..d5051d8a2b0af5d8b63a0d10987c0a7e
          final boolean yZero = movement.y == 0.0;
          final boolean zZero = movement.z == 0.0;
 diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
-index 0c52e315557e1dae6a852694786e72241fff1e29..fbee8c381bc5ed04f5fb0fbd7b67704b9a159b47 100644
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
 @@ -3117,7 +3117,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
@@ -403,7 +391,6 @@ index 0c52e315557e1dae6a852694786e72241fff1e29..fbee8c381bc5ed04f5fb0fbd7b67704b
          if (!this.level().isClientSide) {
              boolean isUsingItem = this.isUsingItem();
 diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
-index 8f4c45fbea2d7c1317aff36031bb834b07b23a82..8ec6f52f58bcc985fdc758a692798a35d6c86378 100644
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
 @@ -205,7 +205,7 @@ public abstract class Player extends LivingEntity {
@@ -447,7 +434,6 @@ index 8f4c45fbea2d7c1317aff36031bb834b07b23a82..8ec6f52f58bcc985fdc758a692798a35
                                  boolean cancelled = false;
                                  org.bukkit.entity.Player player = (org.bukkit.entity.Player) target.getBukkitEntity();
 diff --git a/net/minecraft/world/entity/projectile/FishingHook.java b/net/minecraft/world/entity/projectile/FishingHook.java
-index 5f3abbe943be394e9cb987945a238208940b5015..8c139d572bd3c44b8e2b6205e28ab09f82c9abfe 100644
 --- a/net/minecraft/world/entity/projectile/FishingHook.java
 +++ b/net/minecraft/world/entity/projectile/FishingHook.java
 @@ -58,7 +58,7 @@ public class FishingHook extends Projectile {
@@ -460,7 +446,6 @@ index 5f3abbe943be394e9cb987945a238208940b5015..8c139d572bd3c44b8e2b6205e28ab09f
      public int timeUntilHooked;
      public float fishAngle;
 diff --git a/net/minecraft/world/entity/vehicle/AbstractBoat.java b/net/minecraft/world/entity/vehicle/AbstractBoat.java
-index df360ff06d10fc7f996055dce5148825539e9261..b67ae301db4ed3c45a08941f036dc48078a9f12a 100644
 --- a/net/minecraft/world/entity/vehicle/AbstractBoat.java
 +++ b/net/minecraft/world/entity/vehicle/AbstractBoat.java
 @@ -271,6 +271,11 @@ public abstract class AbstractBoat extends VehicleEntity implements Leashable {
@@ -490,7 +475,6 @@ index df360ff06d10fc7f996055dce5148825539e9261..b67ae301db4ed3c45a08941f036dc480
      protected SoundEvent getPaddleSound() {
          return switch (this.getStatus()) {
 diff --git a/net/minecraft/world/inventory/AbstractContainerMenu.java b/net/minecraft/world/inventory/AbstractContainerMenu.java
-index 06846950348954328c07f64cd9b3359e79a1a468..e1783ad0adbb791b2ff7441243c9f0aeaf37c7f6 100644
 --- a/net/minecraft/world/inventory/AbstractContainerMenu.java
 +++ b/net/minecraft/world/inventory/AbstractContainerMenu.java
 @@ -400,6 +400,7 @@ public abstract class AbstractContainerMenu {
@@ -525,7 +509,6 @@ index 06846950348954328c07f64cd9b3359e79a1a468..e1783ad0adbb791b2ff7441243c9f0ae
          FeatureFlagSet featureFlagSet = player.level().enabledFeatures();
          return carriedItem.isItemEnabled(featureFlagSet) && carriedItem.overrideStackedOnOther(slot, action, player)
 diff --git a/net/minecraft/world/item/ItemStack.java b/net/minecraft/world/item/ItemStack.java
-index da16f4831c875e07c25d7ed041bed493db614658..462e2e4173ea07811022838e4fb592ab5f65e653 100644
 --- a/net/minecraft/world/item/ItemStack.java
 +++ b/net/minecraft/world/item/ItemStack.java
 @@ -442,7 +442,7 @@ public final class ItemStack implements DataComponentHolder {
@@ -559,7 +542,6 @@ index da16f4831c875e07c25d7ed041bed493db614658..462e2e4173ea07811022838e4fb592ab
          return this.getItem().useOnRelease(this);
      }
 diff --git a/net/minecraft/world/level/block/piston/PistonMovingBlockEntity.java b/net/minecraft/world/level/block/piston/PistonMovingBlockEntity.java
-index f1ce4cff1c03a0037ade2c8ef989cf327c973a7e..0976aef81b950a062152094501372d00c20bb2b7 100644
 --- a/net/minecraft/world/level/block/piston/PistonMovingBlockEntity.java
 +++ b/net/minecraft/world/level/block/piston/PistonMovingBlockEntity.java
 @@ -135,7 +135,7 @@ public class PistonMovingBlockEntity extends BlockEntity {
@@ -572,7 +554,6 @@ index f1ce4cff1c03a0037ade2c8ef989cf327c973a7e..0976aef81b950a062152094501372d00
                                  double d1 = deltaMovement.x;
                                  double d2 = deltaMovement.y;
 diff --git a/net/minecraft/world/level/levelgen/PhantomSpawner.java b/net/minecraft/world/level/levelgen/PhantomSpawner.java
-index d2e674b046bcf82a239b4706c3b89197ec6749c8..8e2c18fdb76ae6ea7402e6862a64c96db03f191a 100644
 --- a/net/minecraft/world/level/levelgen/PhantomSpawner.java
 +++ b/net/minecraft/world/level/levelgen/PhantomSpawner.java
 @@ -48,6 +48,11 @@ public class PhantomSpawner implements CustomSpawner {
@@ -588,7 +569,6 @@ index d2e674b046bcf82a239b4706c3b89197ec6749c8..8e2c18fdb76ae6ea7402e6862a64c96d
                                              BlockPos blockPos1 = blockPos.above(20 + randomSource.nextInt(15))
                                                  .east(-10 + randomSource.nextInt(21))
 diff --git a/net/minecraft/world/level/storage/LevelResource.java b/net/minecraft/world/level/storage/LevelResource.java
-index bef794c3f58c41d910aa0bcc63fbdeea7225fddf..a601da588e6973cc5b87d3e3eeba49b53f6d9a6d 100644
 --- a/net/minecraft/world/level/storage/LevelResource.java
 +++ b/net/minecraft/world/level/storage/LevelResource.java
 @@ -15,7 +15,7 @@ public class LevelResource {
@@ -601,7 +581,6 @@ index bef794c3f58c41d910aa0bcc63fbdeea7225fddf..a601da588e6973cc5b87d3e3eeba49b5
      }
  
 diff --git a/net/minecraft/world/level/storage/PlayerDataStorage.java b/net/minecraft/world/level/storage/PlayerDataStorage.java
-index fe44d8d17d2622b3d6021c11579af85ef96737bb..0aae211dc2048f8cd14213c2a868394d1ed16070 100644
 --- a/net/minecraft/world/level/storage/PlayerDataStorage.java
 +++ b/net/minecraft/world/level/storage/PlayerDataStorage.java
 @@ -19,7 +19,7 @@ import net.minecraft.util.datafix.DataFixTypes;

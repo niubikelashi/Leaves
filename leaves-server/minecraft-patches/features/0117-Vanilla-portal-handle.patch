@@ -5,7 +5,6 @@ Subject: [PATCH] Vanilla portal handle
 
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index f5ed9965394eb075faf92515181c2446981e24a2..0a29cf071cefe14f1862d4bd5ddcacff42fe9f15 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -836,6 +836,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -26,7 +25,6 @@ index f5ed9965394eb075faf92515181c2446981e24a2..0a29cf071cefe14f1862d4bd5ddcacff
              this.spawnSprintParticle();
          }
 diff --git a/net/minecraft/world/entity/vehicle/AbstractMinecart.java b/net/minecraft/world/entity/vehicle/AbstractMinecart.java
-index 7e61d68b36ca2768f70dc1fc130a8d7b95347b6b..8e73204f6e7d159d66c3d90c7e2845bfde867e7a 100644
 --- a/net/minecraft/world/entity/vehicle/AbstractMinecart.java
 +++ b/net/minecraft/world/entity/vehicle/AbstractMinecart.java
 @@ -293,7 +293,7 @@ public abstract class AbstractMinecart extends VehicleEntity {

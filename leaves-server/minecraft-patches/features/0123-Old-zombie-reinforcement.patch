@@ -5,7 +5,6 @@ Subject: [PATCH] Old zombie reinforcement
 
 
 diff --git a/net/minecraft/world/entity/monster/Zombie.java b/net/minecraft/world/entity/monster/Zombie.java
-index a23607874a72723914cbfeea0ad1c51236c044d8..cb7b248276bfb6a9721e0bcc42ef00bf7029f263 100644
 --- a/net/minecraft/world/entity/monster/Zombie.java
 +++ b/net/minecraft/world/entity/monster/Zombie.java
 @@ -341,7 +341,7 @@ public class Zombie extends Monster {

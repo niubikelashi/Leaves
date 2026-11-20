@@ -6,7 +6,6 @@ Subject: [PATCH] MC Technical Survival Mode
 Will automatically overwrite some configuration after startup
 
 diff --git a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
-index a972eeddbdc59e53279a7c5c704e28c2fcdf7290..584e4fd53a0b78b4dbdf756c3a714c482bb7c3b8 100644
 --- a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
 +++ b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
 @@ -336,6 +336,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor

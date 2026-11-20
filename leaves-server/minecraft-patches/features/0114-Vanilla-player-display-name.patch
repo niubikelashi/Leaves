@@ -5,7 +5,6 @@ Subject: [PATCH] Vanilla player display name
 
 
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index 7cbd70c17369f3578f1a50c553dd25bfb189af11..70b35fa479bdfcda2f404b3b86547552f7d6da8e 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
 @@ -476,7 +476,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
@@ -18,7 +17,6 @@ index 7cbd70c17369f3578f1a50c553dd25bfb189af11..70b35fa479bdfcda2f404b3b86547552
          this.maxHealthCache = this.getMaxHealth();
          // CraftBukkit end
 diff --git a/net/minecraft/world/scores/Scoreboard.java b/net/minecraft/world/scores/Scoreboard.java
-index 4275d048a8f5e98c7436f5bf2d55a9b68f7ba818..c68399f1ada71f6b301b41bdc83af024a9d2f1d3 100644
 --- a/net/minecraft/world/scores/Scoreboard.java
 +++ b/net/minecraft/world/scores/Scoreboard.java
 @@ -282,6 +282,16 @@ public class Scoreboard {

@@ -5,7 +5,6 @@ Subject: [PATCH] Allow grindstone overstacking
 
 
 diff --git a/net/minecraft/world/SimpleContainer.java b/net/minecraft/world/SimpleContainer.java
-index 75170c8d3be477a6ea2a1d62018a6ab630b0e54e..e5f348daf1ae9e604ae12928e5c8618c4803bd70 100644
 --- a/net/minecraft/world/SimpleContainer.java
 +++ b/net/minecraft/world/SimpleContainer.java
 @@ -211,6 +211,12 @@ public class SimpleContainer implements Container, StackedContentsCompatible {
@@ -22,7 +21,6 @@ index 75170c8d3be477a6ea2a1d62018a6ab630b0e54e..e5f348daf1ae9e604ae12928e5c8618c
          this.setChanged();
      }
 diff --git a/net/minecraft/world/entity/vehicle/ContainerEntity.java b/net/minecraft/world/entity/vehicle/ContainerEntity.java
-index 99f109e2653eff10c011f380694bd77a76381cee..3d7ea706747a6bcd8db8dd62139989669acb9c08 100644
 --- a/net/minecraft/world/entity/vehicle/ContainerEntity.java
 +++ b/net/minecraft/world/entity/vehicle/ContainerEntity.java
 @@ -163,6 +163,11 @@ public interface ContainerEntity extends Container, MenuProvider {
@@ -38,7 +36,6 @@ index 99f109e2653eff10c011f380694bd77a76381cee..3d7ea706747a6bcd8db8dd6213998966
      }
  
 diff --git a/net/minecraft/world/inventory/AbstractContainerMenu.java b/net/minecraft/world/inventory/AbstractContainerMenu.java
-index 863b9ab56304a58e8ecbe43657857b95a19cea87..5e0cd62bd693de025fb4cc70b8f31972f5fe531a 100644
 --- a/net/minecraft/world/inventory/AbstractContainerMenu.java
 +++ b/net/minecraft/world/inventory/AbstractContainerMenu.java
 @@ -607,7 +607,7 @@ public abstract class AbstractContainerMenu {
@@ -91,7 +88,6 @@ index 863b9ab56304a58e8ecbe43657857b95a19cea87..5e0cd62bd693de025fb4cc70b8f31972
                      if (isCheck) {
                          stack.shrink(Math.min(stack.getCount(), i1));
 diff --git a/net/minecraft/world/inventory/GrindstoneMenu.java b/net/minecraft/world/inventory/GrindstoneMenu.java
-index 18c15a7657e6fd994a8f17d0812c822d6adc8eab..00a0ce28632a7f515a94087c2752e8787212f0d9 100644
 --- a/net/minecraft/world/inventory/GrindstoneMenu.java
 +++ b/net/minecraft/world/inventory/GrindstoneMenu.java
 @@ -178,7 +178,7 @@ public class GrindstoneMenu extends AbstractContainerMenu {
@@ -113,7 +109,6 @@ index 18c15a7657e6fd994a8f17d0812c822d6adc8eab..00a0ce28632a7f515a94087c2752e878
                  }
  
 diff --git a/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.java b/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.java
-index 4fdb3c36b39213f01f86ba281c7b62af99f5dcce..646d4c26870bb03f6d397b5e03ad97923d0928b2 100644
 --- a/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.java
 @@ -409,7 +409,11 @@ public abstract class AbstractFurnaceBlockEntity extends BaseContainerBlockEntit
@@ -130,7 +125,6 @@ index 4fdb3c36b39213f01f86ba281c7b62af99f5dcce..646d4c26870bb03f6d397b5e03ad9792
              this.cookingTotalTime = getTotalCookTime(serverLevel, this, this.recipeType, this.cookSpeedMultiplier); // Paper - cook speed multiplier API
              this.cookingTimer = 0;
 diff --git a/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.java b/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.java
-index 63d6a43dab067aa4c8fb67095c455130196eef9f..561acadcf81dc219d88e8ec8bdbd4f5f8fcbadc3 100644
 --- a/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.java
 @@ -145,6 +145,12 @@ public abstract class BaseContainerBlockEntity extends BlockEntity implements Co
@@ -147,7 +141,6 @@ index 63d6a43dab067aa4c8fb67095c455130196eef9f..561acadcf81dc219d88e8ec8bdbd4f5f
          this.setChanged();
      }
 diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-index 1a4326df24188918542349ba7c812578e78723ee..a900cde0d7e6ddd6faf961e7861c3cc499164d7a 100644
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 @@ -113,6 +113,11 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen

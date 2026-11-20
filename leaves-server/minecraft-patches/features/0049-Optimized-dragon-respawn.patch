@@ -5,7 +5,6 @@ Subject: [PATCH] Optimized dragon respawn
 
 
 diff --git a/net/minecraft/world/level/block/state/pattern/BlockPattern.java b/net/minecraft/world/level/block/state/pattern/BlockPattern.java
-index f7bb979f08634a7e1b77c59040f59fb5e11aafa5..3cad7d6bca9af77bace18bfd7cc013ac22be4075 100644
 --- a/net/minecraft/world/level/block/state/pattern/BlockPattern.java
 +++ b/net/minecraft/world/level/block/state/pattern/BlockPattern.java
 @@ -59,7 +59,7 @@ public class BlockPattern {
@@ -18,7 +17,6 @@ index f7bb979f08634a7e1b77c59040f59fb5e11aafa5..3cad7d6bca9af77bace18bfd7cc013ac
              for (int i1 = 0; i1 < this.height; i1++) {
                  for (int i2 = 0; i2 < this.depth; i2++) {
 diff --git a/net/minecraft/world/level/dimension/end/EndDragonFight.java b/net/minecraft/world/level/dimension/end/EndDragonFight.java
-index 8ccd40c70e150bd5a8d89818c229258642f2349e..18a567b676f0bfcd725f19c5ed9e3fdbc8e65573 100644
 --- a/net/minecraft/world/level/dimension/end/EndDragonFight.java
 +++ b/net/minecraft/world/level/dimension/end/EndDragonFight.java
 @@ -273,8 +273,68 @@ public class EndDragonFight {

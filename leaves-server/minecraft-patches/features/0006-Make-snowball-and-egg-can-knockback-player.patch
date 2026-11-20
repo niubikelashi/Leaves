@@ -5,7 +5,6 @@ Subject: [PATCH] Make snowball and egg can knockback player
 
 
 diff --git a/net/minecraft/world/entity/projectile/Snowball.java b/net/minecraft/world/entity/projectile/Snowball.java
-index 677b4b681f9c2c09a8ae3cfdec72102265547a7b..1474cf208019cd46ca767374bceb3c9c31fdeab2 100644
 --- a/net/minecraft/world/entity/projectile/Snowball.java
 +++ b/net/minecraft/world/entity/projectile/Snowball.java
 @@ -54,6 +54,12 @@ public class Snowball extends ThrowableItemProjectile {
@@ -22,7 +21,6 @@ index 677b4b681f9c2c09a8ae3cfdec72102265547a7b..1474cf208019cd46ca767374bceb3c9c
  
      @Override
 diff --git a/net/minecraft/world/entity/projectile/ThrownEgg.java b/net/minecraft/world/entity/projectile/ThrownEgg.java
-index 73ec34b43f3fb2aa3edc3f1cb48a923d1fa32036..6583f983129b2a90bd44104de9f4f992fa21a00c 100644
 --- a/net/minecraft/world/entity/projectile/ThrownEgg.java
 +++ b/net/minecraft/world/entity/projectile/ThrownEgg.java
 @@ -55,6 +55,12 @@ public class ThrownEgg extends ThrowableItemProjectile {

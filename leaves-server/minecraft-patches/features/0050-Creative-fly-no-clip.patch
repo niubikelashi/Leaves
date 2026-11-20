@@ -5,7 +5,6 @@ Subject: [PATCH] Creative fly no clip
 
 
 diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
-index 8ec6f52f58bcc985fdc758a692798a35d6c86378..0d046133ea2b6d47e089cb792cf3bc3abace70ba 100644
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
 @@ -287,8 +287,8 @@ public abstract class Player extends LivingEntity {
@@ -65,7 +64,6 @@ index 8ec6f52f58bcc985fdc758a692798a35d6c86378..0d046133ea2b6d47e089cb792cf3bc3a
      public boolean canBeHitByProjectile() {
          return !this.isSpectator() && super.canBeHitByProjectile();
 diff --git a/net/minecraft/world/item/BlockItem.java b/net/minecraft/world/item/BlockItem.java
-index a46a50d1385897cc7fcf0d6976f0de7e8078d260..593e65ef3a768d4039047e42e666c8382a5d38eb 100644
 --- a/net/minecraft/world/item/BlockItem.java
 +++ b/net/minecraft/world/item/BlockItem.java
 @@ -185,8 +185,9 @@ public class BlockItem extends Item {
@@ -80,7 +78,6 @@ index a46a50d1385897cc7fcf0d6976f0de7e8078d260..593e65ef3a768d4039047e42e666c838
  
          org.bukkit.event.block.BlockCanBuildEvent event = new org.bukkit.event.block.BlockCanBuildEvent(
 diff --git a/net/minecraft/world/item/StandingAndWallBlockItem.java b/net/minecraft/world/item/StandingAndWallBlockItem.java
-index 1f0e7c391d02b18e2c89700025713ec3d759f2ea..300ee12ca9584e53e9d72e3ebfd039beb3fab3b2 100644
 --- a/net/minecraft/world/item/StandingAndWallBlockItem.java
 +++ b/net/minecraft/world/item/StandingAndWallBlockItem.java
 @@ -45,7 +45,7 @@ public class StandingAndWallBlockItem extends BlockItem {
@@ -93,7 +90,6 @@ index 1f0e7c391d02b18e2c89700025713ec3d759f2ea..300ee12ca9584e53e9d72e3ebfd039be
  
              org.bukkit.event.block.BlockCanBuildEvent event = new org.bukkit.event.block.BlockCanBuildEvent(org.bukkit.craftbukkit.block.CraftBlock.at(context.getLevel(), clickedPos), player, org.bukkit.craftbukkit.block.data.CraftBlockData.fromData(blockState), defaultReturn, org.bukkit.craftbukkit.CraftEquipmentSlot.getHand(context.getHand())); // Paper - Expose hand in BlockCanBuildEvent
 diff --git a/net/minecraft/world/level/block/entity/ShulkerBoxBlockEntity.java b/net/minecraft/world/level/block/entity/ShulkerBoxBlockEntity.java
-index a820ab9a2b6dc6b95d4de61aaaad4e79c521efe4..c1d1e28daa3b4d2a0bb359af08670f5d071e51ed 100644
 --- a/net/minecraft/world/level/block/entity/ShulkerBoxBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/ShulkerBoxBlockEntity.java
 @@ -152,7 +152,7 @@ public class ShulkerBoxBlockEntity extends RandomizableContainerBlockEntity impl
@@ -106,7 +102,6 @@ index a820ab9a2b6dc6b95d4de61aaaad4e79c521efe4..c1d1e28daa3b4d2a0bb359af08670f5d
                              MoverType.SHULKER_BOX,
                              new Vec3(
 diff --git a/net/minecraft/world/level/block/piston/PistonMovingBlockEntity.java b/net/minecraft/world/level/block/piston/PistonMovingBlockEntity.java
-index 0976aef81b950a062152094501372d00c20bb2b7..2841dd4896ee15d8d7ea1105d0f78b7fe41937fb 100644
 --- a/net/minecraft/world/level/block/piston/PistonMovingBlockEntity.java
 +++ b/net/minecraft/world/level/block/piston/PistonMovingBlockEntity.java
 @@ -151,7 +151,7 @@ public class PistonMovingBlockEntity extends BlockEntity {

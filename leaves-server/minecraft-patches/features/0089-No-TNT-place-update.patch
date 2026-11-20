@@ -5,7 +5,6 @@ Subject: [PATCH] No TNT place update
 
 
 diff --git a/net/minecraft/world/level/block/TntBlock.java b/net/minecraft/world/level/block/TntBlock.java
-index 93d6e05578622b057d8e973c71f880a17036a6b5..807b2d9bde6d9a365feff13adc4a8b546bec6d0c 100644
 --- a/net/minecraft/world/level/block/TntBlock.java
 +++ b/net/minecraft/world/level/block/TntBlock.java
 @@ -47,7 +47,7 @@ public class TntBlock extends Block {

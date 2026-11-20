@@ -5,7 +5,6 @@ Subject: [PATCH] Renewable coral
 
 
 diff --git a/net/minecraft/world/level/block/CoralFanBlock.java b/net/minecraft/world/level/block/CoralFanBlock.java
-index a10af527340d26b9cfd59f73a2518ce31ea5c464..5beaa24e96f3057cfd38df691306c78fcedf669c 100644
 --- a/net/minecraft/world/level/block/CoralFanBlock.java
 +++ b/net/minecraft/world/level/block/CoralFanBlock.java
 @@ -13,7 +13,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -30,7 +29,6 @@ index a10af527340d26b9cfd59f73a2518ce31ea5c464..5beaa24e96f3057cfd38df691306c78f
 +    // Leaves end - renewable coral
  }
 diff --git a/net/minecraft/world/level/block/CoralPlantBlock.java b/net/minecraft/world/level/block/CoralPlantBlock.java
-index 20396db7afb93bc8ea5b7ae28a76ca82bd1a4535..9fc66adcb3ffdbfee5ad6b76a01e396634a6f4e5 100644
 --- a/net/minecraft/world/level/block/CoralPlantBlock.java
 +++ b/net/minecraft/world/level/block/CoralPlantBlock.java
 @@ -16,7 +16,7 @@ import net.minecraft.world.level.material.Fluids;
@@ -56,7 +54,6 @@ index 20396db7afb93bc8ea5b7ae28a76ca82bd1a4535..9fc66adcb3ffdbfee5ad6b76a01e3966
 +    // Leaves end - renewable coral
  }
 diff --git a/net/minecraft/world/level/block/CoralWallFanBlock.java b/net/minecraft/world/level/block/CoralWallFanBlock.java
-index af0cc07404032032211ca4e377e8af681af2d7ab..7a0033ebce5f5058f331b32bb57e5f586a3d9d21 100644
 --- a/net/minecraft/world/level/block/CoralWallFanBlock.java
 +++ b/net/minecraft/world/level/block/CoralWallFanBlock.java
 @@ -13,7 +13,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -81,7 +78,6 @@ index af0cc07404032032211ca4e377e8af681af2d7ab..7a0033ebce5f5058f331b32bb57e5f58
 +    // Leaves end - renewable coral
  }
 diff --git a/net/minecraft/world/level/levelgen/feature/CoralClawFeature.java b/net/minecraft/world/level/levelgen/feature/CoralClawFeature.java
-index abb8519ede1c2271c98497a8e3336f0ad89c340d..f5009d112b32ce91296ed84310bb9bf48bc0e408 100644
 --- a/net/minecraft/world/level/levelgen/feature/CoralClawFeature.java
 +++ b/net/minecraft/world/level/levelgen/feature/CoralClawFeature.java
 @@ -17,7 +17,7 @@ public class CoralClawFeature extends CoralFeature {
@@ -94,7 +90,6 @@ index abb8519ede1c2271c98497a8e3336f0ad89c340d..f5009d112b32ce91296ed84310bb9bf4
              return false;
          } else {
 diff --git a/net/minecraft/world/level/levelgen/feature/CoralFeature.java b/net/minecraft/world/level/levelgen/feature/CoralFeature.java
-index 2569754d96694edbc1fe64e6048d6ec26cbe243e..88d38433ffb78fbdd04d9adf53d584c492dc8ec7 100644
 --- a/net/minecraft/world/level/levelgen/feature/CoralFeature.java
 +++ b/net/minecraft/world/level/levelgen/feature/CoralFeature.java
 @@ -31,7 +31,7 @@ public abstract class CoralFeature extends Feature<NoneFeatureConfiguration> {
@@ -107,7 +102,6 @@ index 2569754d96694edbc1fe64e6048d6ec26cbe243e..88d38433ffb78fbdd04d9adf53d584c4
      protected boolean placeCoralBlock(LevelAccessor level, RandomSource random, BlockPos pos, BlockState state) {
          BlockPos blockPos = pos.above();
 diff --git a/net/minecraft/world/level/levelgen/feature/CoralMushroomFeature.java b/net/minecraft/world/level/levelgen/feature/CoralMushroomFeature.java
-index cd550c704cbe46727caf965d7910d2a1d55f5697..29c5c8ed793834dd5bbafb89e48670a30dc8184d 100644
 --- a/net/minecraft/world/level/levelgen/feature/CoralMushroomFeature.java
 +++ b/net/minecraft/world/level/levelgen/feature/CoralMushroomFeature.java
 @@ -14,7 +14,7 @@ public class CoralMushroomFeature extends CoralFeature {
@@ -120,7 +114,6 @@ index cd550c704cbe46727caf965d7910d2a1d55f5697..29c5c8ed793834dd5bbafb89e48670a3
          int i1 = random.nextInt(3) + 3;
          int i2 = random.nextInt(3) + 3;
 diff --git a/net/minecraft/world/level/levelgen/feature/CoralTreeFeature.java b/net/minecraft/world/level/levelgen/feature/CoralTreeFeature.java
-index 521dbd30e9fb7a366d534fe6a952b0e3a8ec8449..13a0c047c86563d0f28866d513c52999bfce6fd1 100644
 --- a/net/minecraft/world/level/levelgen/feature/CoralTreeFeature.java
 +++ b/net/minecraft/world/level/levelgen/feature/CoralTreeFeature.java
 @@ -15,7 +15,7 @@ public class CoralTreeFeature extends CoralFeature {

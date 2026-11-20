@@ -5,7 +5,6 @@ Subject: [PATCH] Renewable deepslate
 
 
 diff --git a/net/minecraft/world/level/block/LiquidBlock.java b/net/minecraft/world/level/block/LiquidBlock.java
-index 7320b416e8d660419018b0699f49ab6f45a3373b..553c6b298ec5929dba6acd859bd38bfbe293838b 100644
 --- a/net/minecraft/world/level/block/LiquidBlock.java
 +++ b/net/minecraft/world/level/block/LiquidBlock.java
 @@ -190,7 +190,7 @@ public class LiquidBlock extends Block implements BucketPickup {
@@ -18,7 +17,6 @@ index 7320b416e8d660419018b0699f49ab6f45a3373b..553c6b298ec5929dba6acd859bd38bfb
                      if (org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockFormEvent(level, pos, block.defaultBlockState(), 3)) {
                          this.fizz(level, pos);
 diff --git a/net/minecraft/world/level/material/LavaFluid.java b/net/minecraft/world/level/material/LavaFluid.java
-index 033f252248b671e35135269dd2df6e7ca4585604..5bea04f4d70566e6791bef49e32c775cc5546d6c 100644
 --- a/net/minecraft/world/level/material/LavaFluid.java
 +++ b/net/minecraft/world/level/material/LavaFluid.java
 @@ -223,7 +223,7 @@ public abstract class LavaFluid extends FlowingFluid {

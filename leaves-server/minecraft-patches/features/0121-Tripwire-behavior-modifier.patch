@@ -5,7 +5,6 @@ Subject: [PATCH] Tripwire behavior modifier
 
 
 diff --git a/net/minecraft/world/level/levelgen/feature/EndPlatformFeature.java b/net/minecraft/world/level/levelgen/feature/EndPlatformFeature.java
-index dfe8b815987a0ee385846616e4845428a81f2782..63bbee85d18537760c876cdab5bcac5798bf918b 100644
 --- a/net/minecraft/world/level/levelgen/feature/EndPlatformFeature.java
 +++ b/net/minecraft/world/level/levelgen/feature/EndPlatformFeature.java
 @@ -28,14 +28,40 @@ public class EndPlatformFeature extends Feature<NoneFeatureConfiguration> {

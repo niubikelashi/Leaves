@@ -5,7 +5,6 @@ Subject: [PATCH] Villager infinite discounts
 
 
 diff --git a/net/minecraft/world/entity/ai/gossip/GossipType.java b/net/minecraft/world/entity/ai/gossip/GossipType.java
-index 32548e375202452c5f5ec89fec8a82d62252e823..b8a05c113e8b228c904e952f6ab2b4c38694dc3e 100644
 --- a/net/minecraft/world/entity/ai/gossip/GossipType.java
 +++ b/net/minecraft/world/entity/ai/gossip/GossipType.java
 @@ -15,9 +15,9 @@ public enum GossipType implements StringRepresentable {

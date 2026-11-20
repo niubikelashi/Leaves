@@ -6,7 +6,6 @@ Subject: [PATCH] Optimize noise generation
 This patch is Powered by Gale(https://github.com/GaleMC/Gale)
 
 diff --git a/net/minecraft/world/level/levelgen/synth/ImprovedNoise.java b/net/minecraft/world/level/levelgen/synth/ImprovedNoise.java
-index fb11a2eea540d55e50eab59f9857ca5d99f556f8..47225646e98b5707af167cf8758f44c42c3cd38c 100644
 --- a/net/minecraft/world/level/levelgen/synth/ImprovedNoise.java
 +++ b/net/minecraft/world/level/levelgen/synth/ImprovedNoise.java
 @@ -11,6 +11,27 @@ public final class ImprovedNoise {
@@ -222,7 +221,6 @@ index fb11a2eea540d55e50eab59f9857ca5d99f556f8..47225646e98b5707af167cf8758f44c4
  
      private double sampleWithDerivative(int gridX, int gridY, int gridZ, double deltaX, double deltaY, double deltaZ, double[] noiseValues) {
 diff --git a/net/minecraft/world/level/levelgen/synth/PerlinNoise.java b/net/minecraft/world/level/levelgen/synth/PerlinNoise.java
-index da3c26fbad32d75d71f7e59c8c3341316a754756..82a2569139b088b30f9d8a13f50d556fefd78742 100644
 --- a/net/minecraft/world/level/levelgen/synth/PerlinNoise.java
 +++ b/net/minecraft/world/level/levelgen/synth/PerlinNoise.java
 @@ -26,6 +26,10 @@ public class PerlinNoise {

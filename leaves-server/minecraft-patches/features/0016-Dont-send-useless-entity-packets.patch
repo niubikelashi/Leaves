@@ -6,7 +6,6 @@ Subject: [PATCH] Dont send useless entity packets
 This patch is Powered by Purpur(https://github.com/PurpurMC/Purpur)
 
 diff --git a/net/minecraft/server/level/ServerEntity.java b/net/minecraft/server/level/ServerEntity.java
-index e96d4dee14c05f2fa329bfb1588ec795d4e3d730..f6b2d541fdfd11c6ff6033fbf4cd5153796634e3 100644
 --- a/net/minecraft/server/level/ServerEntity.java
 +++ b/net/minecraft/server/level/ServerEntity.java
 @@ -200,6 +200,11 @@ public class ServerEntity {

@@ -7,7 +7,6 @@ Subject: [PATCH] Reduce lambda and Optional allocation in
 This patch is Powered by Gale(https://github.com/GaleMC/Gale)
 
 diff --git a/net/minecraft/world/level/EntityBasedExplosionDamageCalculator.java b/net/minecraft/world/level/EntityBasedExplosionDamageCalculator.java
-index 52cb2dcd714cf8c16f167466333eeb923e4ff183..8f2fbfb8d0a24d53697442addf940fa18ae4c69b 100644
 --- a/net/minecraft/world/level/EntityBasedExplosionDamageCalculator.java
 +++ b/net/minecraft/world/level/EntityBasedExplosionDamageCalculator.java
 @@ -15,8 +15,20 @@ public class EntityBasedExplosionDamageCalculator extends ExplosionDamageCalcula

@@ -5,7 +5,6 @@ Subject: [PATCH] Leaves Extra Yggdrasil Service
 
 
 diff --git a/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java b/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java
-index 8c3151c25c172b846f0d028b5100718ada2d09d7..d59d05f8894481fb5ebe1aeb8ee7a162b3dc6f1c 100644
 --- a/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java
 +++ b/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java
 @@ -46,7 +46,7 @@ import java.util.stream.Collectors;
@@ -18,7 +17,6 @@ index 8c3151c25c172b846f0d028b5100718ada2d09d7..d59d05f8894481fb5ebe1aeb8ee7a162
      private final String baseUrl;
      private final URL joinUrl;
 diff --git a/net/minecraft/server/Main.java b/net/minecraft/server/Main.java
-index fd3553bdc1c3cdbf6aa3dc00e0a4987f8eaa4fb8..e673df664b06c654a7be0622874b9b27ad7ef20f 100644
 --- a/net/minecraft/server/Main.java
 +++ b/net/minecraft/server/Main.java
 @@ -178,7 +178,7 @@ public class Main {
@@ -31,7 +29,6 @@ index fd3553bdc1c3cdbf6aa3dc00e0a4987f8eaa4fb8..e673df664b06c654a7be0622874b9b27
              String string = Optional.ofNullable((String) optionSet.valueOf("world")).orElse(dedicatedServerSettings.getProperties().levelName);
              LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(file.toPath());
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 11728fa48bb144bbe933eb8fa2df22b52ac1b5a5..7e339cb26a132487ac0ab91d3db7e4885bacd545 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
 @@ -245,7 +245,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa

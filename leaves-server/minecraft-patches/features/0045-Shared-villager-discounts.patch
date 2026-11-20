@@ -5,7 +5,6 @@ Subject: [PATCH] Shared villager discounts
 
 
 diff --git a/net/minecraft/world/entity/ai/gossip/GossipContainer.java b/net/minecraft/world/entity/ai/gossip/GossipContainer.java
-index 425ca1931fb0a5c33ba7aaf4f639409c9fea836f..c17ba3f76069f23b38de2aabf29b784049059144 100644
 --- a/net/minecraft/world/entity/ai/gossip/GossipContainer.java
 +++ b/net/minecraft/world/entity/ai/gossip/GossipContainer.java
 @@ -121,6 +121,16 @@ public class GossipContainer {
