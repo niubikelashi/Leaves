@@ -1,11 +1,9 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: MC_XiaoHei <xor7xiaohei@gmail.com>
 Date: Sat, 2 Aug 2025 09:46:11 +0800
 Subject: [PATCH] Leaves Plugin
 
-This patch is licensed under the MIT license.
-
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
+index 5cc913f9e..554b8977c 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
 @@ -3004,6 +3004,12 @@ public final class Bukkit {
@@ -22,6 +20,7 @@ diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Buk
      /**
       * Returns a bot manager.
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
+index 95621c3b4..cdc5295db 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
 @@ -2761,6 +2761,10 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
