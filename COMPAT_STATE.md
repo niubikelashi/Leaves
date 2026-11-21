@@ -198,3 +198,28 @@ Paper 仓库当前状态：默认分支 `gradle.properties` = `mcVersion=26.3`�
 
 结论：`compat/1.21.11` = `conflict-needs-review`，连续第 3 个非 success 版本 → 按规则 6 停止整个推演。
 
+## 10. 推演日志 · compat/1.21.11 续跑（2026-11-21，人工授权后，分支提交 `5bcbafd` + `38e7a0e`）
+
+人工「继续」授权后接着推 1.21.11；本轮全部改动都有构建/字节码证据，逐条标注待复核。
+
+工具链与插件证据：
+
+- `javap` 解析已解析到的插件 jar（`C:\Users\hui\.gradle\caches\modules-2\files-2.1\org.leavesmc.leavesweight\leavesweight-core\2.0.0-SNAPSHOT\...\leavesweight-core-2.0.0-SNAPSHOT.jar`，缓存里只有这一个版本）：`SpigotExtension` 只有 `getBuildDataRef()` / `getPackageVersion()`，**没有 `enabled`**；`PaperweightCoreExtension` 没有 `updatingMinecraft`；插件内也没有任何 `paper.*` / `leaves.*` 的 Spigot 开关 gradle property（只有 `paper.at`）。因此最新 leavesweight 已无法表达「禁用 Spigot」这个意图。
+- `repo.leavesmc.org/snapshots/` 的目录列表与 `maven-metadata.xml` 全部 404，无法枚举插件版本；把版本写死也只能写 `2.0.0-SNAPSHOT`，没有意义 → 记为依赖漂移，需人工定版。
+- Gradle wrapper 由 `8.14.2` bump 到 `9.2.1`（与 fork master 一致）：修掉第 5 轮那 5 处 `Unresolved reference`（`publishing.softwareComponentFactory`、`mapToMavenScope` 是 Gradle 9 才有的访问器）。
+
+已提交的机械性/工具链修复（`5bcbafd`、`38e7a0e`，均已推送）：
+
+- `spigot { enabled = false }` 行删除、`updatingMinecraft { }` 块删除（插件 DSL 已无这两个成员，留着就是编译错误）。**语义影响待复核**：删掉 `enabled` 后 Spigot 层是否参与构建由插件默认值决定，与 Leaves 原意图（禁用）相反，也与上游 1.21.11 补丁的 `enabled = true` 不同。
+- `leavesclip("org.leavesmc:leavesclip:3.0.5")` → `3.0.10`（上游 1.21.11 用的版本）。
+- `org.lz4:lz4-java:1.8.0` → `at.yawk.lz4:lz4-java:1.8.1`：1.21.11 的 `mache` 提供同一 capability 的 fork 坐标，Gradle 报 `Cannot select module with conflict on capability 'org.lz4:lz4-java'`；换成 mache 的坐标后依赖解析通过。
+- 结果：构建从「配置阶段就失败」推进到「补丁层执行」，`:applyPaperSingleFilePatches`、`:applyPaperApi*`、`:applyPaper*` 全部通过，失败点落到 `:applyMinecraftFeaturePatches`。
+
+minecraft 层漂移清单（第 10 轮，只读盘点，不改语义）：
+
+- 用 `git apply --reject` + 逐 hunk 重锚的盘点跑（`Workspace\inventory_features.py`，起点 `d66a996`「leaves File Patches」，即 Paper 补丁 + Leaves imports/file 层之后）：**141 个 feature 补丁里 100 个应用成功，41 个阻塞**。阻塞原因分两类：`removed lines not present`（被删除的上下文行在 1.21.11 源码里不存在）与 `insertion anchor ambiguous or missing`（插入锚点不唯一或缺失），另有 5 个补丁（`0006`、`0076`、`0079`、`0123`、`0125`）在提交环节失败（补丁头缺 `From:`/`Subject:` 作者字段）。
+- 已核实的一处典型机械性漂移：`0003-Leaves-Utils.patch` 要把 `Level.java` / `LevelAccessor.java` 的 `getServer()` 注解从 `@Nullable` 换成 `@org.jetbrains.annotations.NotNull`，但 1.21.11 里注解被写成同一行内联形式（`public @Nullable MinecraftServer getServer() {` 第 925 行；`@Nullable MinecraftServer getServer();` 第 45 行）→ 属于机械性重排。
+- 已核实的一处语义分歧（仍未裁决）：`Entity.getServer()` 在 1.21.11 源码树里**完全不存在**（`net/minecraft/world/entity/Entity.java` 0 命中；`level()` 在第 5368 行，`Level.getServer()` 第 925 行，`ServerLevel.getServer()` 第 2054 行）。Leaves 自有源码有 8 处实例调用。候选改法是给 `Entity` 补一个 `public MinecraftServer getServer() { return this.level().getServer(); }`（与 1.21.8 被删的 vanilla 方法语义一致），或把调用点改成 `level().getServer()`，或照上游只给 `Level`/`LevelAccessor` 加注解 —— 三者都不属于机械性偏移，按规则 3 不自动修。
+- 其余 39 个阻塞补丁正在按逐个只读复核的方式分类（机械性漂移 vs 语义冲突），结论记到本节末尾后再决定是否继续修。
+
+下载目录（本机，不进仓库）：`E:\mc\leaves-work\downloads\upstream\` 放了上游三个仓库的浅克隆（`Leaves` / `Documentation` / `Configuration`，只作只读参照，不搬运提交）；`E:\mc\leaves-work\downloads\builds\1.21.8\` 放了我们自己构建成功的产物：`leaves-server-1.21.8-R0.1-SNAPSHOT.jar`（27,935,137 B）、`leaves-bundler-1.21.8-R0.1-SNAPSHOT-mojmap.jar`（106,629,693 B）、`leaves-leavesclip-1.21.8-R0.1-SNAPSHOT-mojmap.jar`（63,166,983 B）、`leaves-api-1.21.8-R0.1-SNAPSHOT.jar`（2,706,427 B）。后续每个构建成功的版本都会把产物复制到同一目录。
