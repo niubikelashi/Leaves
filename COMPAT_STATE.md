@@ -92,14 +92,14 @@ Paper 仓库当前状态：默认分支 `gradle.properties` = `mcVersion=26.3`�
 | 1.21.8 | （基线工作树，无分支） | 基线构建 success | `applyAllPatches` + `createMojmapLeavesclipJar` 均 BUILD SUCCESSFUL，见 §5 |
 | 1.21.9 | `compat/1.21.9` | **conflict-needs-review**（10/10 轮已用满） | 见 §7：语义冲突（上游删除 `Entity.getServer()`），已提交部分成果 `8e0597c`，未合并 |
 | 1.21.10 | `compat/1.21.10` | **conflict-needs-review**（第 9 轮，未合并） | 见 §8：语义冲突（Paper 1.21.10 把 `spigot { enabled = false }` 改为 `enabled = true`），api 层已适配完成 |
-| 1.21.11 | `compat/1.21.11` | pending | 未开始 |
+| 1.21.11 | `compat/1.21.11` | **conflict-needs-review**（第 5 轮，未合并） | 见 §9：Leaves 构建插件 DSL 漂移导致 build.gradle.kts 编译失败；另有 Spigot 启用与 `Entity.getServer()` 两处语义分歧待裁决 |
 | 26.1 | `compat/26.1` | skipped-no-paper-base | 人工裁决：Paper 无精确基线（§3），不算失败、不触发停止 |
 | 26.1.1 | `compat/26.1.1` | pending | 未开始 |
 | 26.1.2 | `compat/26.1.2` | pending | 未开始 |
 | 26.2 | `compat/26.2` | pending | 未开始 |
 | 26.3 | `compat/26.3` | pending | 未开始 |
 
-连续非 success 计数：**2**（1.21.9、1.21.10；26.1 记为 `skipped-no-paper-base`，不计入）。按规则 6，整个推演已**停止（halted）**，等待人工裁决两处语义分歧后再恢复：①`Entity.getServer()` 被上游删除后的处理方式；②Paper 1.21.10 重新启用 Spigot 层后 Leaves 的「禁用 spigot」意图如何表达。
+连续非 success 计数：**3**（1.21.9、1.21.10、1.21.11；26.1 记为 `skipped-no-paper-base`，不计入）。按规则 6，整个推演已**停止（halted）**，等待人工裁决三处分歧后再恢复：①`Entity.getServer()` 被上游删除后的表达方式；②Spigot 层是否重新启用（含 `buildDataRef`/`packageVersion` 取值）；③`leavesweight` / `leavesclip` 是否固定版本（当前未固定，见 §9）。26.x 尚未开始。
 
 ## 5. 基线构建记录
 
@@ -172,4 +172,29 @@ Paper 仓库当前状态：默认分支 `gradle.properties` = `mcVersion=26.3`�
 - `leaves-server/build.gradle.kts.patch` 未被修改，保持原样；api 层的重生成补丁已随分支提交保留。
 
 结论：`compat/1.21.10` = `conflict-needs-review`，连续第 2 个非 success 版本 → 按规则 6 停止整个推演。
+
+## 9. 推演日志 · compat/1.21.11（2026-11-21，分支 `compat/1.21.11`，基于 `4f6cf0f`，提交 `060e990`）
+
+工作树 `E:\mc\leaves-work\Leaves-1.21.11`，起点 `4f6cf0f`（复用 `compat/1.21.10` 的机械性修复，不搬运上游提交）。`gradle.properties` 重写为干净 LF 无 BOM：`version=1.21.11-R0.1-SNAPSHOT` / `mcVersion=1.21.11` / `paperRef=ba4b700e133f6de66101393b56f4d9068cd4d3b0` / `apiVersion=1.21.11`（本机 trustStore 的 `org.gradle.jvmargs` 只在本地追加，不提交）。
+
+本轮通过的层（机械性偏移全部修好）：
+
+- `leaves-api` 与 `leaves-server` 的 feature/file 补丁层全部通过；paper 缓存仓库 `git status` 干净，说明 `compat/1.21.9`/`compat/1.21.10` 的重锚成果可直接复用。
+- 仅剩 `leaves-api/build.gradle.kts.patch` 与 `leaves-server/build.gradle.kts.patch`（paperweight single-file patch，头形如 `@@ -7,21 +_,33 @@`）失败：server 补丁只有 Hunk 2 EXACT，其余 0/1/3–9 全 FAILURE；api 补丁 Hunk 0–3 全 FAILURE。
+
+尝试与结论（共 5 轮）：
+
+- 第 2 轮：先试「容错重锚」两条路线，均不可信 —— 正则/锚点版把 hunk 插到错误位置；改用 difflib 窗口对齐后 dry-run 能过（api exit 0，server 只剩 buildTime 一处 blocked），但写出的文件位置错乱（`brand`/`title` 行被插进 `dependencies`、误删 `runDevServer`/`runBundler`、`fill { }` 块残缺）→ `git checkout --` 复位，弃用。`git apply --recount`（把 `+_,36` 转成标准 unified diff）同样报 `patch does not apply`。
+- 第 3 轮：改用显式逐条替换脚本（每条锚点必须在目标文件里**唯一命中**，否则 exit 2，绝不猜测），把 Leaves 的改动逐项落到 Paper 1.21.11 真实文件上：leavesweight/leavesclip 插件与依赖、forks register + sourceSets 路径、Leaves 依赖块、`JavaCompile` 的 `-Xlint` 排除、`Brand`/`Title` 改名、`generatedDir`、UTF-8 `systemProperty`、`runLeavesclip`/`runReobfLeavesclip`/`createLeavesConfig` 替换 `fill` 块、删除 `BuildChannel` import 与 fill 插件。脚本 exit 0；逐块人工核对 diff（api 34 行、server 119 行变更）后，用 `git diff --no-color` 重新生成两个补丁文件（server 217 行 / api 85 行，去掉 `diff --git` 与 `index` 行），并把 paper 缓存仓库 `git checkout --` 复位到 `ba4b700e1`。残留的 `leaves-server/build.gradle.kts.patch.rej` 已删除。
+- 第 4 轮：`applyAllPatches` 在**配置阶段**就失败：`Build file 'leaves-server/build.gradle.kts' line: 6 — Plugin [id: 'io.papermc.paperweight.core'] was not found`。根因是 `leaves-server/build.gradle.kts` / `leaves-api/build.gradle.kts` 是 paperweight 的**生成物**（未被 git 跟踪），上一轮失败的补丁把 base 版内容留在了工作树里，Gradle 先求值这个残留文件。把第 3 轮适配后的两个文件写入生成目录后重跑。
+- 第 5 轮：`BUILD FAILED in 9s`，`Script compilation errors` 共 5 处，全部是 `Unresolved reference`：`spigot { enabled = false }` 里的 `enabled`、`updatingMinecraft { }`、`publishing.softwareComponentFactory`、`mapToMavenScope`（2 处）。也就是说插件 `org.leavesmc.leavesweight.core` 能解析，但它暴露的 DSL 已不含这些成员。
+
+阻塞点定性（语义/工具链分歧，按规则 3 停止，不猜测改写）：
+
+- `settings.gradle.kts` 的 `pluginManagement` 只列了仓库（`repo.leavesmc.org/snapshots/`），**没有固定 leavesweight 版本**；因此解析到的是当前最新快照。已核实上游 Leaves `master`（1.21.11）的 `leaves-server/build.gradle.kts.patch` 里仍写 `spigot { enabled = true; buildDataRef = "17f77cee7117ab9d6175f088ae8962bfd04e61a9"; packageVersion = "v1_21_R7" }`（不再禁用 Spigot），并**删除**了 `updatingMinecraft { }` 块，依赖改用 `leavesclip("org.leavesmc:leavesclip:3.0.10")` + `mache 1.21.11+build.1`，同时删除 fill 插件与 `io.papermc.fill.model.BuildChannel` import。这说明同一份上游补丁在今天的最新 leavesweight 下也会编译失败：失败来自**构建插件版本漂移**，而不是 MC 1.21.11 的源码漂移。
+- 因此需要人工裁决的三件事：①`Entity.getServer()` 被上游删除后 Leaves 调用点如何表达（§7，仍未解决）；②Spigot 层是否重新启用（Paper 1.21.11 的 tag 又回到 `enabled = false`，本轮按「保持原样」处理；上游 1.21.11 补丁则是 `enabled = true` + R7 + 新 `buildDataRef`，两者语义相反）；③是否给 `leavesweight`/`leavesclip` 固定版本（固定到 1.21.11 时代的版本可保留「禁用 spigot + updatingMinecraft 占位」的旧意图，跟随最新快照则必须重写 build 配置）。这三项都不属于机械性改名/签名/偏移，不自动修。
+
+已提交并保留的成果：`compat/1.21.11` 的 `060e990`「compat: re-anchor Leaves build config onto Paper 1.21.11 single-file patches」（提交信息内注明上述两处待复核判断：`spigot enabled = false` 保持原样、`buildTime` 保留 Leaves 的 `Instant.now()` 意图而 Paper 1.21.11 改为 `providers.environmentVariable("BUILD_STARTED_AT").map(Instant::parse).orElse(Instant.EPOCH).get()`）。分支未合并到 `master`。
+
+结论：`compat/1.21.11` = `conflict-needs-review`，连续第 3 个非 success 版本 → 按规则 6 停止整个推演。
 
