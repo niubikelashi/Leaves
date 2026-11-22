@@ -3,7 +3,6 @@ Date: Wed, 22 May 2024 10:12:04 +0800
 Subject: [PATCH] Bytebuf API
 
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 44ee8036e..c25729882 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
 @@ -3020,4 +3020,10 @@ public final class Bukkit {
@@ -18,7 +17,6 @@ index 44ee8036e..c25729882 100644
 +    // Leaves end - Bytebuf API
  }
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index 74f704d42..9f9051214 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
 @@ -2773,4 +2773,8 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
@@ -31,7 +29,6 @@ index 74f704d42..9f9051214 100644
 +    // Leaves end - Bytebuf API
  }
 diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
-index 25c677958..6b63bd1d7 100644
 --- a/src/main/java/org/bukkit/entity/Player.java
 +++ b/src/main/java/org/bukkit/entity/Player.java
 @@ -3930,6 +3930,12 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM

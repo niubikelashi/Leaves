@@ -3,7 +3,6 @@ Date: Wed, 27 Jul 2022 15:30:34 +0800
 Subject: [PATCH] Add fakeplayer api
 
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 14d81c7b1..3b0513fbb 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
 @@ -3003,4 +3003,15 @@ public final class Bukkit {
@@ -23,7 +22,6 @@ index 14d81c7b1..3b0513fbb 100644
 +    // Leaves end - Bot API
  }
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index 964b57bb2..865842a85 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
 @@ -2760,4 +2760,13 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi

@@ -3,7 +3,6 @@ Date: Sat, 17 May 2025 17:36:22 +0800
 Subject: [PATCH] Replay Mod API
 
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 3b0513fbb..44ee8036e 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
 @@ -3014,4 +3014,10 @@ public final class Bukkit {
@@ -18,7 +17,6 @@ index 3b0513fbb..44ee8036e 100644
 +    // Leaves end - Photographer API
  }
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index 865842a85..74f704d42 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
 @@ -2769,4 +2769,8 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
