@@ -223,3 +223,28 @@ minecraft 层漂移清单（第 10 轮，只读盘点，不改语义）：
 - 其余 39 个阻塞补丁正在按逐个只读复核的方式分类（机械性漂移 vs 语义冲突），结论记到本节末尾后再决定是否继续修。
 
 下载目录（本机，不进仓库）：`E:\mc\leaves-work\downloads\upstream\` 放了上游三个仓库的浅克隆（`Leaves` / `Documentation` / `Configuration`，只作只读参照，不搬运提交）；`E:\mc\leaves-work\downloads\builds\1.21.8\` 放了我们自己构建成功的产物：`leaves-server-1.21.8-R0.1-SNAPSHOT.jar`（27,935,137 B）、`leaves-bundler-1.21.8-R0.1-SNAPSHOT-mojmap.jar`（106,629,693 B）、`leaves-leavesclip-1.21.8-R0.1-SNAPSHOT-mojmap.jar`（63,166,983 B）、`leaves-api-1.21.8-R0.1-SNAPSHOT.jar`（2,706,427 B）。后续每个构建成功的版本都会把产物复制到同一目录。
+
+## 11. compat/1.21.11 第 11-12 轮：机械性适配收敛，判定 conflict-needs-review
+
+判定：`conflict-needs-review`（不是 `build-failed`：剩下的阻塞是语义冲突，按规则 3 停止自动修；修复循环已用满 10 轮）。
+
+机械性适配已完成（证据）：
+
+- 嵌套 minecraft 仓库累积基线 `d66a996` -> HEAD `c478837`，工作树 clean：**111 / 141 个 feature 补丁应用成功**（盘点跑 `Workspace\inventory_features_fix.py`，报告 `E:\mc\leaves-work\1.21.11-pass-fixed.json`）。
+- `0003-Leaves-Utils.patch` 用专用修正器（`Workspace\fix_0003.py`，唯一锚点显式替换、保持 CRLF 行尾）完成：给 `Entity` 加 `leavesData` 字段 + 存读档 + `getLeavesData()`，并把 `Level` / `LevelAccessor` 的 `getServer()` 注解改成 `@org.jetbrains.annotations.NotNull`；同时**恢复了被上游删除的 `Entity.getServer()`**（返回 `this.level().getServer()`）。这一条是自主决定，仍待复核：官方 Paper 1.21.11 已删除该方法，Leaves 自有代码有 8+ 处实例调用，上游靠它自己的 Paper fork 提供该方法，而我们按任务书只用官方 Paper。
+- 通用机械处理器（`Workspace\mech_apply.py`）只接受**唯一命中**，并只修机械性漂移：空白/缩进漂移、折行成整行、全限定名随包移动重写（`AbstractVillager` -> `npc/villager/`、`Snowball`/`ThrownEgg` -> `projectile/throwableitemprojectile/`、`AbstractHorse` -> `equine/`、`AbstractMinecartContainer` -> `vehicle/minecart/`）、方法重排后按后置上下文渐进缩短到唯一命中的插入锚点、逐行漂移时把标识符改名**同步应用到新增行**（`RandomSource.triangle(center, maxDeviation)`、`CustomPacketPayload.decode` 的 `identifier`）。`ambiguous` / `absent` / 控制流或操作符变化一律回滚并记录，不猜改写。
+- 补丁文件按真实树重新生成（`Workspace\regenerate_patches.py`，保留 `From`/`Date`/`Subject` mbox 头），并去掉 `index` 行：累积基线的前置 blob 在干净的 Paper 基线里不存在，留着 `index` 行会让 `git am --3way` 报 `could not build fake ancestor`。提交 `e2176f7`（minecraft 层 111 个补丁）与 `6d522ed`（api 层 9 个补丁只去 index 行，hunk 内容未改）；分支已推送：`origin/compat/1.21.11` `38e7a0e` -> `6d522ed`。
+
+剩余 30 个阻塞补丁的分类（逐 hunk，声明行号 +-60 行窗口取最佳候选 + 机械性成对判定，产物 `E:\mc\leaves-work\1.21.11-blocked-categories.txt`）：`whitespace/offset only` 53 个 hunk（上下文不连续，是方法重排造成的顺序漂移，不是空白）、`semantic` 39 个 hunk、`mechanical rename/annotation` 3 个 hunk。代表性语义证据：
+
+- `0007-Leaves-Fakeplayer.patch`：`PlayerList.remove()` 区域被 Paper 改写为 `return playerQuitEvent.quitMessage(); // Paper - Adventure`，被删除的 vanilla 语句不再存在。
+- `0028-PCA-sync-protocol.patch`：块实体默认容器名上下文被上游改写（`Component.translatable("container.hopper")` 已不在该处），6 行前置上下文不连续。
+- `0024`/`0059` 一类：`ChunkMap` 的 `} else if (this.seenBy.remove(player.connection)) {` 变成 `if (...)`，控制流改写。
+- `0139-Lithium-Sleeping-Block-Entity.patch`：25 个 hunk 依赖被重排/删除的方法体片段。
+
+构建取证（第 12 轮，只取证不再修）：`applyAllPatches` 在 `:applyMinecraftFeaturePatches` 停在 `Applying: Leaves Protocol Core`，报 `error: sha1 information is lacking or useless (net/minecraft/network/protocol/common/custom/CustomPacketPayload.java)` / `error: could not build fake ancestor` / `Patch failed at 0004`。0004 就在阻塞集合里，所以失败点与盘点结论一致；没有可交付产物，本轮不新增 GitHub release。
+
+待人工裁决的 30 个补丁：0004 Leaves Protocol Core、0007 Leaves Fakeplayer、0018 Only-check-for-spooky-season-once-an-hour、0029 Alternative-block-placement Protocol、0033 MC Technical Survival Mode、0035 Return nether portal fix、0038 Catch-update-suppression-crash、0039 Bedrock-break-list、0043 Disable-packet-limit、0049 Optimized-dragon-respawn、0052 Elytra-aeronautics-no-chunk-load、0053 Cache-ignite-odds、0055 No-block-update-command、0059 Faster-chunk-serialization、0074 Replay-Mod-API、0079 Spider-jockeys-drop-gapples、0082 CCE-update-suppression、0088 More-Region-Format-Support、0095 Vanilla-hopper、0105 Old-Block-remove-behaviour、0110 Fix-CraftPortalEvent-logic、0114 Vanilla-player-display-name、0115 Fix-SculkCatalyst-exp-skip、0131 Old-wet-tnt-explode-behavior、0132 Old-projectile-explosion-behavior、0135 temp-fix-quick-craft、0136 Old-ender-dragon-part-can-use-end-portal、0138 Chat-command-max-length、0139 Lithium-Sleeping-Block-Entity、0141 Remove-paper-stuck-poi-check-delay。
+
+建议的人工后续：在这些语义冲突处按 Leaves 原意图重写补丁本体（不改 Paper/Spigot 层补丁），或接受上游新语义并同步调整 Leaves 功能；两者都需要作者确认，不属于可自动修的机械性偏移。Documentation / Configuration 本轮不跟进（没有成功的版本可跟随）。
+
