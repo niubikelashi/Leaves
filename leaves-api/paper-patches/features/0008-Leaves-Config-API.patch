@@ -3,15 +3,13 @@ From: Lumine1909 <133463833+Lumine1909@users.noreply.github.com>
 Date: Sun, 18 May 2025 19:59:11 +0800
 Subject: [PATCH] Leaves Config API
 
-
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 29570b8bcf34806af2f8d3dfdd656319176a61e5..786546ba9503a6fc7762589059b998afc62d8e22 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -3026,4 +3026,10 @@ public final class Bukkit {
-         return server.getBytebufAllocator();
+@@ -3022,4 +3022,11 @@ public final class Bukkit {
+         return server.getPhotographerManager();
      }
-     // Leaves end - Bytebuf API
+     // Leaves end - Photographer API
 +
 +    // Leaves start - Config API
 +    public static org.leavesmc.leaves.config.LeavesConfigProvider getLeavesConfig() {
@@ -19,14 +17,15 @@ index 29570b8bcf34806af2f8d3dfdd656319176a61e5..786546ba9503a6fc7762589059b998af
 +    }
 +    // Leaves end - Config API
  }
++
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index 9544b376e457b3b62f6c025bd31f2bb2a5318269..bd84c7725effc55b00510d0b7a050343e2ff0361 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
-@@ -2774,4 +2774,6 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
-     @NotNull org.leavesmc.leaves.entity.photographer.PhotographerManager getPhotographerManager(); // Leaves - Photographer API
+@@ -2785,4 +2785,7 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+     // Leaves end - Bot API
  
-     org.leavesmc.leaves.bytebuf.BytebufAllocator getBytebufAllocator(); // Leaves - Bytebuf API
+     @NotNull org.leavesmc.leaves.entity.photographer.PhotographerManager getPhotographerManager(); // Leaves - Photographer API
 +
 +    org.leavesmc.leaves.config.LeavesConfigProvider getLeavesConfig(); // Leaves - Config API
  }
++

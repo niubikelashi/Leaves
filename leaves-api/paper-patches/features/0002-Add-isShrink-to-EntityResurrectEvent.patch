@@ -3,9 +3,7 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Wed, 30 Mar 2022 08:58:32 +0000
 Subject: [PATCH] Add isShrink to EntityResurrectEvent
 
-
 diff --git a/src/main/java/org/bukkit/event/entity/EntityResurrectEvent.java b/src/main/java/org/bukkit/event/entity/EntityResurrectEvent.java
-index b3e4c6b3c882888b4bc2b93dc4ed2ae0c149ec19..a8d36f0b120740b4c6ea5fbf205b28aba1473206 100644
 --- a/src/main/java/org/bukkit/event/entity/EntityResurrectEvent.java
 +++ b/src/main/java/org/bukkit/event/entity/EntityResurrectEvent.java
 @@ -17,22 +17,46 @@ public class EntityResurrectEvent extends EntityEvent implements Cancellable {

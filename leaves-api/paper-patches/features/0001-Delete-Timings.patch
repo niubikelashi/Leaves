@@ -6,7 +6,6 @@ Subject: [PATCH] Delete Timings
 
 diff --git a/src/main/java/co/aikar/timings/FullServerTickHandler.java b/src/main/java/co/aikar/timings/FullServerTickHandler.java
 deleted file mode 100644
-index 73b125979e2f2dfd13cbf689a90b29cc68a36e09..0000000000000000000000000000000000000000
 --- a/src/main/java/co/aikar/timings/FullServerTickHandler.java
 +++ /dev/null
 @@ -1,89 +0,0 @@
@@ -101,7 +100,6 @@ index 73b125979e2f2dfd13cbf689a90b29cc68a36e09..00000000000000000000000000000000
 -}
 diff --git a/src/main/java/co/aikar/timings/NullTimingHandler.java b/src/main/java/co/aikar/timings/NullTimingHandler.java
 deleted file mode 100644
-index 42e7e712403676171d34d5f2be27e48e7a071ebd..0000000000000000000000000000000000000000
 --- a/src/main/java/co/aikar/timings/NullTimingHandler.java
 +++ /dev/null
 @@ -1,72 +0,0 @@
@@ -179,7 +177,6 @@ index 42e7e712403676171d34d5f2be27e48e7a071ebd..00000000000000000000000000000000
 -}
 diff --git a/src/main/java/co/aikar/timings/TimedEventExecutor.java b/src/main/java/co/aikar/timings/TimedEventExecutor.java
 deleted file mode 100644
-index 157617933a772451f6c073d97afaf305769b4d40..0000000000000000000000000000000000000000
 --- a/src/main/java/co/aikar/timings/TimedEventExecutor.java
 +++ /dev/null
 @@ -1,93 +0,0 @@
@@ -278,7 +275,6 @@ index 157617933a772451f6c073d97afaf305769b4d40..00000000000000000000000000000000
 -}
 diff --git a/src/main/java/co/aikar/timings/Timing.java b/src/main/java/co/aikar/timings/Timing.java
 deleted file mode 100644
-index 4195efcfe044618052bb03dea34a4fb2ca7c44f0..0000000000000000000000000000000000000000
 --- a/src/main/java/co/aikar/timings/Timing.java
 +++ /dev/null
 @@ -1,86 +0,0 @@
@@ -370,7 +366,6 @@ index 4195efcfe044618052bb03dea34a4fb2ca7c44f0..00000000000000000000000000000000
 -}
 diff --git a/src/main/java/co/aikar/timings/TimingData.java b/src/main/java/co/aikar/timings/TimingData.java
 deleted file mode 100644
-index a5d13a1e44edb861f45c83a9b4309fbf799d407d..0000000000000000000000000000000000000000
 --- a/src/main/java/co/aikar/timings/TimingData.java
 +++ /dev/null
 @@ -1,122 +0,0 @@
@@ -498,7 +493,6 @@ index a5d13a1e44edb861f45c83a9b4309fbf799d407d..00000000000000000000000000000000
 -}
 diff --git a/src/main/java/co/aikar/timings/TimingHandler.java b/src/main/java/co/aikar/timings/TimingHandler.java
 deleted file mode 100644
-index 199789d56d22fcb1b77ebd56805cc28aa5a5ab0a..0000000000000000000000000000000000000000
 --- a/src/main/java/co/aikar/timings/TimingHandler.java
 +++ /dev/null
 @@ -1,226 +0,0 @@
@@ -730,7 +724,6 @@ index 199789d56d22fcb1b77ebd56805cc28aa5a5ab0a..00000000000000000000000000000000
 -}
 diff --git a/src/main/java/co/aikar/timings/TimingHistory.java b/src/main/java/co/aikar/timings/TimingHistory.java
 deleted file mode 100644
-index 143fb3623a3fcf4be2d30dafb330584cb61ffe50..0000000000000000000000000000000000000000
 --- a/src/main/java/co/aikar/timings/TimingHistory.java
 +++ /dev/null
 @@ -1,356 +0,0 @@
@@ -1092,7 +1085,6 @@ index 143fb3623a3fcf4be2d30dafb330584cb61ffe50..00000000000000000000000000000000
 -}
 diff --git a/src/main/java/co/aikar/timings/TimingHistoryEntry.java b/src/main/java/co/aikar/timings/TimingHistoryEntry.java
 deleted file mode 100644
-index 86d5ac6bd0d7d0003688761aceb3f3343575319f..0000000000000000000000000000000000000000
 --- a/src/main/java/co/aikar/timings/TimingHistoryEntry.java
 +++ /dev/null
 @@ -1,58 +0,0 @@
@@ -1156,7 +1148,6 @@ index 86d5ac6bd0d7d0003688761aceb3f3343575319f..00000000000000000000000000000000
 -}
 diff --git a/src/main/java/co/aikar/timings/TimingIdentifier.java b/src/main/java/co/aikar/timings/TimingIdentifier.java
 deleted file mode 100644
-index df142a89b8c43acb81eb383eac0ef048a1f49a6e..0000000000000000000000000000000000000000
 --- a/src/main/java/co/aikar/timings/TimingIdentifier.java
 +++ /dev/null
 @@ -1,116 +0,0 @@
@@ -1278,7 +1269,6 @@ index df142a89b8c43acb81eb383eac0ef048a1f49a6e..00000000000000000000000000000000
 -}
 diff --git a/src/main/java/co/aikar/timings/Timings.java b/src/main/java/co/aikar/timings/Timings.java
 deleted file mode 100644
-index 95b7cdf0677ef71e6885fa78aa5c75bb500f5f53..0000000000000000000000000000000000000000
 --- a/src/main/java/co/aikar/timings/Timings.java
 +++ /dev/null
 @@ -1,325 +0,0 @@
@@ -1609,7 +1599,6 @@ index 95b7cdf0677ef71e6885fa78aa5c75bb500f5f53..00000000000000000000000000000000
 -
 diff --git a/src/main/java/co/aikar/timings/TimingsCommand.java b/src/main/java/co/aikar/timings/TimingsCommand.java
 deleted file mode 100644
-index b83e5ff7ada8771fdf27ba9807c77ba6a4ce12da..0000000000000000000000000000000000000000
 --- a/src/main/java/co/aikar/timings/TimingsCommand.java
 +++ /dev/null
 @@ -1,127 +0,0 @@
@@ -1742,7 +1731,6 @@ index b83e5ff7ada8771fdf27ba9807c77ba6a4ce12da..00000000000000000000000000000000
 -}
 diff --git a/src/main/java/co/aikar/timings/TimingsManager.java b/src/main/java/co/aikar/timings/TimingsManager.java
 deleted file mode 100644
-index 83a70358e9b7d3d9ae76cf130915b3c33d09a793..0000000000000000000000000000000000000000
 --- a/src/main/java/co/aikar/timings/TimingsManager.java
 +++ /dev/null
 @@ -1,192 +0,0 @@
@@ -1940,7 +1928,6 @@ index 83a70358e9b7d3d9ae76cf130915b3c33d09a793..00000000000000000000000000000000
 -}
 diff --git a/src/main/java/co/aikar/timings/TimingsReportListener.java b/src/main/java/co/aikar/timings/TimingsReportListener.java
 deleted file mode 100644
-index df066d6f8d55afbc0c1897c486d638657a5f8df9..0000000000000000000000000000000000000000
 --- a/src/main/java/co/aikar/timings/TimingsReportListener.java
 +++ /dev/null
 @@ -1,90 +0,0 @@
@@ -2036,7 +2023,6 @@ index df066d6f8d55afbc0c1897c486d638657a5f8df9..00000000000000000000000000000000
 -}
 diff --git a/src/main/java/co/aikar/timings/UnsafeTimingHandler.java b/src/main/java/co/aikar/timings/UnsafeTimingHandler.java
 deleted file mode 100644
-index 632c4961515f5052551f841cfa840e60bba7a257..0000000000000000000000000000000000000000
 --- a/src/main/java/co/aikar/timings/UnsafeTimingHandler.java
 +++ /dev/null
 @@ -1,53 +0,0 @@
@@ -2095,7 +2081,6 @@ index 632c4961515f5052551f841cfa840e60bba7a257..00000000000000000000000000000000
 -}
 diff --git a/src/main/java/co/aikar/util/Counter.java b/src/main/java/co/aikar/util/Counter.java
 deleted file mode 100644
-index dae84243804b4b076cafb3e1b29bdcf614efc93f..0000000000000000000000000000000000000000
 --- a/src/main/java/co/aikar/util/Counter.java
 +++ /dev/null
 @@ -1,39 +0,0 @@
@@ -2140,7 +2125,6 @@ index dae84243804b4b076cafb3e1b29bdcf614efc93f..00000000000000000000000000000000
 -}
 diff --git a/src/main/java/co/aikar/util/JSONUtil.java b/src/main/java/co/aikar/util/JSONUtil.java
 deleted file mode 100644
-index 232bf09e1a7bc176bfd34b1acb5326a06a92fe79..0000000000000000000000000000000000000000
 --- a/src/main/java/co/aikar/util/JSONUtil.java
 +++ /dev/null
 @@ -1,138 +0,0 @@
@@ -2284,7 +2268,6 @@ index 232bf09e1a7bc176bfd34b1acb5326a06a92fe79..00000000000000000000000000000000
 -}
 diff --git a/src/main/java/co/aikar/util/LoadingIntMap.java b/src/main/java/co/aikar/util/LoadingIntMap.java
 deleted file mode 100644
-index 5753b9bce89db2ac378ec41f1b61907cc2e23335..0000000000000000000000000000000000000000
 --- a/src/main/java/co/aikar/util/LoadingIntMap.java
 +++ /dev/null
 @@ -1,77 +0,0 @@
@@ -2367,7 +2350,6 @@ index 5753b9bce89db2ac378ec41f1b61907cc2e23335..00000000000000000000000000000000
 -}
 diff --git a/src/main/java/co/aikar/util/LoadingMap.java b/src/main/java/co/aikar/util/LoadingMap.java
 deleted file mode 100644
-index 207b6853a0cb0185492b62c0c5d9602d48b7959c..0000000000000000000000000000000000000000
 --- a/src/main/java/co/aikar/util/LoadingMap.java
 +++ /dev/null
 @@ -1,369 +0,0 @@
@@ -2742,7 +2724,6 @@ index 207b6853a0cb0185492b62c0c5d9602d48b7959c..00000000000000000000000000000000
 -}
 diff --git a/src/main/java/co/aikar/util/MRUMapCache.java b/src/main/java/co/aikar/util/MRUMapCache.java
 deleted file mode 100644
-index 3e61a926620a67daec3af54b72a1b911eaef2ed4..0000000000000000000000000000000000000000
 --- a/src/main/java/co/aikar/util/MRUMapCache.java
 +++ /dev/null
 @@ -1,112 +0,0 @@
@@ -2859,7 +2840,6 @@ index 3e61a926620a67daec3af54b72a1b911eaef2ed4..00000000000000000000000000000000
 -    }
 -}
 diff --git a/src/main/java/org/bukkit/command/Command.java b/src/main/java/org/bukkit/command/Command.java
-index 3171a20c8fcff10a8da3dd822c8bba3f58f59e02..9fd50b3ffaa7edebf5d975b35475e451bc8de8d8 100644
 --- a/src/main/java/org/bukkit/command/Command.java
 +++ b/src/main/java/org/bukkit/command/Command.java
 @@ -32,16 +32,6 @@ public abstract class Command {
@@ -2880,7 +2860,6 @@ index 3171a20c8fcff10a8da3dd822c8bba3f58f59e02..9fd50b3ffaa7edebf5d975b35475e451
      protected Command(@NotNull String name) {
          this(name, "", "/" + name, new ArrayList<String>());
 diff --git a/src/main/java/org/bukkit/command/FormattedCommandAlias.java b/src/main/java/org/bukkit/command/FormattedCommandAlias.java
-index 59fada9b1eb78238d280c6bbb711f52facba52c6..eb4d78c6111a530d015a0b91d14c40ad0eec9ca7 100644
 --- a/src/main/java/org/bukkit/command/FormattedCommandAlias.java
 +++ b/src/main/java/org/bukkit/command/FormattedCommandAlias.java
 @@ -14,7 +14,6 @@ public class FormattedCommandAlias extends Command {
@@ -2903,7 +2882,6 @@ index 59fada9b1eb78238d280c6bbb711f52facba52c6..eb4d78c6111a530d015a0b91d14c40ad
          return i >= j && i <= k;
      }
 diff --git a/src/main/java/org/bukkit/command/SimpleCommandMap.java b/src/main/java/org/bukkit/command/SimpleCommandMap.java
-index ad1330d87223dfcf3c9da40aa5ece8c21141f0d6..f561ac4ebd8d40266ae9f066e79045bb93113a53 100644
 --- a/src/main/java/org/bukkit/command/SimpleCommandMap.java
 +++ b/src/main/java/org/bukkit/command/SimpleCommandMap.java
 @@ -34,7 +34,6 @@ public class SimpleCommandMap implements CommandMap {
@@ -2941,7 +2919,6 @@ index ad1330d87223dfcf3c9da40aa5ece8c21141f0d6..f561ac4ebd8d40266ae9f066e79045bb
              server.getPluginManager().callEvent(new com.destroystokyo.paper.event.server.ServerExceptionEvent(new com.destroystokyo.paper.exception.ServerCommandException(ex, target, sender, args))); // Paper
              //target.timings.stopTiming(); // Spigot // Paper
 diff --git a/src/main/java/org/bukkit/plugin/SimplePluginManager.java b/src/main/java/org/bukkit/plugin/SimplePluginManager.java
-index dfc2d76403993640e6283f25f9f3647bb6d1a30c..cc2a208b7cb118134ca4088c622644b5d2fac1c0 100644
 --- a/src/main/java/org/bukkit/plugin/SimplePluginManager.java
 +++ b/src/main/java/org/bukkit/plugin/SimplePluginManager.java
 @@ -720,7 +720,6 @@ public final class SimplePluginManager implements PluginManager {
@@ -2973,7 +2950,6 @@ index dfc2d76403993640e6283f25f9f3647bb6d1a30c..cc2a208b7cb118134ca4088c622644b5
  
      // Paper start
 diff --git a/src/main/java/org/bukkit/plugin/java/JavaPluginLoader.java b/src/main/java/org/bukkit/plugin/java/JavaPluginLoader.java
-index 163e9a0e179dc88be93614ff66ee2be3eccc694f..f4f1a51a3b0c34b87270ba81b705a8ee5d615f8a 100644
 --- a/src/main/java/org/bukkit/plugin/java/JavaPluginLoader.java
 +++ b/src/main/java/org/bukkit/plugin/java/JavaPluginLoader.java
 @@ -290,22 +290,22 @@ public final class JavaPluginLoader implements PluginLoader {
@@ -3014,7 +2990,6 @@ index 163e9a0e179dc88be93614ff66ee2be3eccc694f..f4f1a51a3b0c34b87270ba81b705a8ee
      }
 diff --git a/src/main/java/org/spigotmc/CustomTimingsHandler.java b/src/main/java/org/spigotmc/CustomTimingsHandler.java
 deleted file mode 100644
-index 5fbacfcf108432c5187aa9a4092d00d7d5b0fd53..0000000000000000000000000000000000000000
 --- a/src/main/java/org/spigotmc/CustomTimingsHandler.java
 +++ /dev/null
 @@ -1,67 +0,0 @@
