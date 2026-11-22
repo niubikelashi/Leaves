@@ -3,11 +3,10 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Fri, 28 Jan 2022 18:34:29 +0800
 Subject: [PATCH] Make snowball and egg can knockback player
 
-
-diff --git a/net/minecraft/world/entity/projectile/Snowball.java b/net/minecraft/world/entity/projectile/Snowball.java
---- a/net/minecraft/world/entity/projectile/Snowball.java
-+++ b/net/minecraft/world/entity/projectile/Snowball.java
-@@ -54,6 +54,12 @@ public class Snowball extends ThrowableItemProjectile {
+diff --git a/net/minecraft/world/entity/projectile/throwableitemprojectile/Snowball.java b/net/minecraft/world/entity/projectile/throwableitemprojectile/Snowball.java
+--- a/net/minecraft/world/entity/projectile/throwableitemprojectile/Snowball.java
++++ b/net/minecraft/world/entity/projectile/throwableitemprojectile/Snowball.java
+@@ -55,6 +55,12 @@ public class Snowball extends ThrowableItemProjectile {
          Entity entity = result.getEntity();
          int i = entity instanceof Blaze ? 3 : 0;
          entity.hurt(this.damageSources().thrown(this, this.getOwner()), i);
@@ -20,10 +19,10 @@ diff --git a/net/minecraft/world/entity/projectile/Snowball.java b/net/minecraft
      }
  
      @Override
-diff --git a/net/minecraft/world/entity/projectile/ThrownEgg.java b/net/minecraft/world/entity/projectile/ThrownEgg.java
---- a/net/minecraft/world/entity/projectile/ThrownEgg.java
-+++ b/net/minecraft/world/entity/projectile/ThrownEgg.java
-@@ -55,6 +55,12 @@ public class ThrownEgg extends ThrowableItemProjectile {
+diff --git a/net/minecraft/world/entity/projectile/throwableitemprojectile/ThrownEgg.java b/net/minecraft/world/entity/projectile/throwableitemprojectile/ThrownEgg.java
+--- a/net/minecraft/world/entity/projectile/throwableitemprojectile/ThrownEgg.java
++++ b/net/minecraft/world/entity/projectile/throwableitemprojectile/ThrownEgg.java
+@@ -56,6 +56,12 @@ public class ThrownEgg extends ThrowableItemProjectile {
      protected void onHitEntity(EntityHitResult result) {
          super.onHitEntity(result);
          result.getEntity().hurt(this.damageSources().thrown(this, this.getOwner()), 0.0F);

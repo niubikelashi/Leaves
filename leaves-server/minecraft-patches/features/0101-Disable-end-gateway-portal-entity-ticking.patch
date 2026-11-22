@@ -3,11 +3,10 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Mon, 1 Jul 2024 22:09:33 +0800
 Subject: [PATCH] Disable end gateway portal entity ticking
 
-
 diff --git a/net/minecraft/world/level/block/EndGatewayBlock.java b/net/minecraft/world/level/block/EndGatewayBlock.java
 --- a/net/minecraft/world/level/block/EndGatewayBlock.java
 +++ b/net/minecraft/world/level/block/EndGatewayBlock.java
-@@ -123,11 +123,14 @@ public class EndGatewayBlock extends BaseEntityBlock implements Portal {
+@@ -121,11 +121,14 @@ public class EndGatewayBlock extends BaseEntityBlock implements Portal {
              if (portalPosition == null) {
                  return null;
              } else {

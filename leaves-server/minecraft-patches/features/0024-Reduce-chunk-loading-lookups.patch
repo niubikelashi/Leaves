@@ -3,12 +3,10 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Sun, 21 Aug 2022 08:29:15 +0800
 Subject: [PATCH] Reduce chunk loading & lookups
 
-This patch is Powered by Pufferfish(https://github.com/pufferfish-gg/Pufferfish)
-
 diff --git a/net/minecraft/world/entity/monster/EnderMan.java b/net/minecraft/world/entity/monster/EnderMan.java
 --- a/net/minecraft/world/entity/monster/EnderMan.java
 +++ b/net/minecraft/world/entity/monster/EnderMan.java
-@@ -296,11 +296,28 @@ public class EnderMan extends Monster implements NeutralMob {
+@@ -300,11 +300,28 @@ public class EnderMan extends Monster implements NeutralMob {
      private boolean teleport(double x, double y, double z) {
          BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos(x, y, z);
  

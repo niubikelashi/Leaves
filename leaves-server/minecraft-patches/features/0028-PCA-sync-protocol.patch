@@ -3,12 +3,10 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Mon, 3 Feb 2025 13:17:03 +0800
 Subject: [PATCH] PCA sync protocol
 
-This patch is Powered by plusls-carpet-addition(https://github.com/plusls/plusls-carpet-addition)
-
-diff --git a/net/minecraft/world/entity/animal/horse/AbstractHorse.java b/net/minecraft/world/entity/animal/horse/AbstractHorse.java
---- a/net/minecraft/world/entity/animal/horse/AbstractHorse.java
-+++ b/net/minecraft/world/entity/animal/horse/AbstractHorse.java
-@@ -305,6 +305,13 @@ public abstract class AbstractHorse extends Animal implements HasCustomInventory
+diff --git a/net/minecraft/world/entity/animal/equine/AbstractHorse.java b/net/minecraft/world/entity/animal/equine/AbstractHorse.java
+--- a/net/minecraft/world/entity/animal/equine/AbstractHorse.java
++++ b/net/minecraft/world/entity/animal/equine/AbstractHorse.java
+@@ -301,6 +301,13 @@ public abstract class AbstractHorse extends Animal implements HasCustomInventory
      public void createInventory() {
          SimpleContainer simpleContainer = this.inventory;
          this.inventory = new SimpleContainer(this.getInventorySize(), (org.bukkit.entity.AbstractHorse) this.getBukkitEntity()); // CraftBukkit
@@ -22,11 +20,11 @@ diff --git a/net/minecraft/world/entity/animal/horse/AbstractHorse.java b/net/mi
          if (simpleContainer != null) {
              int min = Math.min(simpleContainer.getContainerSize(), this.inventory.getContainerSize());
  
-diff --git a/net/minecraft/world/entity/npc/AbstractVillager.java b/net/minecraft/world/entity/npc/AbstractVillager.java
---- a/net/minecraft/world/entity/npc/AbstractVillager.java
-+++ b/net/minecraft/world/entity/npc/AbstractVillager.java
-@@ -48,6 +48,15 @@ public abstract class AbstractVillager extends AgeableMob implements InventoryCa
-         super(entityType, level);
+diff --git a/net/minecraft/world/entity/npc/villager/AbstractVillager.java b/net/minecraft/world/entity/npc/villager/AbstractVillager.java
+--- a/net/minecraft/world/entity/npc/villager/AbstractVillager.java
++++ b/net/minecraft/world/entity/npc/villager/AbstractVillager.java
+@@ -49,6 +49,15 @@ public abstract class AbstractVillager extends AgeableMob implements InventoryCa
+         super(type, level);
          this.setPathfindingMalus(PathType.DANGER_FIRE, 16.0F);
          this.setPathfindingMalus(PathType.DAMAGE_FIRE, -1.0F);
 +        // Leaves start - pca
@@ -41,9 +39,9 @@ diff --git a/net/minecraft/world/entity/npc/AbstractVillager.java b/net/minecraf
      }
  
      @Override
-diff --git a/net/minecraft/world/entity/vehicle/AbstractMinecartContainer.java b/net/minecraft/world/entity/vehicle/AbstractMinecartContainer.java
---- a/net/minecraft/world/entity/vehicle/AbstractMinecartContainer.java
-+++ b/net/minecraft/world/entity/vehicle/AbstractMinecartContainer.java
+diff --git a/net/minecraft/world/entity/vehicle/minecart/AbstractMinecartContainer.java b/net/minecraft/world/entity/vehicle/minecart/AbstractMinecartContainer.java
+--- a/net/minecraft/world/entity/vehicle/minecart/AbstractMinecartContainer.java
++++ b/net/minecraft/world/entity/vehicle/minecart/AbstractMinecartContainer.java
 @@ -65,6 +65,11 @@ public abstract class AbstractMinecartContainer extends AbstractMinecart impleme
  
      @Override
@@ -59,7 +57,7 @@ diff --git a/net/minecraft/world/entity/vehicle/AbstractMinecartContainer.java b
 diff --git a/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.java b/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.java
-@@ -429,6 +429,16 @@ public abstract class AbstractFurnaceBlockEntity extends BaseContainerBlockEntit
+@@ -430,6 +430,16 @@ public abstract class AbstractFurnaceBlockEntity extends BaseContainerBlockEntit
          }
      }
  
@@ -79,7 +77,7 @@ diff --git a/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.j
 diff --git a/net/minecraft/world/level/block/entity/BarrelBlockEntity.java b/net/minecraft/world/level/block/entity/BarrelBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/BarrelBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/BarrelBlockEntity.java
-@@ -121,6 +121,16 @@ public class BarrelBlockEntity extends RandomizableContainerBlockEntity {
+@@ -124,6 +124,16 @@ public class BarrelBlockEntity extends RandomizableContainerBlockEntity {
          this.items = items;
      }
  
@@ -95,11 +93,11 @@ diff --git a/net/minecraft/world/level/block/entity/BarrelBlockEntity.java b/net
 +
      @Override
      protected Component getDefaultName() {
-         return Component.translatable("container.barrel");
+         return DEFAULT_NAME;
 diff --git a/net/minecraft/world/level/block/entity/BeehiveBlockEntity.java b/net/minecraft/world/level/block/entity/BeehiveBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/BeehiveBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/BeehiveBlockEntity.java
-@@ -147,6 +147,11 @@ public class BeehiveBlockEntity extends BlockEntity {
+@@ -150,6 +150,11 @@ public class BeehiveBlockEntity extends BlockEntity {
              super.setChanged();
          }
  
@@ -111,7 +109,7 @@ diff --git a/net/minecraft/world/level/block/entity/BeehiveBlockEntity.java b/ne
          return list;
      }
  
-@@ -204,6 +209,11 @@ public class BeehiveBlockEntity extends BlockEntity {
+@@ -207,6 +212,11 @@ public class BeehiveBlockEntity extends BlockEntity {
                  this.level.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(bee, this.getBlockState()));
              }
  
@@ -123,7 +121,7 @@ diff --git a/net/minecraft/world/level/block/entity/BeehiveBlockEntity.java b/ne
              bee.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.ENTER_BLOCK); // CraftBukkit - add Bukkit remove cause
              super.setChanged();
          }
-@@ -325,6 +335,11 @@ public class BeehiveBlockEntity extends BlockEntity {
+@@ -328,6 +338,11 @@ public class BeehiveBlockEntity extends BlockEntity {
                  if (releaseOccupant(level, pos, state, beeData.toOccupant(), null, beeReleaseStatus, savedFlowerPos)) {
                      flag = true;
                      iterator.remove();
@@ -135,7 +133,7 @@ diff --git a/net/minecraft/world/level/block/entity/BeehiveBlockEntity.java b/ne
                  }
                  // Paper start - Fix bees aging inside; use exitTickCounter to keep actual bee life
                  else if (level.paperConfig().entities.behavior.cooldownFailedBeehiveReleases) {
-@@ -358,6 +373,11 @@ public class BeehiveBlockEntity extends BlockEntity {
+@@ -359,6 +374,11 @@ public class BeehiveBlockEntity extends BlockEntity {
          input.read("bees", BeehiveBlockEntity.Occupant.LIST_CODEC).orElse(List.of()).forEach(this::storeBee);
          this.savedFlowerPos = input.read("flower_pos", BlockPos.CODEC).orElse(null);
          this.maxBees = input.getIntOr("Bukkit.MaxEntities", MAX_OCCUPANTS); // Paper - persist max bukkit occupants
@@ -150,7 +148,7 @@ diff --git a/net/minecraft/world/level/block/entity/BeehiveBlockEntity.java b/ne
 diff --git a/net/minecraft/world/level/block/entity/BrewingStandBlockEntity.java b/net/minecraft/world/level/block/entity/BrewingStandBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/BrewingStandBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/BrewingStandBlockEntity.java
-@@ -331,4 +331,14 @@ public class BrewingStandBlockEntity extends BaseContainerBlockEntity implements
+@@ -334,4 +334,14 @@ public class BrewingStandBlockEntity extends BaseContainerBlockEntity implements
      protected AbstractContainerMenu createMenu(int id, Inventory player) {
          return new BrewingStandMenu(id, player, this, this.dataAccess);
      }
@@ -168,7 +166,7 @@ diff --git a/net/minecraft/world/level/block/entity/BrewingStandBlockEntity.java
 diff --git a/net/minecraft/world/level/block/entity/ChestBlockEntity.java b/net/minecraft/world/level/block/entity/ChestBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/ChestBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/ChestBlockEntity.java
-@@ -202,6 +202,16 @@ public class ChestBlockEntity extends RandomizableContainerBlockEntity implement
+@@ -214,6 +214,16 @@ public class ChestBlockEntity extends RandomizableContainerBlockEntity implement
          otherChest.setItems(items);
      }
  
@@ -208,7 +206,7 @@ diff --git a/net/minecraft/world/level/block/entity/ComparatorBlockEntity.java b
 diff --git a/net/minecraft/world/level/block/entity/DispenserBlockEntity.java b/net/minecraft/world/level/block/entity/DispenserBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/DispenserBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/DispenserBlockEntity.java
-@@ -104,6 +104,16 @@ public class DispenserBlockEntity extends RandomizableContainerBlockEntity {
+@@ -105,6 +105,16 @@ public class DispenserBlockEntity extends RandomizableContainerBlockEntity {
          return stack;
      }
  
@@ -224,11 +222,11 @@ diff --git a/net/minecraft/world/level/block/entity/DispenserBlockEntity.java b/
 +
      @Override
      protected Component getDefaultName() {
-         return Component.translatable("container.dispenser");
+         return DEFAULT_NAME;
 diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -122,6 +122,16 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -123,6 +123,16 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
          this.facing = blockState.getValue(HopperBlock.FACING);
      }
  
@@ -244,8 +242,8 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
 +
      @Override
      protected Component getDefaultName() {
-         return Component.translatable("container.hopper");
-@@ -198,6 +208,11 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+         return DEFAULT_NAME;
+@@ -199,6 +209,11 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
                  if (flag) {
                      blockEntity.setCooldown(level.spigotConfig.hopperTransfer); // Spigot
                      setChanged(level, pos, state);

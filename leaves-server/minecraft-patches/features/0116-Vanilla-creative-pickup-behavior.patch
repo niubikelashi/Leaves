@@ -3,11 +3,10 @@ From: Lumine1909 <133463833+Lumine1909@users.noreply.github.com>
 Date: Sat, 10 May 2025 00:49:51 +0800
 Subject: [PATCH] Vanilla creative pickup behavior
 
-
 diff --git a/net/minecraft/world/entity/player/Inventory.java b/net/minecraft/world/entity/player/Inventory.java
 --- a/net/minecraft/world/entity/player/Inventory.java
 +++ b/net/minecraft/world/entity/player/Inventory.java
-@@ -176,6 +176,13 @@ public class Inventory implements Container, Nameable {
+@@ -177,6 +177,13 @@ public class Inventory implements Container, Nameable {
      // CraftBukkit start - Watch method above! :D
      public int canHold(ItemStack itemStack) {
          int remains = itemStack.getCount();

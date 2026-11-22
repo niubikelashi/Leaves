@@ -3,23 +3,22 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Sat, 22 Jul 2023 12:00:59 +0800
 Subject: [PATCH] Fix villagers dont release memory
 
-
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -4032,7 +4032,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -4104,7 +4104,7 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
          return this;
      }
  
--    private Entity teleportCrossDimension(ServerLevel oldLevel, ServerLevel newLevel, TeleportTransition teleportTransition) {
-+    protected Entity teleportCrossDimension(ServerLevel oldLevel, ServerLevel newLevel, TeleportTransition teleportTransition) { // Leaves - private -> protected
+-    private @Nullable Entity teleportCrossDimension(ServerLevel oldLevel, ServerLevel newLevel, TeleportTransition teleportTransition) {
++    protected Entity Entity(teleportCrossDimension ServerLevel, teleportCrossDimension ServerLevel, newLevel TeleportTransition) { // Leaves - private -> protected
          List<Entity> passengers = this.getPassengers();
          List<Entity> list = new ArrayList<>(passengers.size());
          this.ejectPassengers();
-diff --git a/net/minecraft/world/entity/npc/Villager.java b/net/minecraft/world/entity/npc/Villager.java
---- a/net/minecraft/world/entity/npc/Villager.java
-+++ b/net/minecraft/world/entity/npc/Villager.java
-@@ -1033,4 +1033,19 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+diff --git a/net/minecraft/world/entity/npc/villager/Villager.java b/net/minecraft/world/entity/npc/villager/Villager.java
+--- a/net/minecraft/world/entity/npc/villager/Villager.java
++++ b/net/minecraft/world/entity/npc/villager/Villager.java
+@@ -1022,4 +1022,19 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
              return super.applyImplicitComponent(component, value);
          }
      }

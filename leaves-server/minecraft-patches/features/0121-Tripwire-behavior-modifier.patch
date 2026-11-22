@@ -3,7 +3,6 @@ From: Helvetica Volubi <suisuroru@blue-millennium.fun>
 Date: Sat, 17 May 2025 21:03:00 +0800
 Subject: [PATCH] Tripwire behavior modifier
 
-
 diff --git a/net/minecraft/world/level/levelgen/feature/EndPlatformFeature.java b/net/minecraft/world/level/levelgen/feature/EndPlatformFeature.java
 --- a/net/minecraft/world/level/levelgen/feature/EndPlatformFeature.java
 +++ b/net/minecraft/world/level/levelgen/feature/EndPlatformFeature.java

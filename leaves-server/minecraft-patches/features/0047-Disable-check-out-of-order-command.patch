@@ -3,11 +3,10 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Sun, 10 Dec 2023 13:13:14 +0800
 Subject: [PATCH] Disable check out-of-order command
 
-
 diff --git a/net/minecraft/network/chat/SignedMessageChain.java b/net/minecraft/network/chat/SignedMessageChain.java
 --- a/net/minecraft/network/chat/SignedMessageChain.java
 +++ b/net/minecraft/network/chat/SignedMessageChain.java
-@@ -45,7 +45,7 @@ public class SignedMessageChain {
+@@ -44,7 +44,7 @@ public class SignedMessageChain {
                      SignedMessageLink signedMessageLink = SignedMessageChain.this.nextLink;
                      if (signedMessageLink == null) {
                          throw new SignedMessageChain.DecodeException(SignedMessageChain.DecodeException.CHAIN_BROKEN);

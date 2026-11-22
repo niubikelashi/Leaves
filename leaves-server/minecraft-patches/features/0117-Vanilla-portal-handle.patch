@@ -3,11 +3,10 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Thu, 15 May 2025 12:17:30 +0800
 Subject: [PATCH] Vanilla portal handle
 
-
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -836,6 +836,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -846,6 +846,7 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
  
      // CraftBukkit start
      public void postTick() {
@@ -15,7 +14,7 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
          // No clean way to break out of ticking once the entity has been copied to a new world, so instead we move the portalling later in the tick cycle
          if (!(this instanceof ServerPlayer) && this.isAlive()) { // Paper - don't attempt to teleport dead entities
              this.handlePortal();
-@@ -856,7 +857,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -867,7 +868,7 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
              this.boardingCooldown--;
          }
  
@@ -24,15 +23,3 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
          if (this.canSpawnSprintParticle()) {
              this.spawnSprintParticle();
          }
-diff --git a/net/minecraft/world/entity/vehicle/AbstractMinecart.java b/net/minecraft/world/entity/vehicle/AbstractMinecart.java
---- a/net/minecraft/world/entity/vehicle/AbstractMinecart.java
-+++ b/net/minecraft/world/entity/vehicle/AbstractMinecart.java
-@@ -293,7 +293,7 @@ public abstract class AbstractMinecart extends VehicleEntity {
-         }
- 
-         this.checkBelowWorld();
--        // this.handlePortal(); // CraftBukkit - handled in postTick
-+        if (org.leavesmc.leaves.LeavesConfig.fix.vanillaPortalHandle) this.handlePortal(); // CraftBukkit - handled in postTick // Leaves - vanilla
-         this.behavior.tick();
-         // CraftBukkit start
-         org.bukkit.World bworld = this.level().getWorld();

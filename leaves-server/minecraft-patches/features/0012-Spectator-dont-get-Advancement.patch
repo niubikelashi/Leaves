@@ -3,11 +3,10 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Sat, 25 Jun 2022 18:04:35 +0800
 Subject: [PATCH] Spectator dont get Advancement
 
-
 diff --git a/net/minecraft/server/PlayerAdvancements.java b/net/minecraft/server/PlayerAdvancements.java
 --- a/net/minecraft/server/PlayerAdvancements.java
 +++ b/net/minecraft/server/PlayerAdvancements.java
-@@ -167,6 +167,11 @@ public class PlayerAdvancements {
+@@ -166,6 +166,11 @@ public class PlayerAdvancements {
      }
  
      public boolean award(AdvancementHolder advancement, String criterionKey) {
@@ -16,6 +15,11 @@ diff --git a/net/minecraft/server/PlayerAdvancements.java b/net/minecraft/server
 +            return false;
 +        }
 +        // Leaves end - spectator don't get advancement
-         // Leaves start - bot can't get advancement
-         if (player instanceof org.leavesmc.leaves.bot.ServerBot) {
-             return false;
+         boolean flag = false;
+         AdvancementProgress orStartProgress = this.getOrStartProgress(advancement);
+         boolean isDone = orStartProgress.isDone();
+@@ -344,3 +349,4 @@ public class PlayerAdvancements {
+         }
+     }
+ }
++

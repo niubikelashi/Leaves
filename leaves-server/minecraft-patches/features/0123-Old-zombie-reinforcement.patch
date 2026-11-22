@@ -3,11 +3,10 @@ From: Helvetica Volubi <suisuroru@blue-millennium.fun>
 Date: Mon, 19 May 2025 00:42:17 +0800
 Subject: [PATCH] Old zombie reinforcement
 
-
-diff --git a/net/minecraft/world/entity/monster/Zombie.java b/net/minecraft/world/entity/monster/Zombie.java
---- a/net/minecraft/world/entity/monster/Zombie.java
-+++ b/net/minecraft/world/entity/monster/Zombie.java
-@@ -341,7 +341,7 @@ public class Zombie extends Monster {
+diff --git a/net/minecraft/world/entity/monster/zombie/Zombie.java b/net/minecraft/world/entity/monster/zombie/Zombie.java
+--- a/net/minecraft/world/entity/monster/zombie/Zombie.java
++++ b/net/minecraft/world/entity/monster/zombie/Zombie.java
+@@ -314,7 +314,7 @@ public class Zombie extends Monster {
                  int floor = Mth.floor(this.getX());
                  int floor1 = Mth.floor(this.getY());
                  int floor2 = Mth.floor(this.getZ());

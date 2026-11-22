@@ -3,7 +3,6 @@ From: Bluemangoo <chenfy2006@qq.com>
 Date: Fri, 19 Jul 2024 15:04:03 +0800
 Subject: [PATCH] Disable crystal-portal proximity check
 
-
 diff --git a/net/minecraft/world/item/EndCrystalItem.java b/net/minecraft/world/item/EndCrystalItem.java
 --- a/net/minecraft/world/item/EndCrystalItem.java
 +++ b/net/minecraft/world/item/EndCrystalItem.java
@@ -28,7 +27,7 @@ diff --git a/net/minecraft/world/item/EndCrystalItem.java b/net/minecraft/world/
 diff --git a/net/minecraft/world/level/dimension/end/EndDragonFight.java b/net/minecraft/world/level/dimension/end/EndDragonFight.java
 --- a/net/minecraft/world/level/dimension/end/EndDragonFight.java
 +++ b/net/minecraft/world/level/dimension/end/EndDragonFight.java
-@@ -576,12 +576,14 @@ public class EndDragonFight {
+@@ -511,12 +511,14 @@ public class EndDragonFight {
      }
  
      public boolean tryRespawn() { // CraftBukkit - return boolean
@@ -43,15 +42,15 @@ diff --git a/net/minecraft/world/level/dimension/end/EndDragonFight.java b/net/m
          if (this.dragonKilled && this.respawnStage == null) {
              BlockPos blockPos = this.portalLocation;
              if (blockPos == null) {
-@@ -596,6 +598,7 @@ public class EndDragonFight {
+@@ -531,6 +533,7 @@ public class EndDragonFight {
  
                  blockPos = this.portalLocation;
              }
 +            /* Leaves
              // Paper start - Perf: Do crystal-portal proximity check before entity lookup
-             if (placedEndCrystalPos != null) {
+             if (placedEndCrystalPos != null && !level.paperConfig().misc.allowRemoteEnderDragonRespawning) {
                  // The end crystal must be 0 or 1 higher than the portal origin
-@@ -611,7 +614,7 @@ public class EndDragonFight {
+@@ -546,7 +549,7 @@ public class EndDragonFight {
                  }
              }
              // Paper end - Perf: Do crystal-portal proximity check before entity lookup
@@ -60,3 +59,8 @@ diff --git a/net/minecraft/world/level/dimension/end/EndDragonFight.java b/net/m
  
              List<EndCrystal> list = Lists.newArrayList();
              BlockPos blockPos1 = blockPos.above(1);
+@@ -629,3 +632,4 @@ public class EndDragonFight {
+         );
+     }
+ }
++

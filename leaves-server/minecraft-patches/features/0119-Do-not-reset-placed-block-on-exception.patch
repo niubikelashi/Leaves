@@ -3,7 +3,6 @@ From: MC_XiaoHei <xiaohei.xor7@outlook.com>
 Date: Sat, 17 May 2025 11:38:56 +0000
 Subject: [PATCH] Do not reset placed block on exception
 
-
 diff --git a/net/minecraft/world/item/BlockItem.java b/net/minecraft/world/item/BlockItem.java
 --- a/net/minecraft/world/item/BlockItem.java
 +++ b/net/minecraft/world/item/BlockItem.java

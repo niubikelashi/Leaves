@@ -3,11 +3,10 @@ From: Fortern <blueten.ki@gmail.com>
 Date: Sat, 17 May 2025 03:01:48 +0000
 Subject: [PATCH] Fix chunk reload detector
 
-
 diff --git a/net/minecraft/server/level/ServerEntity.java b/net/minecraft/server/level/ServerEntity.java
 --- a/net/minecraft/server/level/ServerEntity.java
 +++ b/net/minecraft/server/level/ServerEntity.java
-@@ -390,7 +390,7 @@ public class ServerEntity {
+@@ -372,7 +372,7 @@ public class ServerEntity {
              if (!list.isEmpty()) {
                  consumer.accept(new ClientboundSetEquipmentPacket(this.entity.getId(), list, true)); // Paper - data sanitization
              }

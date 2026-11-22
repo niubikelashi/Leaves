@@ -3,15 +3,13 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Sun, 11 Dec 2022 18:43:35 +0800
 Subject: [PATCH] Player operation limiter
 
-This patch is Powered by plusls-carpet-addition(https://github.com/plusls/plusls-carpet-addition)
-
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -429,6 +429,10 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -433,6 +433,10 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
      public boolean isRealPlayer; // Paper
-     public @Nullable com.destroystokyo.paper.event.entity.PlayerNaturallySpawnCreaturesEvent playerNaturallySpawnedEvent; // Paper - PlayerNaturallySpawnCreaturesEvent
-     public @Nullable org.bukkit.event.player.PlayerQuitEvent.QuitReason quitReason = null; // Paper - Add API for quit reason; there are a lot of changes to do if we change all methods leading to the event
+     public com.destroystokyo.paper.event.entity.@Nullable PlayerNaturallySpawnCreaturesEvent playerNaturallySpawnedEvent; // Paper - PlayerNaturallySpawnCreaturesEvent
+     public org.bukkit.event.player.PlayerQuitEvent.@Nullable QuitReason quitReason = null; // Paper - Add API for quit reason; there are a lot of changes to do if we change all methods leading to the event
 +    // Leaves start - player operation limiter
 +    private int instaBreakCountPerTick = 0;
 +    private int placeBlockCountPerTick = 0;
@@ -19,15 +17,15 @@ diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server
  
      // Paper start - rewrite chunk system
      private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
-@@ -745,6 +749,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -720,6 +724,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
          }
          // CraftBukkit end
-         this.tickClientLoadTimeout();
+         this.connection.tickClientLoadTimeout();
 +        this.resetOperationCountPerTick(); // Leaves - player operation limiter
          this.gameMode.tick();
          this.wardenSpawnTracker.tick();
          if (this.invulnerableTime > 0) {
-@@ -2981,4 +2986,31 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -3128,4 +3133,32 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
          return (org.bukkit.craftbukkit.entity.CraftPlayer) super.getBukkitEntity();
      }
      // CraftBukkit end
@@ -59,10 +57,11 @@ diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server
 +    }
 +    // Leaves end - player operation limiter
  }
++
 diff --git a/net/minecraft/server/level/ServerPlayerGameMode.java b/net/minecraft/server/level/ServerPlayerGameMode.java
 --- a/net/minecraft/server/level/ServerPlayerGameMode.java
 +++ b/net/minecraft/server/level/ServerPlayerGameMode.java
-@@ -300,6 +300,19 @@ public class ServerPlayerGameMode {
+@@ -317,6 +317,19 @@ public class ServerPlayerGameMode {
      }
  
      public void destroyAndAck(BlockPos pos, int sequence, String message) {

@@ -3,7 +3,6 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Wed, 14 Jun 2023 12:07:07 +0800
 Subject: [PATCH] Redstone ignore upwards update
 
-
 diff --git a/net/minecraft/world/level/block/ComparatorBlock.java b/net/minecraft/world/level/block/ComparatorBlock.java
 --- a/net/minecraft/world/level/block/ComparatorBlock.java
 +++ b/net/minecraft/world/level/block/ComparatorBlock.java
@@ -18,7 +17,7 @@ diff --git a/net/minecraft/world/level/block/ComparatorBlock.java b/net/minecraf
 diff --git a/net/minecraft/world/level/block/RedStoneWireBlock.java b/net/minecraft/world/level/block/RedStoneWireBlock.java
 --- a/net/minecraft/world/level/block/RedStoneWireBlock.java
 +++ b/net/minecraft/world/level/block/RedStoneWireBlock.java
-@@ -179,7 +179,7 @@ public class RedStoneWireBlock extends Block {
+@@ -178,7 +178,7 @@ public class RedStoneWireBlock extends Block {
          RandomSource random
      ) {
          if (direction == Direction.DOWN) {
@@ -27,7 +26,7 @@ diff --git a/net/minecraft/world/level/block/RedStoneWireBlock.java b/net/minecr
          } else if (direction == Direction.UP) {
              return this.getConnectionState(level, state, pos);
          } else {
-@@ -238,7 +238,7 @@ public class RedStoneWireBlock extends Block {
+@@ -237,7 +237,7 @@ public class RedStoneWireBlock extends Block {
          BlockPos blockPos = pos.relative(direction);
          BlockState blockState = level.getBlockState(blockPos);
          if (nonNormalCubeAbove) {

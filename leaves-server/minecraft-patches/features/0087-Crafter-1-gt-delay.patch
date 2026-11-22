@@ -3,7 +3,6 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Tue, 12 Dec 2023 14:15:54 +0800
 Subject: [PATCH] Crafter 1 gt delay
 
-
 diff --git a/net/minecraft/world/level/block/CrafterBlock.java b/net/minecraft/world/level/block/CrafterBlock.java
 --- a/net/minecraft/world/level/block/CrafterBlock.java
 +++ b/net/minecraft/world/level/block/CrafterBlock.java
@@ -13,15 +12,20 @@ diff --git a/net/minecraft/world/level/block/CrafterBlock.java b/net/minecraft/w
          if (hasNeighborSignal && !triggeredValue) {
 -            level.scheduleTick(pos, this, 4);
 +            level.scheduleTick(pos, this, !org.leavesmc.leaves.LeavesConfig.modify.oldMC.crafter1gt ? 4 : 1); // Leaves - crafter 1 gt delay
-             level.setBlock(pos, state.setValue(TRIGGERED, true), 2);
+             level.setBlock(pos, state.setValue(TRIGGERED, true), Block.UPDATE_CLIENTS);
              this.setBlockEntityTriggered(blockEntity, true);
          } else if (!hasNeighborSignal && triggeredValue) {
-@@ -125,7 +125,7 @@ public class CrafterBlock extends BaseEntityBlock {
+@@ -124,7 +124,7 @@ public class CrafterBlock extends BaseEntityBlock {
      @Override
-     public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
          if (state.getValue(TRIGGERED)) {
 -            level.scheduleTick(pos, this, 4);
 +            level.scheduleTick(pos, this, !org.leavesmc.leaves.LeavesConfig.modify.oldMC.crafter1gt ? 4 : 1); // Leaves - crafter 1 gt delay
          }
      }
  
+@@ -276,3 +276,4 @@ public class CrafterBlock extends BaseEntityBlock {
+         builder.add(ORIENTATION, TRIGGERED, CRAFTING);
+     }
+ }
++

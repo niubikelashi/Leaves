@@ -3,7 +3,6 @@ From: Helvetica Volubi <suisuroru@blue-millennium.fun>
 Date: Thu, 12 Jun 2025 12:55:12 +0800
 Subject: [PATCH] Leaves I18n support
 
-
 diff --git a/net/minecraft/locale/Language.java b/net/minecraft/locale/Language.java
 --- a/net/minecraft/locale/Language.java
 +++ b/net/minecraft/locale/Language.java
@@ -27,7 +26,7 @@ diff --git a/net/minecraft/locale/Language.java b/net/minecraft/locale/Language.
 diff --git a/net/minecraft/server/Main.java b/net/minecraft/server/Main.java
 --- a/net/minecraft/server/Main.java
 +++ b/net/minecraft/server/Main.java
-@@ -154,6 +154,8 @@ public class Main {
+@@ -150,6 +150,8 @@ public class Main {
                  return;
              }
  
@@ -39,11 +38,16 @@ diff --git a/net/minecraft/server/Main.java b/net/minecraft/server/Main.java
 diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -187,6 +187,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -275,6 +275,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+         com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
  
          org.leavesmc.leaves.LeavesConfig.init((java.io.File) options.valueOf("leaves-settings")); // Leaves - Server Config
-         this.getBotList().loadBotInfo(); // Leaves - load resident bot info
 +        org.leavesmc.leaves.util.ServerI18nUtil.init(); // Leaves I18n
  
          com.destroystokyo.paper.Metrics.PaperMetrics.startMetrics(); // Paper - start metrics // Leaves - down
  
+@@ -1053,3 +1054,4 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+     // CraftBukkit end
+ }
+ 
++

@@ -3,11 +3,10 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Mon, 22 Jan 2024 11:41:13 +0800
 Subject: [PATCH] Renewable sponges
 
-
 diff --git a/net/minecraft/world/entity/monster/Guardian.java b/net/minecraft/world/entity/monster/Guardian.java
 --- a/net/minecraft/world/entity/monster/Guardian.java
 +++ b/net/minecraft/world/entity/monster/Guardian.java
-@@ -452,6 +452,28 @@ public class Guardian extends Monster {
+@@ -446,6 +446,28 @@ public class Guardian extends Monster {
          }
      }
  

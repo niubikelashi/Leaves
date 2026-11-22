@@ -3,11 +3,10 @@ From: Fortern <blueten.ki@gmail.com>
 Date: Sat, 20 Jan 2024 02:50:56 +0800
 Subject: [PATCH] Placing locked hopper no longer send NC updates
 
-
 diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Level.java
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
-@@ -1210,7 +1210,11 @@ public abstract class Level implements LevelAccessor, UUIDLookup<Entity>, AutoCl
+@@ -1161,7 +1161,11 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
              }
  
              if ((flags & 1) != 0) {
@@ -17,6 +16,11 @@ diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Le
 +                    this.updateNeighborsAt(pos, blockState.getBlock());
 +                }
 +                // Leaves end - Placing locked hopper doesn't send NC updates.
-                 if (!this.isClientSide && state.hasAnalogOutputSignal()) {
+                 if (!this.isClientSide() && state.hasAnalogOutputSignal()) {
                      this.updateNeighbourForOutputSignal(pos, newState.getBlock());
                  }
+@@ -2099,3 +2103,4 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+     // Paper end - allow patching this logic
+ }
+ 
++

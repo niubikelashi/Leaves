@@ -3,7 +3,6 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Tue, 1 Jul 2025 01:29:07 +0800
 Subject: [PATCH] Old Throwable Projectile tick order
 
-
 diff --git a/net/minecraft/world/entity/projectile/ThrowableProjectile.java b/net/minecraft/world/entity/projectile/ThrowableProjectile.java
 --- a/net/minecraft/world/entity/projectile/ThrowableProjectile.java
 +++ b/net/minecraft/world/entity/projectile/ThrowableProjectile.java

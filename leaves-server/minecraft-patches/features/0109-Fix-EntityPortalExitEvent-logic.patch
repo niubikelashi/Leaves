@@ -3,11 +3,10 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Thu, 2 Jan 2025 22:01:17 +0800
 Subject: [PATCH] Fix EntityPortalExitEvent logic
 
-
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -3984,19 +3984,21 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -4056,19 +4056,21 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
                  );
                  event.callEvent();
  

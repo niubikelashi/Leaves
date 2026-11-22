@@ -3,11 +3,10 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Tue, 1 Jul 2025 00:19:23 +0800
 Subject: [PATCH] Configurable item damage check
 
-
 diff --git a/net/minecraft/world/item/ItemStack.java b/net/minecraft/world/item/ItemStack.java
 --- a/net/minecraft/world/item/ItemStack.java
 +++ b/net/minecraft/world/item/ItemStack.java
-@@ -597,11 +597,11 @@ public final class ItemStack implements DataComponentHolder {
+@@ -603,11 +603,11 @@ public final class ItemStack implements DataComponentHolder {
      }
  
      public int getDamageValue() {

@@ -3,7 +3,6 @@ From: Fortern <blueten.ki@gmail.com>
 Date: Thu, 24 Oct 2024 23:10:34 +0800
 Subject: [PATCH] Configurable collision behavior
 
-
 diff --git a/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java b/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java
 --- a/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java
 +++ b/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java

@@ -3,8 +3,6 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Wed, 14 Dec 2022 14:47:06 +0800
 Subject: [PATCH] Item overstack util
 
-This patch is Powered by fabric-carpet(https://github.com/gnembon/fabric-carpet) and plusls-carpet-addition(https://github.com/plusls/plusls-carpet-addition)
-
 diff --git a/net/minecraft/commands/arguments/item/ItemInput.java b/net/minecraft/commands/arguments/item/ItemInput.java
 --- a/net/minecraft/commands/arguments/item/ItemInput.java
 +++ b/net/minecraft/commands/arguments/item/ItemInput.java
@@ -27,19 +25,24 @@ diff --git a/net/minecraft/commands/arguments/item/ItemInput.java b/net/minecraf
 diff --git a/net/minecraft/server/commands/GiveCommand.java b/net/minecraft/server/commands/GiveCommand.java
 --- a/net/minecraft/server/commands/GiveCommand.java
 +++ b/net/minecraft/server/commands/GiveCommand.java
-@@ -55,7 +55,7 @@ public class GiveCommand {
+@@ -54,7 +54,7 @@ public class GiveCommand {
+ 
      private static int giveItem(CommandSourceStack source, ItemInput item, Collection<ServerPlayer> targets, int count) throws CommandSyntaxException {
          ItemStack itemStack = item.createItemStack(1, false);
-         final Component displayName = itemStack.getDisplayName(); // Paper - get display name early
 -        int maxStackSize = itemStack.getMaxStackSize();
 +        int maxStackSize = org.leavesmc.leaves.util.ItemOverstackUtils.getItemStackMaxCount(itemStack); // Leaves - item over-stack util
          int i = maxStackSize * 100;
          if (count > i) {
              source.sendFailure(Component.translatable("commands.give.failed.toomanyitems", i, itemStack.getDisplayName()));
+@@ -109,3 +109,4 @@ public class GiveCommand {
+         }
+     }
+ }
++
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -2987,7 +2987,7 @@ public class ServerGamePacketListenerImpl
+@@ -3041,7 +3041,7 @@ public class ServerGamePacketListenerImpl
                                              } else if (slot.mayPlace(cursor)) {
                                                  if (ItemStack.isSameItemSameComponents(clickedItem, cursor)) {
                                                      int toPlace = packet.buttonNum() == 0 ? cursor.getCount() : 1;
@@ -48,7 +51,7 @@ diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/ne
                                                      toPlace = Math.min(toPlace, slot.container.getMaxStackSize() - clickedItem.getCount());
                                                      if (toPlace == 1) {
                                                          action = InventoryAction.PLACE_ONE;
-@@ -3023,7 +3023,7 @@ public class ServerGamePacketListenerImpl
+@@ -3077,7 +3077,7 @@ public class ServerGamePacketListenerImpl
                                                  }
                                              } else if (ItemStack.isSameItemSameComponents(cursor, clickedItem)) {
                                                  if (clickedItem.getCount() >= 0) {
@@ -57,7 +60,7 @@ diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/ne
                                                          // As of 1.5, this is result slots only
                                                          action = InventoryAction.PICKUP_ALL;
                                                      }
-@@ -3234,6 +3234,7 @@ public class ServerGamePacketListenerImpl
+@@ -3294,6 +3294,7 @@ public class ServerGamePacketListenerImpl
                          this.player.containerMenu.broadcastFullState();
                      } else {
                          this.player.containerMenu.broadcastChanges();
@@ -65,7 +68,7 @@ diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/ne
                      }
                      if (packet.buttonNum() == Inventory.SLOT_OFFHAND && this.player.containerMenu != this.player.inventoryMenu) this.player.containerSynchronizer.sendOffHandSlotChange(); // Paper - update offhand data when the player is clicking in an inventory not their own as the sychronizer does not include offhand slots
                      if (io.papermc.paper.configuration.GlobalConfiguration.get().unsupportedSettings.updateEquipmentOnPlayerActions) this.player.detectEquipmentUpdates(); // Paper - Force update attributes.
-@@ -3345,7 +3346,7 @@ public class ServerGamePacketListenerImpl
+@@ -3405,7 +3406,7 @@ public class ServerGamePacketListenerImpl
              }
  
              boolean flag1 = packet.slotNum() >= 1 && packet.slotNum() <= 45;
@@ -74,7 +77,7 @@ diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/ne
              if (flag || (flag1 && !ItemStack.matches(this.player.inventoryMenu.getSlot(packet.slotNum()).getItem(), packet.itemStack()))) { // Insist on valid slot
                  // CraftBukkit start - Call click event
                  org.bukkit.inventory.InventoryView inventory = this.player.inventoryMenu.getBukkitView();
-@@ -3387,6 +3388,7 @@ public class ServerGamePacketListenerImpl
+@@ -3447,6 +3448,7 @@ public class ServerGamePacketListenerImpl
                  this.player.inventoryMenu.getSlot(packet.slotNum()).setByPlayer(itemStack);
                  this.player.inventoryMenu.setRemoteSlot(packet.slotNum(), itemStack);
                  this.player.inventoryMenu.broadcastChanges();
@@ -85,7 +88,7 @@ diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/ne
 diff --git a/net/minecraft/world/Container.java b/net/minecraft/world/Container.java
 --- a/net/minecraft/world/Container.java
 +++ b/net/minecraft/world/Container.java
-@@ -32,6 +32,12 @@ public interface Container extends Clearable, Iterable<ItemStack> {
+@@ -37,6 +37,12 @@ public interface Container extends Clearable, SlotProvider, Iterable<ItemStack>
          return Math.min(this.getMaxStackSize(), stack.getMaxStackSize());
      }
  
@@ -101,7 +104,7 @@ diff --git a/net/minecraft/world/Container.java b/net/minecraft/world/Container.
 diff --git a/net/minecraft/world/SimpleContainer.java b/net/minecraft/world/SimpleContainer.java
 --- a/net/minecraft/world/SimpleContainer.java
 +++ b/net/minecraft/world/SimpleContainer.java
-@@ -211,7 +211,7 @@ public class SimpleContainer implements Container, StackedContentsCompatible {
+@@ -210,7 +210,7 @@ public class SimpleContainer implements Container, StackedContentsCompatible {
      @Override
      public void setItem(int index, ItemStack stack) {
          this.items.set(index, stack);
@@ -110,7 +113,7 @@ diff --git a/net/minecraft/world/SimpleContainer.java b/net/minecraft/world/Simp
          this.setChanged();
      }
  
-@@ -286,7 +286,7 @@ public class SimpleContainer implements Container, StackedContentsCompatible {
+@@ -285,7 +285,7 @@ public class SimpleContainer implements Container, StackedContentsCompatible {
      }
  
      private void moveItemsBetweenStacks(ItemStack stack, ItemStack other) {
@@ -122,7 +125,7 @@ diff --git a/net/minecraft/world/SimpleContainer.java b/net/minecraft/world/Simp
 diff --git a/net/minecraft/world/entity/item/ItemEntity.java b/net/minecraft/world/entity/item/ItemEntity.java
 --- a/net/minecraft/world/entity/item/ItemEntity.java
 +++ b/net/minecraft/world/entity/item/ItemEntity.java
-@@ -279,10 +279,15 @@ public class ItemEntity extends Entity implements TraceableEntity {
+@@ -267,10 +267,15 @@ public class ItemEntity extends Entity implements TraceableEntity {
  
      private boolean isMergable() {
          ItemStack item = this.getItem();
@@ -142,7 +145,7 @@ diff --git a/net/minecraft/world/entity/item/ItemEntity.java b/net/minecraft/wor
 diff --git a/net/minecraft/world/entity/player/Inventory.java b/net/minecraft/world/entity/player/Inventory.java
 --- a/net/minecraft/world/entity/player/Inventory.java
 +++ b/net/minecraft/world/entity/player/Inventory.java
-@@ -165,10 +165,12 @@ public class Inventory implements Container, Nameable {
+@@ -166,10 +166,12 @@ public class Inventory implements Container, Nameable {
      }
  
      private boolean hasRemainingSpaceForItem(ItemStack destination, ItemStack origin) {
@@ -157,7 +160,7 @@ diff --git a/net/minecraft/world/entity/player/Inventory.java b/net/minecraft/wo
      }
  
      // CraftBukkit start - Watch method above! :D
-@@ -181,7 +183,7 @@ public class Inventory implements Container, Nameable {
+@@ -182,7 +184,7 @@ public class Inventory implements Container, Nameable {
              }
  
              if (this.hasRemainingSpaceForItem(itemInSlot, itemStack)) {
@@ -166,7 +169,7 @@ diff --git a/net/minecraft/world/entity/player/Inventory.java b/net/minecraft/wo
              }
              if (remains <= 0) {
                  return itemStack.getCount();
-@@ -190,7 +192,7 @@ public class Inventory implements Container, Nameable {
+@@ -191,7 +193,7 @@ public class Inventory implements Container, Nameable {
  
          ItemStack itemInOffhand = this.equipment.get(EquipmentSlot.OFFHAND);
          if (this.hasRemainingSpaceForItem(itemInOffhand, itemStack)) {
@@ -175,7 +178,7 @@ diff --git a/net/minecraft/world/entity/player/Inventory.java b/net/minecraft/wo
          }
          if (remains <= 0) {
              return itemStack.getCount();
-@@ -314,7 +316,7 @@ public class Inventory implements Container, Nameable {
+@@ -315,7 +317,7 @@ public class Inventory implements Container, Nameable {
              this.setItem(slot, item);
          }
  
@@ -184,7 +187,7 @@ diff --git a/net/minecraft/world/entity/player/Inventory.java b/net/minecraft/wo
          int min = Math.min(count, i);
          if (min == 0) {
              return count;
-@@ -420,7 +422,7 @@ public class Inventory implements Container, Nameable {
+@@ -421,7 +423,7 @@ public class Inventory implements Container, Nameable {
                  break;
              }
  
@@ -196,7 +199,7 @@ diff --git a/net/minecraft/world/entity/player/Inventory.java b/net/minecraft/wo
 diff --git a/net/minecraft/world/entity/player/StackedItemContents.java b/net/minecraft/world/entity/player/StackedItemContents.java
 --- a/net/minecraft/world/entity/player/StackedItemContents.java
 +++ b/net/minecraft/world/entity/player/StackedItemContents.java
-@@ -23,7 +23,7 @@ public class StackedItemContents {
+@@ -36,7 +36,7 @@ public class StackedItemContents {
      }
  
      public void accountStack(ItemStack stack) {
@@ -208,7 +211,7 @@ diff --git a/net/minecraft/world/entity/player/StackedItemContents.java b/net/mi
 diff --git a/net/minecraft/world/entity/vehicle/ContainerEntity.java b/net/minecraft/world/entity/vehicle/ContainerEntity.java
 --- a/net/minecraft/world/entity/vehicle/ContainerEntity.java
 +++ b/net/minecraft/world/entity/vehicle/ContainerEntity.java
-@@ -163,7 +163,7 @@ public interface ContainerEntity extends Container, MenuProvider {
+@@ -162,7 +162,7 @@ public interface ContainerEntity extends Container, MenuProvider {
      default void setChestVehicleItem(int slot, ItemStack stack) {
          this.unpackChestVehicleLootTable(null);
          this.getItemStacks().set(slot, stack);
@@ -216,11 +219,16 @@ diff --git a/net/minecraft/world/entity/vehicle/ContainerEntity.java b/net/minec
 +        stack.limitSize(this.getMaxStackLeaves(stack)); // Leaves - item over-stack util
      }
  
-     default SlotAccess getChestVehicleSlot(final int index) {
+     default @Nullable SlotAccess getChestVehicleSlot(final int slot) {
+@@ -194,3 +194,4 @@ public interface ContainerEntity extends Container, MenuProvider {
+     }
+     // Paper end - LootTable API
+ }
++
 diff --git a/net/minecraft/world/inventory/AbstractContainerMenu.java b/net/minecraft/world/inventory/AbstractContainerMenu.java
 --- a/net/minecraft/world/inventory/AbstractContainerMenu.java
 +++ b/net/minecraft/world/inventory/AbstractContainerMenu.java
-@@ -295,6 +295,13 @@ public abstract class AbstractContainerMenu {
+@@ -292,6 +292,13 @@ public abstract class AbstractContainerMenu {
          this.sendAllDataToRemote();
      }
  
@@ -234,7 +242,7 @@ diff --git a/net/minecraft/world/inventory/AbstractContainerMenu.java b/net/mine
      private void updateDataSlotListeners(int slotIndex, int value) {
          for (ContainerListener containerListener : this.containerListeners) {
              containerListener.dataChanged(this, slotIndex, value);
-@@ -452,7 +459,7 @@ public abstract class AbstractContainerMenu {
+@@ -448,7 +455,7 @@ public abstract class AbstractContainerMenu {
                              && (this.quickcraftType == 2 || carried1.getCount() >= this.quickcraftSlots.size())
                              && this.canDragTo(slot1)) {
                              int i2 = slot1.hasItem() ? slot1.getItem().getCount() : 0;
@@ -243,7 +251,7 @@ diff --git a/net/minecraft/world/inventory/AbstractContainerMenu.java b/net/mine
                              int min1 = Math.min(getQuickCraftPlaceCount(this.quickcraftSlots, this.quickcraftType, itemStack) + i2, min);
                              count -= min1 - i2;
                              // slot1.setByPlayer(itemStack.copyWithCount(min1));
-@@ -564,7 +571,7 @@ public abstract class AbstractContainerMenu {
+@@ -560,7 +567,7 @@ public abstract class AbstractContainerMenu {
                                  slot.setByPlayer(carried2);
                              }
                          } else if (ItemStack.isSameItemSameComponents(carried, carried2)) {
@@ -252,15 +260,15 @@ diff --git a/net/minecraft/world/inventory/AbstractContainerMenu.java b/net/mine
                              optional1.ifPresent(itemStack2 -> {
                                  carried2.grow(itemStack2.getCount());
                                  slot.onTake(player, itemStack2);
-@@ -626,7 +633,7 @@ public abstract class AbstractContainerMenu {
-             Slot slot2 = this.slots.get(slotId);
+@@ -622,7 +629,7 @@ public abstract class AbstractContainerMenu {
+             Slot slot2 = this.slots.get(slotIndex);
              if (slot2.hasItem()) {
                  ItemStack itemStack = slot2.getItem();
 -                this.setCarried(itemStack.copyWithCount(itemStack.getMaxStackSize()));
 +                this.setCarried(itemStack.copyWithCount(org.leavesmc.leaves.util.ItemOverstackUtils.getItemStackMaxCount(itemStack))); // Leaves - item over-stack util
              }
-         } else if (clickType == ClickType.THROW && this.getCarried().isEmpty() && slotId >= 0) {
-             Slot slot2 = this.slots.get(slotId);
+         } else if (clickType == ClickType.THROW && this.getCarried().isEmpty() && slotIndex >= 0) {
+             Slot slot2 = this.slots.get(slotIndex);
 @@ -657,15 +664,15 @@ public abstract class AbstractContainerMenu {
                  int maxStackSize = button == 0 ? 1 : -1;
  
@@ -280,7 +288,7 @@ diff --git a/net/minecraft/world/inventory/AbstractContainerMenu.java b/net/mine
                                  itemStack.grow(itemStack1.getCount());
                              }
                          }
-@@ -783,7 +790,7 @@ public abstract class AbstractContainerMenu {
+@@ -767,7 +774,7 @@ public abstract class AbstractContainerMenu {
              i = endIndex - 1;
          }
  
@@ -289,7 +297,7 @@ diff --git a/net/minecraft/world/inventory/AbstractContainerMenu.java b/net/mine
              while (!stack.isEmpty() && (reverseDirection ? i >= startIndex : i < endIndex)) {
                  Slot slot = this.slots.get(i);
                  ItemStack item = slot.getItem();
-@@ -884,7 +891,7 @@ public abstract class AbstractContainerMenu {
+@@ -868,7 +875,7 @@ public abstract class AbstractContainerMenu {
      public static boolean canItemQuickReplace(@Nullable Slot slot, ItemStack stack, boolean stackSizeMatters) {
          boolean flag = slot == null || !slot.hasItem();
          return !flag && ItemStack.isSameItemSameComponents(stack, slot.getItem())
@@ -298,7 +306,7 @@ diff --git a/net/minecraft/world/inventory/AbstractContainerMenu.java b/net/mine
              : flag;
      }
  
-@@ -892,7 +899,7 @@ public abstract class AbstractContainerMenu {
+@@ -876,7 +883,7 @@ public abstract class AbstractContainerMenu {
          return switch (type) {
              case 0 -> Mth.floor((float)stack.getCount() / slots.size());
              case 1 -> 1;
@@ -307,7 +315,7 @@ diff --git a/net/minecraft/world/inventory/AbstractContainerMenu.java b/net/mine
              default -> stack.getCount();
          };
      }
-@@ -914,7 +921,7 @@ public abstract class AbstractContainerMenu {
+@@ -898,7 +905,7 @@ public abstract class AbstractContainerMenu {
              for (int i = 0; i < container.getContainerSize(); i++) {
                  ItemStack item = container.getItem(i);
                  if (!item.isEmpty()) {
@@ -316,10 +324,15 @@ diff --git a/net/minecraft/world/inventory/AbstractContainerMenu.java b/net/mine
                  }
              }
  
+@@ -981,3 +988,4 @@ public abstract class AbstractContainerMenu {
+     }
+     // Paper end - Add missing InventoryHolders
+ }
++
 diff --git a/net/minecraft/world/inventory/MerchantContainer.java b/net/minecraft/world/inventory/MerchantContainer.java
 --- a/net/minecraft/world/inventory/MerchantContainer.java
 +++ b/net/minecraft/world/inventory/MerchantContainer.java
-@@ -109,7 +109,7 @@ public class MerchantContainer implements Container {
+@@ -108,7 +108,7 @@ public class MerchantContainer implements Container {
      @Override
      public void setItem(int index, ItemStack stack) {
          this.itemStacks.set(index, stack);
@@ -339,20 +352,25 @@ diff --git a/net/minecraft/world/inventory/Slot.java b/net/minecraft/world/inven
 +        return Math.min(this.getMaxStackSize(), org.leavesmc.leaves.util.ItemOverstackUtils.getItemStackMaxCount(stack)); // Leaves - item over-stack util
      }
  
-     @Nullable
+     public @Nullable Identifier getNoItemIcon() {
+@@ -162,3 +162,4 @@ public class Slot {
+         return false;
+     }
+ }
++
 diff --git a/net/minecraft/world/item/ItemStack.java b/net/minecraft/world/item/ItemStack.java
 --- a/net/minecraft/world/item/ItemStack.java
 +++ b/net/minecraft/world/item/ItemStack.java
-@@ -162,7 +162,7 @@ public final class ItemStack implements DataComponentHolder {
+@@ -170,7 +170,7 @@ public final class ItemStack implements DataComponentHolder {
+     private int popTime;
      @Deprecated
-     @Nullable
-     private Item item;
+     private @Nullable Item item;
 -    PatchedDataComponentMap components;
 +    public PatchedDataComponentMap components; // Leaves - item over-stack util
-     @Nullable
-     private Entity entityRepresentation;
+     private @Nullable Entity entityRepresentation;
  
-@@ -189,7 +189,8 @@ public final class ItemStack implements DataComponentHolder {
+     public static DataResult<ItemStack> validateStrict(ItemStack stack) {
+@@ -196,7 +196,8 @@ public final class ItemStack implements DataComponentHolder {
                  } else {
                      Holder<Item> holder = Item.STREAM_CODEC.decode(buffer);
                      DataComponentPatch dataComponentPatch = codec.decode(buffer);
@@ -362,7 +380,7 @@ diff --git a/net/minecraft/world/item/ItemStack.java b/net/minecraft/world/item/
                  }
              }
  
-@@ -198,13 +199,15 @@ public final class ItemStack implements DataComponentHolder {
+@@ -205,13 +206,15 @@ public final class ItemStack implements DataComponentHolder {
                  if (value.isEmpty() || value.getItem() == null) { // CraftBukkit - NPE fix itemstack.getItem()
                      buffer.writeVarInt(0);
                  } else {
@@ -382,7 +400,7 @@ diff --git a/net/minecraft/world/item/ItemStack.java b/net/minecraft/world/item/
                      } finally {
                          net.minecraft.network.chat.ComponentSerialization.DONT_RENDER_TRANSLATABLES.set(prev);
                      }
-@@ -299,7 +302,7 @@ public final class ItemStack implements DataComponentHolder {
+@@ -305,7 +308,7 @@ public final class ItemStack implements DataComponentHolder {
  
              for (ItemStack itemStack : itemContainerContents.nonEmptyItems()) {
                  int count = itemStack.getCount();
@@ -391,10 +409,15 @@ diff --git a/net/minecraft/world/item/ItemStack.java b/net/minecraft/world/item/
                  if (count > maxStackSize) {
                      return DataResult.error(() -> "Item stack with count of " + count + " was larger than maximum: " + maxStackSize);
                  }
+@@ -1407,3 +1410,4 @@ public final class ItemStack implements DataComponentHolder {
+             .orElseGet(fallback);
+     }
+ }
++
 diff --git a/net/minecraft/world/level/block/CrafterBlock.java b/net/minecraft/world/level/block/CrafterBlock.java
 --- a/net/minecraft/world/level/block/CrafterBlock.java
 +++ b/net/minecraft/world/level/block/CrafterBlock.java
-@@ -192,7 +192,7 @@ public class CrafterBlock extends BaseEntityBlock {
+@@ -191,7 +191,7 @@ public class CrafterBlock extends BaseEntityBlock {
          Direction direction = state.getValue(ORIENTATION).front();
          Container containerAt = HopperBlockEntity.getContainerAt(level, pos.relative(direction));
          ItemStack itemStack = stack.copy();
@@ -406,7 +429,7 @@ diff --git a/net/minecraft/world/level/block/CrafterBlock.java b/net/minecraft/w
 diff --git a/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.java b/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.java
-@@ -409,7 +409,7 @@ public abstract class AbstractFurnaceBlockEntity extends BaseContainerBlockEntit
+@@ -410,7 +410,7 @@ public abstract class AbstractFurnaceBlockEntity extends BaseContainerBlockEntit
          ItemStack itemStack = this.items.get(index);
          boolean flag = !stack.isEmpty() && ItemStack.isSameItemSameComponents(itemStack, stack);
          this.items.set(index, stack);
@@ -418,7 +441,7 @@ diff --git a/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.j
 diff --git a/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.java b/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.java
-@@ -145,7 +145,7 @@ public abstract class BaseContainerBlockEntity extends BlockEntity implements Co
+@@ -124,7 +124,7 @@ public abstract class BaseContainerBlockEntity extends BlockEntity implements Co
      @Override
      public void setItem(int slot, ItemStack stack) {
          this.getItems().set(slot, stack);
@@ -430,7 +453,7 @@ diff --git a/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.jav
 diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -113,7 +113,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -114,7 +114,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
      public void setItem(int index, ItemStack stack) {
          this.unpackLootTable(null);
          this.getItems().set(index, stack);
@@ -439,7 +462,7 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
      }
  
      @Override
-@@ -692,9 +692,9 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -693,9 +693,9 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
              if (item.isEmpty()) {
                  // Spigot start - SPIGOT-6693, SimpleContainer#setItem
                  ItemStack leftover = ItemStack.EMPTY; // Paper - Make hoppers respect inventory max stack size

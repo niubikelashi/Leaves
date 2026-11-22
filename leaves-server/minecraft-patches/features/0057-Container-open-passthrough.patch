@@ -3,11 +3,10 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Mon, 3 Feb 2025 21:31:03 +0800
 Subject: [PATCH] Container open passthrough
 
-
 diff --git a/net/minecraft/world/entity/decoration/ItemFrame.java b/net/minecraft/world/entity/decoration/ItemFrame.java
 --- a/net/minecraft/world/entity/decoration/ItemFrame.java
 +++ b/net/minecraft/world/entity/decoration/ItemFrame.java
-@@ -412,6 +412,20 @@ public class ItemFrame extends HangingEntity {
+@@ -419,6 +419,20 @@ public class ItemFrame extends HangingEntity {
                      return InteractionResult.PASS;
                  }
              } else {

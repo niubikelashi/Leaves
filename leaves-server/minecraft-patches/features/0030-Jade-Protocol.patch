@@ -3,12 +3,10 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Mon, 3 Feb 2025 13:33:19 +0800
 Subject: [PATCH] Jade Protocol
 
-This patch is Powered by Jade(https://github.com/Snownee/Jade)
-
 diff --git a/net/minecraft/world/entity/animal/armadillo/Armadillo.java b/net/minecraft/world/entity/animal/armadillo/Armadillo.java
 --- a/net/minecraft/world/entity/animal/armadillo/Armadillo.java
 +++ b/net/minecraft/world/entity/animal/armadillo/Armadillo.java
-@@ -63,7 +63,7 @@ public class Armadillo extends Animal {
+@@ -64,7 +64,7 @@ public class Armadillo extends Animal {
      public final AnimationState rollOutAnimationState = new AnimationState();
      public final AnimationState rollUpAnimationState = new AnimationState();
      public final AnimationState peekAnimationState = new AnimationState();
@@ -16,11 +14,16 @@ diff --git a/net/minecraft/world/entity/animal/armadillo/Armadillo.java b/net/mi
 +    public int scuteTime; // Leaves - private -> public
      private boolean peekReceivedClient = false;
  
-     public Armadillo(EntityType<? extends Animal> entityType, Level level) {
+     public Armadillo(EntityType<? extends Animal> type, Level level) {
+@@ -438,3 +438,4 @@ public class Armadillo extends Animal {
+         }
+     }
+ }
++
 diff --git a/net/minecraft/world/entity/animal/frog/Tadpole.java b/net/minecraft/world/entity/animal/frog/Tadpole.java
 --- a/net/minecraft/world/entity/animal/frog/Tadpole.java
 +++ b/net/minecraft/world/entity/animal/frog/Tadpole.java
-@@ -254,7 +254,7 @@ public class Tadpole extends AbstractFish {
+@@ -244,7 +244,7 @@ public class Tadpole extends AbstractFish {
          }
      }
  
@@ -47,12 +50,17 @@ diff --git a/net/minecraft/world/level/storage/loot/LootTable.java b/net/minecra
 @@ -50,7 +50,7 @@ public class LootTable {
      public static final LootTable EMPTY = new LootTable(LootContextParamSets.EMPTY, Optional.empty(), List.of(), List.of());
      private final ContextKeySet paramSet;
-     private final Optional<ResourceLocation> randomSequence;
+     private final Optional<Identifier> randomSequence;
 -    private final List<LootPool> pools;
 +    public final List<LootPool> pools; // Leaves - private -> public
      private final List<LootItemFunction> functions;
      private final BiFunction<ItemStack, LootContext, ItemStack> compositeFunction;
      public org.bukkit.craftbukkit.CraftLootTable craftLootTable; // CraftBukkit
+@@ -270,3 +270,4 @@ public class LootTable {
+         }
+     }
+ }
++
 diff --git a/net/minecraft/world/level/storage/loot/entries/CompositeEntryBase.java b/net/minecraft/world/level/storage/loot/entries/CompositeEntryBase.java
 --- a/net/minecraft/world/level/storage/loot/entries/CompositeEntryBase.java
 +++ b/net/minecraft/world/level/storage/loot/entries/CompositeEntryBase.java

@@ -3,11 +3,10 @@ From: Lumine1909 <133463833+lumine1909@users.noreply.github.com>
 Date: Wed, 26 Jun 2024 17:59:56 +0800
 Subject: [PATCH] Allow grindstone overstacking
 
-
 diff --git a/net/minecraft/world/SimpleContainer.java b/net/minecraft/world/SimpleContainer.java
 --- a/net/minecraft/world/SimpleContainer.java
 +++ b/net/minecraft/world/SimpleContainer.java
-@@ -211,6 +211,12 @@ public class SimpleContainer implements Container, StackedContentsCompatible {
+@@ -210,6 +210,12 @@ public class SimpleContainer implements Container, StackedContentsCompatible {
      @Override
      public void setItem(int index, ItemStack stack) {
          this.items.set(index, stack);
@@ -23,7 +22,7 @@ diff --git a/net/minecraft/world/SimpleContainer.java b/net/minecraft/world/Simp
 diff --git a/net/minecraft/world/entity/vehicle/ContainerEntity.java b/net/minecraft/world/entity/vehicle/ContainerEntity.java
 --- a/net/minecraft/world/entity/vehicle/ContainerEntity.java
 +++ b/net/minecraft/world/entity/vehicle/ContainerEntity.java
-@@ -163,6 +163,11 @@ public interface ContainerEntity extends Container, MenuProvider {
+@@ -162,6 +162,11 @@ public interface ContainerEntity extends Container, MenuProvider {
      default void setChestVehicleItem(int slot, ItemStack stack) {
          this.unpackChestVehicleLootTable(null);
          this.getItemStacks().set(slot, stack);
@@ -38,7 +37,7 @@ diff --git a/net/minecraft/world/entity/vehicle/ContainerEntity.java b/net/minec
 diff --git a/net/minecraft/world/inventory/AbstractContainerMenu.java b/net/minecraft/world/inventory/AbstractContainerMenu.java
 --- a/net/minecraft/world/inventory/AbstractContainerMenu.java
 +++ b/net/minecraft/world/inventory/AbstractContainerMenu.java
-@@ -607,7 +607,7 @@ public abstract class AbstractContainerMenu {
+@@ -603,7 +603,7 @@ public abstract class AbstractContainerMenu {
                  } else if (carried.isEmpty()) {
                      if (slot.mayPlace(item)) {
                          int maxStackSize = slot.getMaxStackSize(item);
@@ -47,7 +46,7 @@ diff --git a/net/minecraft/world/inventory/AbstractContainerMenu.java b/net/mine
                              slot.setByPlayer(item.split(maxStackSize));
                          } else {
                              inventory.setItem(button, ItemStack.EMPTY);
-@@ -616,7 +616,7 @@ public abstract class AbstractContainerMenu {
+@@ -612,7 +612,7 @@ public abstract class AbstractContainerMenu {
                      }
                  } else if (slot.mayPickup(player) && slot.mayPlace(item)) {
                      int maxStackSize = slot.getMaxStackSize(item);
@@ -56,7 +55,7 @@ diff --git a/net/minecraft/world/inventory/AbstractContainerMenu.java b/net/mine
                          slot.setByPlayer(item.split(maxStackSize));
                          slot.onTake(player, carried);
                          if (!inventory.add(carried)) {
-@@ -776,10 +776,15 @@ public abstract class AbstractContainerMenu {
+@@ -760,10 +760,15 @@ public abstract class AbstractContainerMenu {
      public abstract boolean stillValid(Player player);
  
      protected boolean moveItemStackTo(ItemStack stack, int startIndex, int endIndex, boolean reverseDirection) {
@@ -72,7 +71,7 @@ diff --git a/net/minecraft/world/inventory/AbstractContainerMenu.java b/net/mine
          if (isCheck) {
              stack = stack.copy();
          }
-@@ -844,6 +849,14 @@ public abstract class AbstractContainerMenu {
+@@ -828,6 +833,14 @@ public abstract class AbstractContainerMenu {
                  // Paper end - Add PlayerTradeEvent and PlayerPurchaseEvent
                  if (itemx.isEmpty() && slotx.mayPlace(stack)) {
                      int i1 = slotx.getMaxStackSize(stack);
@@ -90,7 +89,7 @@ diff --git a/net/minecraft/world/inventory/AbstractContainerMenu.java b/net/mine
 diff --git a/net/minecraft/world/inventory/GrindstoneMenu.java b/net/minecraft/world/inventory/GrindstoneMenu.java
 --- a/net/minecraft/world/inventory/GrindstoneMenu.java
 +++ b/net/minecraft/world/inventory/GrindstoneMenu.java
-@@ -178,7 +178,7 @@ public class GrindstoneMenu extends AbstractContainerMenu {
+@@ -179,7 +179,7 @@ public class GrindstoneMenu extends AbstractContainerMenu {
              int i2 = i + i1 + max * 5 / 100;
              int i3 = 1;
              if (!inputItem.isDamageableItem()) {
@@ -99,19 +98,24 @@ diff --git a/net/minecraft/world/inventory/GrindstoneMenu.java b/net/minecraft/w
                      return ItemStack.EMPTY;
                  }
  
-@@ -247,7 +247,7 @@ public class GrindstoneMenu extends AbstractContainerMenu {
+@@ -248,7 +248,7 @@ public class GrindstoneMenu extends AbstractContainerMenu {
              ItemStack item1 = this.repairSlots.getItem(0);
              ItemStack item2 = this.repairSlots.getItem(1);
-             if (index == 2) {
+             if (slotIndex == 2) {
 -                if (!this.moveItemStackTo(item, 3, 39, true)) {
 +                if (!this.moveItemStackTo(item, 3, 39, true, false, org.leavesmc.leaves.LeavesConfig.modify.oldMC.allowGrindstoneOverstacking)) { // Leaves - allowGrindstoneOverstacking: Disable stack check
                      return ItemStack.EMPTY;
                  }
  
+@@ -285,3 +285,4 @@ public class GrindstoneMenu extends AbstractContainerMenu {
+         return itemStack;
+     }
+ }
++
 diff --git a/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.java b/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.java
-@@ -409,7 +409,11 @@ public abstract class AbstractFurnaceBlockEntity extends BaseContainerBlockEntit
+@@ -410,7 +410,11 @@ public abstract class AbstractFurnaceBlockEntity extends BaseContainerBlockEntit
          ItemStack itemStack = this.items.get(index);
          boolean flag = !stack.isEmpty() && ItemStack.isSameItemSameComponents(itemStack, stack);
          this.items.set(index, stack);
@@ -127,7 +131,7 @@ diff --git a/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.j
 diff --git a/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.java b/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.java
-@@ -145,6 +145,12 @@ public abstract class BaseContainerBlockEntity extends BlockEntity implements Co
+@@ -124,6 +124,12 @@ public abstract class BaseContainerBlockEntity extends BlockEntity implements Co
      @Override
      public void setItem(int slot, ItemStack stack) {
          this.getItems().set(slot, stack);
@@ -143,7 +147,7 @@ diff --git a/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.jav
 diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -113,6 +113,11 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -114,6 +114,11 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
      public void setItem(int index, ItemStack stack) {
          this.unpackLootTable(null);
          this.getItems().set(index, stack);

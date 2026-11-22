@@ -3,7 +3,6 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Sun, 27 Mar 2022 12:48:40 +0800
 Subject: [PATCH] Redstone Shears Wrench
 
-
 diff --git a/net/minecraft/world/item/ShearsItem.java b/net/minecraft/world/item/ShearsItem.java
 --- a/net/minecraft/world/item/ShearsItem.java
 +++ b/net/minecraft/world/item/ShearsItem.java

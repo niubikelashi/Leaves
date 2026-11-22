@@ -3,12 +3,10 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Tue, 4 Feb 2025 20:18:35 +0800
 Subject: [PATCH] Wool Hopper Counter
 
-This patch is Powered by fabric-carpet(https://github.com/gnembon/fabric-carpet)
-
 diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -205,8 +205,30 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -206,8 +206,30 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
                      flag |= validator.getAsBoolean(); // Paper - note: this is not a validator, it's what adds/sucks in items
                  }
  
@@ -39,7 +37,7 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
                      setChanged(level, pos, state);
                      // Leaves start - pca
                      if (org.leavesmc.leaves.LeavesConfig.protocol.pca.enable) {
-@@ -432,6 +454,13 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -433,6 +455,13 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
      // Paper end - Perf: Optimize Hoppers
  
      private static boolean ejectItems(Level level, BlockPos pos, HopperBlockEntity blockEntity) {
@@ -53,7 +51,7 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
          Container attachedContainer = getAttachedContainer(level, pos, blockEntity);
          if (attachedContainer == null) {
              return false;
-@@ -498,6 +527,26 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -499,6 +528,26 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
          }
      }
  
@@ -80,7 +78,7 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
      private static int[] getSlots(Container container, Direction direction) {
          if (container instanceof WorldlyContainer worldlyContainer) {
              return worldlyContainer.getSlotsForFace(direction);
-@@ -632,6 +681,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -633,6 +682,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
      }
  
      public static boolean addItem(Container container, ItemEntity item) {
