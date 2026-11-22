@@ -96,10 +96,10 @@ Paper 仓库当前状态：默认分支 `gradle.properties` = `mcVersion=26.3`�
 | 26.1 | `compat/26.1` | skipped-no-paper-base | 人工裁决：Paper 无精确基线（§3），不算失败、不触发停止 |
 | 26.1.1 | `compat/26.1.1` | blocked-no-paper-base | 官方 Paper 没有 `26.1.1` tag（26.x 基线直接跳到 `26.1.2`），见 §12 |
 | 26.1.2 | `compat/26.1.2` | **conflict-needs-review**（第 1 轮，未合并） | 见 §12：配置阶段已通过，补丁层在 api 层 `0001 Delete Timings` 失败；必须先手工重锚再构建 |
-| 26.2 | `compat/26.2` | pending-not-started | Paper tag 存在（`e5fe71723e`），与 26.1.2 属同一类工程 |
+| 26.2 | `compat/26.2` | **conflict-needs-review**（第 5 轮，未合并） | 见 §13：api 层 7/9 已手工重锚并推送（`ffb9cc5`）；gradle 顺序重放卡在 `0001 Delete Timings`；minecraft 层仓库未被创建，无法盘点 |
 | 26.3 | `compat/26.3` | blocked-no-paper-base | Paper 没有 26.3 tag（主干 `mcVersion=26.3` 仍在开发中），按规则 2 不能拿未发版 master 当基线，见 §12 |
 
-连续非 success 计数：**6**（1.21.9、1.21.10、1.21.11、26.1.1、26.1.2、26.3；26.1 记为 `skipped-no-paper-base` 不计入，26.2 尚未开始）。按规则 6，整个推演继续保持**停止（halted）**，等待人工裁决后再恢复：①`Entity.getServer()` 被上游删除后的表达方式；②Spigot 层是否重新启用（含 `buildDataRef`/`packageVersion` 取值）；③`leavesweight` / `leavesclip` 是否固定版本（当前未固定，见 §9）；④1.21.11 剩余 30 个语义冲突补丁的处理方向（见 §11 清单）；⑤26.x 是否允许按手工重锚的方式继续推进（见 §12）。
+连续非 success 计数：**7**（1.21.9、1.21.10、1.21.11、26.1.1、26.1.2、26.2、26.3；26.1 记为 `skipped-no-paper-base` 不计入）。队列已走完（1.21.9 → 1.21.10 → 1.21.11 → 26.1 → 26.1.1 → 26.1.2 → 26.2 → 26.3），按规则 6 整个推演保持**停止（halted）**，等待人工裁决后再恢复：①`Entity.getServer()` 被上游删除后的表达方式；②Spigot 层是否重新启用（含 `buildDataRef`/`packageVersion` 取值）；③`leavesweight` / `leavesclip` 是否固定版本（当前未固定，见 §9）；④1.21.11 剩余 30 个语义冲突补丁的处理方向（见 §11 清单）；⑤26.x 的 api 层 2 个语义冲突与 minecraft 层是否允许按手工重锚的方式继续推进（见 §12-§13）。
 
 ## 5. 基线构建记录
 
@@ -272,4 +272,32 @@ compat/26.1.2 第 1 轮证据（分支 `compat/26.1.2`，从 `8ba0135` 切出并
 - 本轮没有产物，不新增 GitHub release。按规则 6（连续 2 个版本非 success）整个推演继续保持停止状态：1.21.9 / 1.21.10 / 1.21.11 / 26.1.1 / 26.1.2 / 26.3 都不是 success，等待人工裁决。
 
 人工后续的最小可行顺序：①先裁决 1.21.11 的 30 个语义冲突（§11 清单）；②用同一套机械处理器对 26.1.2 的 api 层 + minecraft 层做逐层盘点（基线必须从 `applyAllPatches` 成功的那几个层提交开始，见 E062/E067）；③每层重新生成补丁并保留 mbox 头、去掉 index 行（见 E066）；④跑通才建 `compat-<VERSION>` release，并把产物放进 `E:\mc\leaves-work\downloads\builds\<VERSION>\`。
+
+## 13. compat/26.2 第 1-5 轮与队列终态（2026-11-22）
+
+分支 `compat/26.2`（从 `5157779` 切出，已推送，HEAD `ffb9cc5`），基线 Paper tag `26.2` = `e5fe71723e2ffde7cc9fafc085ac3bb73e63175e`。
+
+- 第 1 轮（机械 bump + `applyAllPatches`）：配置阶段通过（`version/mcVersion/paperRef/apiVersion = 26.2`，Gradle 9.2.1，插件 `org.leavesmc.leavesweight.patcher` 版本已升到 `2.1.0-SNAPSHOT`），失败在 `:applyPaperApiFeaturePatches` —— `Applying: Delete Timings`，`sha1 information is lacking`。与 26.1.2 同一形态：补丁还是 1.21.8 时代的。
+- 第 2 轮（手工盘点 api 层，基线 = `14acd6541 Leaves paperApi File Patches`）：**7 / 9** 应用成功，2 个阻塞，证据是「删除行不存在」：
+  - `0001-Delete-Timings`：`SimplePluginManager.java` `@@ -720,7 +720,6 @@`、`JavaPluginLoader.java` `@@ -290,22 +290,22 @@` 的待删行在 26.2 里不存在，而 `co/aikar/timings` 目录仍在（`FullServerTickHandler.java` 等 14 个文件还在）→ Paper 26.2 重写了 timings 的调用点，删哪些行需要人工判断，按规则 3 不猜。
+  - `0005-Bytebuf-API`：目标文件在 26.2 的 `src/main/java/org/bukkit/` 里已不存在（`git ls-files "src/main/java/org/bukkit/*Byte*"` 返回 0 条）→ 该特性的落点被上游搬迁，属语义冲突。
+- 第 3 轮：`gradle --project-dir` 才可用（`-C` 不是 Gradle 选项，记 E068）；插件内部调用 `git`，PATH 里没有 git → `A problem occurred starting process 'command 'git''`。
+- 第 4 轮：补上 git PATH 后，`git am` 报 `fatal: unable to auto-detect email address (got 'hui@Hui.(none)')` → 补 `GIT_AUTHOR_*`/`GIT_COMMITTER_*`。
+- 第 5 轮：仍然 `:applyPaperApiFeaturePatches FAILED` / `Applying: Delete Timings` / `Patch failed at 0001`。这轮证明了一个结构性事实（记 E069）：gradle 按文件名顺序逐个 `git am`，第 1 个补丁就是语义冲突，后面那 7 个已适配的补丁永远轮不到 —— 手工盘点的 applied 数不等于 gradle 可达性。同时上一层失败时下一层仓库不会 clone：`Get-ChildItem -Recurse -Directory -Force | Where-Object Name -eq '.git'` 只列出 `paper-api`，`leaves-server` 的嵌套 minecraft 仓库不存在，所以 26.2 的 minecraft 层连基线都拿不到。
+- 已提交并推送的部分：`gradle.properties` 适配到 26.2（不含本机 trustStore 参数）+ 9 个 api feature 补丁全部去掉 index 行，其中 7 个按真实树重新导出（`ffb9cc5`，`leaves-server` 层保持未改动，因为无法盘点）。本轮无产物，不新增 GitHub release。
+
+队列终态（规则 2 / 规则 6 / 用户裁决）：
+
+| 版本 | 终态 | 一句话依据 |
+| --- | --- | --- |
+| 1.21.9 | conflict-needs-review | 上游删了 `Entity.getServer()`（§7） |
+| 1.21.10 | conflict-needs-review | Paper 改 `spigot { enabled }` + `Entity.getServer()`（§8） |
+| 1.21.11 | conflict-needs-review | 111/141 已重锚，剩 30 个语义冲突（§11） |
+| 26.1 | skipped-no-paper-base | 用户裁决：Paper 无精确基线，不算失败 |
+| 26.1.1 | blocked-no-paper-base | Paper 无 `26.1.1` tag（§12） |
+| 26.1.2 | conflict-needs-review | 配置通过，补丁层需手工重锚（§12） |
+| 26.2 | conflict-needs-review | api 层天花板 7/9，gradle 卡在 `0001 Delete Timings`（本节） |
+| 26.3 | blocked-no-paper-base | Paper 无 26.3 tag，主干仍在开发（§12） |
+
+没有任何版本达到 success，因此 Documentation / Configuration 的跟进条件（§1 的「成功版本才跟随更新」）不成立，两个仓库保持原样。GitHub Releases 保持 20 个：19 个上游镜像 + `compat-1.21.8`（唯一一次成功构建的产物）。
 
