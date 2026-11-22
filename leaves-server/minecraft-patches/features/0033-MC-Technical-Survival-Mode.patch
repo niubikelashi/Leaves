@@ -3,21 +3,21 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Thu, 19 Jan 2023 23:38:50 +0800
 Subject: [PATCH] MC Technical Survival Mode
 
-Will automatically overwrite some configuration after startup
-
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
+index 9c0d97e..21c7d1f 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -1654,7 +1654,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -1750,7 +1750,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
      public boolean isInvulnerableTo(ServerLevel level, DamageSource damageSource) {
          return (super.isInvulnerableTo(level, damageSource) // Paper - disable player cramming;
              || this.isChangingDimension() && !damageSource.is(DamageTypes.ENDER_PEARL)
--            || !this.hasClientLoaded()) || (!this.level().paperConfig().collisions.allowPlayerCrammingDamage && damageSource.is(DamageTypes.CRAMMING)); // Paper - disable player cramming;
-+            || !this.hasClientLoaded()) || (!org.leavesmc.leaves.LeavesConfig.modify.mcTechnicalMode && !this.level().paperConfig().collisions.allowPlayerCrammingDamage && damageSource.is(DamageTypes.CRAMMING)); // Paper - disable player cramming; // Leaves - mc technical survival mode
+-            || !this.connection.hasClientLoaded()) || (!this.level().paperConfig().collisions.allowPlayerCrammingDamage && damageSource.is(DamageTypes.CRAMMING)); // Paper - disable player cramming;
++            || !this.connection.hasClientLoaded()) || (!org.leavesmc.leaves.LeavesConfig.modify.mcTechnicalMode && !this.level().paperConfig().collisions.allowPlayerCrammingDamage && damageSource.is(DamageTypes.CRAMMING)); // Paper - disable player cramming; // Leaves - mc technical survival mode
      }
  
      @Override
 diff --git a/net/minecraft/world/entity/boss/enderdragon/EndCrystal.java b/net/minecraft/world/entity/boss/enderdragon/EndCrystal.java
+index c095f42..0b3f757 100644
 --- a/net/minecraft/world/entity/boss/enderdragon/EndCrystal.java
 +++ b/net/minecraft/world/entity/boss/enderdragon/EndCrystal.java
 @@ -65,7 +65,7 @@ public class EndCrystal extends Entity {
@@ -30,9 +30,10 @@ diff --git a/net/minecraft/world/entity/boss/enderdragon/EndCrystal.java b/net/m
                  || ((ServerLevel) this.level()).getDragonFight() == null
                  || ((ServerLevel) this.level()).getDragonFight().respawnStage == null
 diff --git a/net/minecraft/world/entity/item/PrimedTnt.java b/net/minecraft/world/entity/item/PrimedTnt.java
+index 910e773..9ceec84 100644
 --- a/net/minecraft/world/entity/item/PrimedTnt.java
 +++ b/net/minecraft/world/entity/item/PrimedTnt.java
-@@ -100,7 +100,7 @@ public class PrimedTnt extends Entity implements TraceableEntity {
+@@ -99,7 +99,7 @@ public class PrimedTnt extends Entity implements TraceableEntity {
  
      @Override
      public void tick() {
@@ -42,9 +43,10 @@ diff --git a/net/minecraft/world/entity/item/PrimedTnt.java b/net/minecraft/worl
          this.applyGravity();
          this.move(MoverType.SELF, this.getDeltaMovement());
 diff --git a/net/minecraft/world/level/NaturalSpawner.java b/net/minecraft/world/level/NaturalSpawner.java
+index 4e50784..05686d5 100644
 --- a/net/minecraft/world/level/NaturalSpawner.java
 +++ b/net/minecraft/world/level/NaturalSpawner.java
-@@ -82,7 +82,7 @@ public final class NaturalSpawner {
+@@ -85,7 +85,7 @@ public final class NaturalSpawner {
                  MobCategory category = entity.getType().getCategory();
                  if (category != MobCategory.MISC) {
                      // Paper start - Only count natural spawns
@@ -54,9 +56,10 @@ diff --git a/net/minecraft/world/level/NaturalSpawner.java b/net/minecraft/world
                              entity.spawnReason == org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.CHUNK_GEN)) {
                          continue;
 diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+index 59a92e7..105db1f 100644
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -275,7 +275,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -276,7 +276,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
                  origItemStack.setCount(originalItemCount);
              }
          }
@@ -65,7 +68,7 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
              hopper.setCooldown(level.spigotConfig.hopperTransfer);
          }
          return false;
-@@ -316,7 +316,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -317,7 +317,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
          }
          origItemStack.setCount(originalItemCount);
  
