@@ -90,7 +90,7 @@ public class ServerLookAction extends ServerBotAction<ServerLookAction> {
     @Override
     public void loadCommand(ServerPlayer player, @NotNull CommandArgumentResult result) {
         String nameOrX = result.readString(player.getScoreboardName());
-        ServerPlayer player1 = player.getServer().getPlayerList().getPlayerByName(nameOrX);
+        ServerPlayer player1 = player.level().getServer().getPlayerList().getPlayerByName(nameOrX);
         if (player1 != null) {
             this.setTarget(player1);
             return;

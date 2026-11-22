@@ -79,7 +79,7 @@ public class ServuxStructuresProtocol implements LeavesProtocol {
     }
 
     public static void onStartedWatchingChunk(ServerPlayer player, LevelChunk chunk) {
-        MinecraftServer server = player.getServer();
+        MinecraftServer server = player.level().getServer();
         if (players.containsKey(player.getId()) && server != null) {
             addChunkTimeoutIfHasReferences(player.getUUID(), chunk, server.getTickCount());
         }

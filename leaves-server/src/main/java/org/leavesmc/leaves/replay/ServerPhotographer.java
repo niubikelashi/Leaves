@@ -78,7 +78,7 @@ public class ServerPhotographer extends ServerPlayer {
     public void tick() {
         super.tick();
 
-        if (this.getServer().getTickCount() % 10 == 0) {
+        if (this.level().getServer().getTickCount() % 10 == 0) {
             connection.resetPosition();
             this.level().chunkSource.move(this);
         }
@@ -130,7 +130,7 @@ public class ServerPhotographer extends ServerPlayer {
         super.remove(RemovalReason.KILLED);
         photographers.remove(this);
         this.recorder.stop();
-        this.getServer().getPlayerList().removePhotographer(this);
+        this.level().getServer().getPlayerList().removePhotographer(this);
 
         LeavesLogger.LOGGER.info("Photographer " + createState.id + " removed");
 

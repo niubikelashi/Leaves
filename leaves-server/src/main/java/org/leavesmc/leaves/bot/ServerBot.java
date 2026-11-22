@@ -148,7 +148,7 @@ public class ServerBot extends ServerPlayer {
             this.notSleepTicks++;
         }
 
-        if (LeavesConfig.modify.fakeplayer.regenAmount > 0.0 && getServer().getTickCount() % 20 == 0) {
+        if (LeavesConfig.modify.fakeplayer.regenAmount > 0.0 && level().getServer().getTickCount() % 20 == 0) {
             float regenAmount = (float) (LeavesConfig.modify.fakeplayer.regenAmount * 20);
             this.setHealth(Math.min(this.getHealth() + regenAmount, this.getMaxHealth()));
         }
@@ -208,7 +208,7 @@ public class ServerBot extends ServerPlayer {
         this.updateIsUnderwater();
 
         if (this.getConfigValue(Configs.TICK_TYPE) == TickType.NETWORK) {
-            this.getServer().scheduleOnMain(this::runAction);
+            this.level().getServer().scheduleOnMain(this::runAction);
         }
 
         this.livingEntityTick();
@@ -346,7 +346,7 @@ public class ServerBot extends ServerPlayer {
         if (LeavesConfig.modify.fakeplayer.canOpenInventory) {
             if (player instanceof ServerPlayer player1 && player.getMainHandItem().isEmpty()) {
                 BotInventoryOpenEvent event = new BotInventoryOpenEvent(this.getBukkitEntity(), player1.getBukkitEntity());
-                this.getServer().server.getPluginManager().callEvent(event);
+                this.level().getServer().server.getPluginManager().callEvent(event);
                 if (!event.isCancelled()) {
                     player.openMenu(new SimpleMenuProvider((i, inventory, p) -> ChestMenu.sixRows(i, inventory, this.container), this.getDisplayName()));
                     return InteractionResult.SUCCESS;
@@ -475,19 +475,19 @@ public class ServerBot extends ServerPlayer {
     }
 
     public void renderInfo() {
-        this.getServer().getPlayerList().getPlayers().forEach(
+        this.level().getServer().getPlayerList().getPlayers().forEach(
             player -> this.sendPlayerInfo(player)
         );
     }
 
     public void renderData() {
-        this.getServer().getPlayerList().getPlayers().forEach(
+        this.level().getServer().getPlayerList().getPlayers().forEach(
             player -> this.sendFakeDataIfNeed(player, false)
         );
     }
 
     private void sendPacket(Packet<?> packet) {
-        this.getServer().getPlayerList().getPlayers().forEach(player -> player.connection.send(packet));
+        this.level().getServer().getPlayerList().getPlayers().forEach(player -> player.connection.send(packet));
     }
 
     @Override
@@ -496,7 +496,7 @@ public class ServerBot extends ServerPlayer {
         Component defaultMessage = this.getCombatTracker().getDeathMessage();
 
         BotDeathEvent event = new BotDeathEvent(this.getBukkitEntity(), PaperAdventure.asAdventure(defaultMessage), flag);
-        this.getServer().server.getPluginManager().callEvent(event);
+        this.level().getServer().server.getPluginManager().callEvent(event);
 
         if (event.isCancelled()) {
             if (this.getHealth() <= 0) {
@@ -509,10 +509,10 @@ public class ServerBot extends ServerPlayer {
 
         net.kyori.adventure.text.Component deathMessage = event.deathMessage();
         if (event.isSendDeathMessage() && deathMessage != null && !deathMessage.equals(net.kyori.adventure.text.Component.empty())) {
-            this.getServer().getPlayerList().broadcastSystemMessage(PaperAdventure.asVanilla(deathMessage), false);
+            this.level().getServer().getPlayerList().broadcastSystemMessage(PaperAdventure.asVanilla(deathMessage), false);
         }
 
-        this.getServer().getBotList().removeBot(this, BotRemoveEvent.RemoveReason.DEATH, null, false);
+        this.level().getServer().getBotList().removeBot(this, BotRemoveEvent.RemoveReason.DEATH, null, false);
     }
 
     public void removeTab() {

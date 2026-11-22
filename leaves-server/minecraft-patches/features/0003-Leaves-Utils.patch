@@ -31,7 +31,7 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
          } catch (Throwable var7) {
              CrashReport crashReport = CrashReport.forThrowable(var7, "Loading entity NBT");
              CrashReportCategory crashReportCategory = crashReport.addCategory("Entity being loaded");
-@@ -5429,4 +5433,14 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
+@@ -5429,4 +5433,9 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
          return ((ServerLevel) this.level()).isPositionEntityTicking(this.blockPosition());
      }
      // Paper end - Expose entity id counter
@@ -40,11 +40,6 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
 +        return leavesData;
 +    }
 +    // Leaves end - leaves ex data
-+    // Leaves start - restore getServer removed upstream in 1.21.11
-+    public net.minecraft.server.MinecraftServer getServer() {
-+        return this.level().getServer();
-+    }
-+    // Leaves end - restore getServer removed upstream in 1.21.11
  }
 diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Level.java
 --- a/net/minecraft/world/level/Level.java
