@@ -3,11 +3,17 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Sun, 6 Apr 2025 00:19:06 +0800
 Subject: [PATCH] Disable packet limit
 
-
 diff --git a/net/minecraft/network/Connection.java b/net/minecraft/network/Connection.java
 --- a/net/minecraft/network/Connection.java
 +++ b/net/minecraft/network/Connection.java
-@@ -245,8 +245,8 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -214,22 +214,22 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+     protected void channelRead0(ChannelHandlerContext ctx, Packet<?> packet) {
+         if (this.channel.isOpen()) {
+             PacketListener packetListener = this.packetListener;
+             if (packetListener == null) {
+                 throw new IllegalStateException("Received a packet before the packet listener was initialized");
+             } else {
+                 // Paper start - packet limiter
                  if (this.stopReadingPackets) {
                      return;
                  }
@@ -18,19 +24,47 @@ diff --git a/net/minecraft/network/Connection.java b/net/minecraft/network/Conne
                      long time = System.nanoTime();
                      synchronized (PACKET_LIMIT_LOCK) {
                          if (this.allPacketCounts != null) {
+                             this.allPacketCounts.updateAndAdd(1, time);
+                             if (this.allPacketCounts.getRate() >= io.papermc.paper.configuration.GlobalConfiguration.get().packetLimiter.allPackets.maxPacketRate()) {
+                                 this.killForPacketSpam();
+                                 return;
+                             }
+                         }
+ 
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -821,7 +821,7 @@ public class ServerGamePacketListenerImpl
+@@ -831,21 +831,21 @@ public class ServerGamePacketListenerImpl
+ 
+     // Paper start - AsyncTabCompleteEvent
+     private static final java.util.concurrent.ExecutorService TAB_COMPLETE_EXECUTOR = java.util.concurrent.Executors.newFixedThreadPool(4,
+         new com.google.common.util.concurrent.ThreadFactoryBuilder().setDaemon(true).setNameFormat("Async Tab Complete Thread - #%d").setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(MinecraftServer.LOGGER)).build());
+     // Paper end - AsyncTabCompleteEvent
+ 
+     @Override
      public void handleCustomCommandSuggestions(ServerboundCommandSuggestionPacket packet) {
          // PacketUtils.ensureRunningOnSameThread(packet, this, this.player.level()); // Paper - AsyncTabCompleteEvent; run this async
          // CraftBukkit start
--        if (!this.tabSpamThrottler.isIncrementAndUnderThreshold() && !this.server.getPlayerList().isOp(this.player.getGameProfile()) && !this.server.isSingleplayerOwner(this.player.getGameProfile())) { // Paper - configurable tab spam limits
-+        if (!org.leavesmc.leaves.LeavesConfig.modify.disablePacketLimit && !this.tabSpamThrottler.isIncrementAndUnderThreshold() && !this.server.getPlayerList().isOp(this.player.getGameProfile()) && !this.server.isSingleplayerOwner(this.player.getGameProfile())) { // Paper - configurable tab spam limits // Leaves - can disable
+-        if (!this.tabSpamThrottler.isIncrementAndUnderThreshold() && !this.server.getPlayerList().isOp(this.player.nameAndId()) && !this.server.isSingleplayerOwner(this.player.nameAndId())) { // Paper - configurable tab spam limits
++        if (!org.leavesmc.leaves.LeavesConfig.modify.disablePacketLimit && !this.tabSpamThrottler.isIncrementAndUnderThreshold() && !this.server.getPlayerList().isOp(this.player.nameAndId()) && !this.server.isSingleplayerOwner(this.player.nameAndId())) { // Paper - configurable tab spam limits // Leaves - can disable
              this.disconnectAsync(Component.translatable("disconnect.spam"), org.bukkit.event.player.PlayerKickEvent.Cause.SPAM); // Paper - Kick event cause // Paper - add proper async disconnect
              return;
          }
-@@ -2002,6 +2002,7 @@ public class ServerGamePacketListenerImpl
+         // CraftBukkit end
+         // Paper start - Don't suggest if tab-complete is disabled
+         if (org.spigotmc.SpigotConfig.tabComplete < 0) {
+             return;
+         }
+         // Paper end - Don't suggest if tab-complete is disabled
+         // Paper start
+@@ -2043,20 +2043,21 @@ public class ServerGamePacketListenerImpl
+                 && !player.getCooldowns().isOnCooldown(stack);
+         }
+     }
+ 
+     // Spigot start - limit place/interactions
+     private int limitedPackets;
+     private long lastLimitedPacket = -1;
      private static int getSpamThreshold() { return io.papermc.paper.configuration.GlobalConfiguration.get().spamLimiter.incomingPacketThreshold; } // Paper - Configurable threshold
  
      private boolean checkLimit(long timestamp) {
@@ -38,7 +72,21 @@ diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/ne
          if (this.lastLimitedPacket != -1 && timestamp - this.lastLimitedPacket < getSpamThreshold() && this.limitedPackets++ >= 8) { // Paper - Configurable threshold; raise packet limit to 8
              return false;
          }
-@@ -2536,6 +2537,7 @@ public class ServerGamePacketListenerImpl
+ 
+         if (this.lastLimitedPacket == -1 || timestamp - this.lastLimitedPacket >= getSpamThreshold()) { // Paper - Configurable threshold
+             this.lastLimitedPacket = timestamp;
+             this.limitedPackets = 0;
+             return true;
+         }
+ 
+@@ -2577,20 +2578,21 @@ public class ServerGamePacketListenerImpl
+         } else {
+             this.chat(rawMessage, message, true);
+         }
+         // this.server.getPlayerList().broadcastChatMessage(message, this.player, ChatType.bind(ChatType.CHAT, this.player));
+         // CraftBukkit end
+         this.detectRateSpam(rawMessage); // Spigot
+     }
  
      // Spigot start - spam exclusions
      private void detectRateSpam(String message) {
@@ -46,7 +94,21 @@ diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/ne
          // CraftBukkit start - replaced with thread safe throttle
          if (org.spigotmc.SpigotConfig.enableSpamExclusions) {
              for (String exclude : org.spigotmc.SpigotConfig.spamExclusions) {
-@@ -3246,7 +3248,7 @@ public class ServerGamePacketListenerImpl
+                 if (exclude != null && message.startsWith(exclude)) {
+                     return;
+                 }
+             }
+         }
+         // Spigot end
+         // this.chatSpamThrottler.increment();
+@@ -3299,21 +3301,21 @@ public class ServerGamePacketListenerImpl
+                     if (packet.buttonNum() == Inventory.SLOT_OFFHAND && this.player.containerMenu != this.player.inventoryMenu) this.player.containerSynchronizer.sendOffHandSlotChange(); // Paper - update offhand data when the player is clicking in an inventory not their own as the sychronizer does not include offhand slots
+                     if (io.papermc.paper.configuration.GlobalConfiguration.get().unsupportedSettings.updateEquipmentOnPlayerActions) this.player.detectEquipmentUpdates(); // Paper - Force update attributes.
+                 }
+             }
+         }
+     }
+ 
      @Override
      public void handlePlaceRecipe(ServerboundPlaceRecipePacket packet) {
          // Paper start - auto recipe limit
@@ -55,3 +117,10 @@ diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/ne
              if (!this.recipeSpamPackets.isIncrementAndUnderThreshold()) {
                  this.disconnectAsync(net.minecraft.network.chat.Component.translatable("disconnect.spam"), org.bukkit.event.player.PlayerKickEvent.Cause.SPAM); // Paper - kick event cause // Paper - add proper async disconnect
                  return;
+             }
+         }
+         // Paper end - auto recipe limit
+         PacketUtils.ensureRunningOnSameThread(packet, this, this.player.level());
+         this.player.resetLastActionTime();
+         if (!this.player.isSpectator() && this.player.containerMenu.containerId == packet.containerId()) {
+             if (!this.player.containerMenu.stillValid(this.player)) {
