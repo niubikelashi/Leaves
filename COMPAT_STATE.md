@@ -301,3 +301,61 @@ compat/26.1.2 第 1 轮证据（分支 `compat/26.1.2`，从 `8ba0135` 切出并
 
 没有任何版本达到 success，因此 Documentation / Configuration 的跟进条件（§1 的「成功版本才跟随更新」）不成立，两个仓库保持原样。GitHub Releases 保持 20 个：19 个上游镜像 + `compat-1.21.8`（唯一一次成功构建的产物）。
 
+## §14 阶段 2 裁决执行（2026-11-23，compat/1.21.11，第 8-9 轮）
+
+### 插件正式版存在性验证（证据）
+- `https://repo.leavesmc.org/snapshots/org/leavesmc/leavesweight/patcher/org.leavesmc.leavesweight.patcher.gradle.plugin/maven-metadata.xml` → 200，`<latest>2.2.0-SNAPSHOT</latest>`，版本列表 `1.0.0-SNAPSHOT / 1.0.1-SNAPSHOT / 1.0.2-SNAPSHOT / 2.0.0-SNAPSHOT / 2.1.0-SNAPSHOT / 2.2.0-SNAPSHOT`（lastUpdated 20260601030237）。
+- 同路径的 `releases/` → **HTTP 404**；Central `repo.maven.apache.org/maven2/org/leavesmc/leavesweight/patcher/…/maven-metadata.xml` → **404**；plugins.gradle.org 走跨源重定向回到 Central，说明插件不在 Gradle Portal。
+- `releases/org/leavesmc/leavesweight/leavesweight-core/` → **404**，snapshots 只有 `2.0.0-SNAPSHOT / 2.1.0-SNAPSHOT / 2.2.0-SNAPSHOT` → **leavesweight patcher/core 没有正式版**。
+- `releases/org/leavesmc/leavesclip/maven-metadata.xml` → 200，`<release>3.0.10</release>`，版本含 `2.0.0 … 3.0.10`；生成脚本已用 `org.leavesmc:leavesclip:3.0.10` → 无需改动。
+- 结论：按裁决「不存在就停止该提交」，**没有做插件版本固定提交**；根 `build.gradle.kts:7` 保持上游原样 `id("org.leavesmc.leavesweight.patcher") version "2.0.0-SNAPSHOT"`，未擅自升级其他版本、未把 SNAPSHOT 当最终态。
+
+### 三个裁决修正的落地情况
+1. Spigot 强制关闭（裁决 ①）：提交 `96c9ea4`「Build: keep spigot generation disabled」把 `spigot { enabled = false }` 恢复回 `leaves-server/build.gradle.kts.patch`。gradle 配置阶段报 `e: leaves-server/build.gradle.kts:37:9: Unresolved reference 'enabled'`（leavesweight DSL 不提供 `enabled` 成员）→ 构建形状变化，按裁决记 **blocked**：**没有**改回 `true`，**没有**自行引入新的 `buildDataRef`/`packageVersion` 取值。需要用户补充裁决（保持上游删除该行 / 改用其他关闭方式）。
+2. `Entity.getServer()`（裁决 ②）：提交 `b42c3a6`（嵌套 minecraft 仓库 `209dc9b`）删除 Leaves 恢复的公共 API，调用点全部改 `level().getServer()` / `this.level().getServer()`（`ServerBot.java` L151/L211/L349/L478/L484/L490/L499/L512/L515、`ServerLookAction.java:93`、`ServuxStructuresProtocol.java:82`、`ServerPhotographer.java:81/133`）；static `MinecraftServer.getServer()` / `Bukkit.getServer()` 保持不变。含 `getServer()` 的补丁 0058/0074/0077/0078/0090/0114 复查后**无需迁移**（用的是 static 调用或 receiver 已是 `ServerLevel`）。
+3. 插件版本（裁决 ③）：见上，停止该提交并回报可用版本。
+
+### A 类机械重锚逐个结果（12 个全部完成，每个单独 commit + 重生成补丁）
+| 补丁 | 外层 commit | 结果 | 关键处理 |
+| --- | --- | --- | --- |
+| 0003 | （早于本轮已提交） | 成功 | 补丁头修复 |
+| 0004 Leaves-Protocol-Core | `c75a339` | 成功 | `ResourceLocation`→`Identifier` 等改名、注解内联 |
+| 0029 Alternative-block-placement | `5334ab6` | 成功 | `@Nullable` 独立行 → 内联声明行；空行错位按归一化重放 |
+| 0033 MC-Technical-Survival-Mode | `43304b9` | 成功 | `getBoolean(GameRules.RULE_*)`→`get(GameRules.*)` |
+| 0039 Bedrock-break-list | `04ac436` | 成功 | `MinecraftServer` tickables 循环形态变了（for-each），改为在 `LeavesProtocolManager.handleTick(...)` 之后唯一锚点插入 `BreakBedrockList.endTick()` |
+| 0043 Disable-packet-limit | `40fd26b` | 成功 | `username`→`playerName`、`hasClientLoaded()`→`this.connection.hasClientLoaded()` |
+| 0049 Optimized-dragon-respawn | `5567bf2` | 成功 | `BlockPattern` 注解内联；计数器字段插在 `respawnDragon(...)` 签名后 |
+| 0052 Elytra-aeronautics-no-chunk-load | `0ce48d0` | 成功 | GameRules / slot flags 改名 |
+| 0055 No-block-update-command | `fd4d62e` | 成功 | `Block.UPDATE_SKIP_ON_PLACE`/`@Block.UpdateFlags` |
+| 0079 Spider-jockeys-drop-gapples | `e338d0a` | 成功 | 文件搬迁重映射 `monster/Skeleton.java`→`monster/skeleton/Skeleton.java`、`monster/Spider.java`→`monster/spider/Spider.java`；Skeleton 已无 `die()` 上下文，`dropFromLootTable` 覆盖插在类尾 `getStepSound()` 之后，`ServerLevel` 改为全限定名（该文件不再有此 import） |
+| 0114 Vanilla-player-display-name | `99fe6ca` | 成功 | `getGameProfile()`→`nameAndId()`、`canBypassFullServerLogin(GameProfile)`→`canBypassPlayerLimit(NameAndId)`、Scoreboard 局部改名 `playerTeam`→`team` |
+| 0131 Old-wet-tnt-explode-behavior | `05c044e` | 成功 | ServerExplosion 局部变量交叉改名（补丁 `_boolean`↔树 `flag`、补丁 `flag`↔树 `flag1`） |
+| 0132 Old-projectile-explosion-behavior | `c321195` | 成功 | 上游新增 redirectable-projectile 分支使两行锚点不再相邻，改用单行唯一锚点 `entity.push(vec32);` 做 replace |
+
+嵌套 minecraft 仓库重放统计：本轮前缀重放到 0132 时 applied 与手工重锚一致；A 类之外仍有 18 个补丁按语义冲突保持未应用（0007/0018/0035/0038/0053/0059/0074/0082/0088/0095/0105/0110/0115/0133/0135/0136/0138/0139/0141）。
+
+### gradle 首个补丁取证（第 8 / 第 9 轮，未混入主分支）
+- 第 8 轮（HEAD 原样，含 `enabled = false`）：配置阶段即失败 `Unresolved reference 'enabled'`，日志 `E:\mc\leaves-work\1.21.11-apply-round8.log`。
+- 第 9 轮（**诊断**，只在 gitignored 的生成脚本里临时删掉 `enabled = false`，未提交、跑完已还原）：日志 `E:\mc\leaves-work\1.21.11-apply-round9.log`，`BUILD FAILED in 30s`，`Execution failed for task ':applyPaperSingleFilePatches'` → `Applied Offset Mismatch in 'paper-server/build.gradle.kts.patch' at 47. Expected: 51, Actual: 50`。
+- 含义：硬卡点已从「MC 源码语义冲突」转移到 **paper-server 构建配置补丁的行偏移**（上游 spigot 块形状变化导致 +侧行数与实际差 1 行）。这属于裁决 ① 的连带后果，按规则不自行改偏移、不改取值，记 blocked。
+
+### Gate 结论（本轮终态）
+- A 类 12 个 + 三个裁决修正已执行完毕；gradle 仍不到 `success`（首个硬卡点仍在构建配置层）→ 按裁决停止扩大 26.x：`compat/26.1.2`、`compat/26.2` 只保留 diag 诊断分支，**未合并 master、未产发布产物、未上传 Release、未宣布 success**。
+- 转为只维护 `1.21.8` 基线（`Leaves-base-1218` detached `d93e976` + `downloads\builds\1.21.8\` 4 个 jar），上游 Releases 镜像保持 20 release / 23 assets。
+- 连续非 success 计数：本轮后为 **9**（上限 10）→ 本轮记 blocked，不再消耗预算。
+- `master` 保持 `175d634`；`compat/1.21.11` 外层 HEAD `c321195`（本轮新增 `5334ab6`/`5567bf2`/`99fe6ca`/`05c044e`/`04ac436`/`e338d0a`/`c321195`）；分支未合并到 master；`Documentation` / `Configuration` 未改动。
+
+### C 类 needs-review 与 D 类 deferred（本轮只标注，不改代码）
+- 0138（chat 输入上限）：baseline 已有 Paper 开关 `ServerboundChatCommandPacket.MAX_CHAT_PACKET_INPUT_SIZE = Integer.getInteger("paper.maxChatCommandInputSize", 256)`；计划用 Leaves 配置覆盖该值（不删补丁），语义组合待人工定案 → **needs-review**。
+- 0095（hopper 冷却）：保留 Leaves `mcTechnicalMode` 语义 + 上游 `paperConfig().hopper.cooldownWhenFull` 双开关，无法安全组合 → **needs-review**。
+- 0074 deferred：依赖 0007（`advancements/critereon/SimpleCriterionTrigger` 已迁到旧路径缺失）PlayerList 迁移定案后恢复。
+- 0105 deferred：等位标志语义定案（上游位标志重构）后恢复。
+- 0135 deferred：需人工确认上游是否已修复对应行为。
+- 0139 deferred：改动体量大，延期。
+- 0141 deferred：需人工确认是否已被上游冗余覆盖。
+- B 类（0018/0053/0110/0115 等）本轮未动，等 A 类结果（已完成）后另轮处理。
+
+### 需要用户补充裁决
+1. Spigot 关闭方式：保持上游（删除 `enabled` 行）还是改用别的关闭姿势？当前 `96c9ea4` 使构建脚本编译失败。
+2. 是否允许对 `paper-server/build.gradle.kts.patch` 做 ±1 行机械偏移修正（不改语义、不改取值）？这是本轮第 9 轮的硬卡点。
+3. 插件版本策略：leavesweight 只有 SNAPSHOT，是否接受「固定到某个 SNAPSHOT」或保持上游不固定？
