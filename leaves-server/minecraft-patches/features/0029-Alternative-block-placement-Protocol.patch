@@ -3,30 +3,46 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Mon, 3 Feb 2025 13:51:26 +0800
 Subject: [PATCH] Alternative block placement Protocol
 
-This patch is Powered by
-carpet-extra(https://github.com/gnembon/carpet-extra)
-MasaGadget(https://github.com/plusls/MasaGadget)
-litematica(https://github.com/maruohon/litematica)
-
 diff --git a/net/minecraft/world/item/BlockItem.java b/net/minecraft/world/item/BlockItem.java
 --- a/net/minecraft/world/item/BlockItem.java
 +++ b/net/minecraft/world/item/BlockItem.java
-@@ -149,7 +149,7 @@ public class BlockItem extends Item {
+@@ -140,21 +140,21 @@ public class BlockItem extends Item {
+             blockEntity.applyComponentsFromItemStack(stack);
+             blockEntity.setChanged();
+         }
+     }
  
-     @Nullable
-     protected BlockState getPlacementState(BlockPlaceContext context) {
+     protected boolean updateCustomBlockEntityTag(BlockPos pos, Level level, @Nullable Player player, ItemStack stack, BlockState state) {
+         return updateCustomBlockEntityTag(level, player, pos, stack);
+     }
+ 
+     protected @Nullable BlockState getPlacementState(BlockPlaceContext context) {
 -        BlockState stateForPlacement = this.getBlock().getStateForPlacement(context);
 +        BlockState stateForPlacement = this.getBlock().getRealStateForPlacement(context); // Leaves - alternativeBlockPlacement
          return stateForPlacement != null && this.canPlace(context, stateForPlacement) ? stateForPlacement : null;
      }
  
+     private BlockState updateBlockStateFromTag(BlockPos pos, Level level, ItemStack stack, BlockState state) {
+         BlockItemStateProperties blockItemStateProperties = stack.getOrDefault(DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY);
+         if (blockItemStateProperties.isEmpty()) {
+             return state;
+         } else {
+             BlockState blockState = blockItemStateProperties.apply(state);
+             if (blockState != state) {
 diff --git a/net/minecraft/world/item/StandingAndWallBlockItem.java b/net/minecraft/world/item/StandingAndWallBlockItem.java
 --- a/net/minecraft/world/item/StandingAndWallBlockItem.java
 +++ b/net/minecraft/world/item/StandingAndWallBlockItem.java
-@@ -27,14 +27,14 @@ public class StandingAndWallBlockItem extends BlockItem {
-     @Nullable
+@@ -19,28 +19,28 @@ public class StandingAndWallBlockItem extends BlockItem {
+         this.wallBlock = wallBlock;
+         this.attachmentDirection = attachmentDirection;
+     }
+ 
+     protected boolean canPlace(LevelReader level, BlockState state, BlockPos pos) {
+         return state.canSurvive(level, pos);
+     }
+ 
      @Override
-     protected BlockState getPlacementState(BlockPlaceContext context) {
+     protected @Nullable BlockState getPlacementState(BlockPlaceContext context) {
 -        BlockState stateForPlacement = this.wallBlock.getStateForPlacement(context);
 +        BlockState stateForPlacement = this.wallBlock.getRealStateForPlacement(context); // Leaves - alternativeBlockPlacement
          BlockState blockState = null;
@@ -40,13 +56,27 @@ diff --git a/net/minecraft/world/item/StandingAndWallBlockItem.java b/net/minecr
                  if (blockState1 != null && this.canPlace(level, blockState1, clickedPos)) {
                      blockState = blockState1;
                      break;
+                 }
+             }
+         }
+ 
+         // return blockState != null && level.isUnobstructed(blockState, clickedPos, CollisionContext.empty()) ? blockState : null;
+         // CraftBukkit start
+         if (blockState != null) {
 diff --git a/net/minecraft/world/level/block/Block.java b/net/minecraft/world/level/block/Block.java
 --- a/net/minecraft/world/level/block/Block.java
 +++ b/net/minecraft/world/level/block/Block.java
-@@ -439,6 +439,33 @@ public class Block extends BlockBehaviour implements ItemLike {
-     public void stepOn(Level level, BlockPos pos, BlockState state, Entity entity) {
+@@ -481,20 +481,47 @@ public class Block extends BlockBehaviour implements ItemLike {
+ 
+     public float getExplosionResistance() {
+         return this.explosionResistance;
      }
  
+     public void wasExploded(ServerLevel level, BlockPos pos, Explosion explosion) {
+     }
+ 
+     public void stepOn(Level level, BlockPos pos, BlockState state, Entity entity) {
+     }
 +    // Leaves start - alternativeBlockPlacement
 +    @Nullable
 +    public BlockState getRealStateForPlacement(BlockPlaceContext ctx) {
@@ -74,6 +104,13 @@ diff --git a/net/minecraft/world/level/block/Block.java b/net/minecraft/world/le
 +    }
 +    // Leaves end - alternativeBlockPlacement
 +
-     @Nullable
-     public BlockState getStateForPlacement(BlockPlaceContext context) {
+ 
+     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
          return this.defaultBlockState();
+     }
+ 
+     @Deprecated @io.papermc.paper.annotation.DoNotUse // Paper - fix drops not preventing stats/food exhaustion
+     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
+         // Paper start - fix drops not preventing stats/food exhaustion
+         this.playerDestroy(level, player, pos, state, blockEntity, tool, true, true);
+     }
