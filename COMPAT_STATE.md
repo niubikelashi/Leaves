@@ -92,14 +92,14 @@ Paper 仓库当前状态：默认分支 `gradle.properties` = `mcVersion=26.3`�
 | 1.21.8 | （基线工作树，无分支） | 基线构建 success | `applyAllPatches` + `createMojmapLeavesclipJar` 均 BUILD SUCCESSFUL，见 §5 |
 | 1.21.9 | `compat/1.21.9` | **conflict-needs-review**（10/10 轮已用满） | 见 §7：语义冲突（上游删除 `Entity.getServer()`），已提交部分成果 `8e0597c`，未合并 |
 | 1.21.10 | `compat/1.21.10` | **conflict-needs-review**（第 9 轮，未合并） | 见 §8：语义冲突（Paper 1.21.10 把 `spigot { enabled = false }` 改为 `enabled = true`），api 层已适配完成 |
-| 1.21.11 | `compat/1.21.11` | **conflict-needs-review**（第 5 轮，未合并） | 见 §9：Leaves 构建插件 DSL 漂移导致 build.gradle.kts 编译失败；另有 Spigot 启用与 `Entity.getServer()` 两处语义分歧待裁决 |
+| 1.21.11 | `compat/1.21.11` | **conflict-needs-review**（第 12 轮，未合并） | 见 §11：111/141 个 feature 补丁已重锚到 1.21.11/Paper 基线并推送（`6d522ed`），剩 30 个语义冲突；另有 Spigot 启用、`Entity.getServer()`、插件定版三处待裁决 |
 | 26.1 | `compat/26.1` | skipped-no-paper-base | 人工裁决：Paper 无精确基线（§3），不算失败、不触发停止 |
-| 26.1.1 | `compat/26.1.1` | pending | 未开始 |
-| 26.1.2 | `compat/26.1.2` | pending | 未开始 |
-| 26.2 | `compat/26.2` | pending | 未开始 |
-| 26.3 | `compat/26.3` | pending | 未开始 |
+| 26.1.1 | `compat/26.1.1` | blocked-no-paper-base | 官方 Paper 没有 `26.1.1` tag（26.x 基线直接跳到 `26.1.2`），见 §12 |
+| 26.1.2 | `compat/26.1.2` | **conflict-needs-review**（第 1 轮，未合并） | 见 §12：配置阶段已通过，补丁层在 api 层 `0001 Delete Timings` 失败；必须先手工重锚再构建 |
+| 26.2 | `compat/26.2` | pending-not-started | Paper tag 存在（`e5fe71723e`），与 26.1.2 属同一类工程 |
+| 26.3 | `compat/26.3` | blocked-no-paper-base | Paper 没有 26.3 tag（主干 `mcVersion=26.3` 仍在开发中），按规则 2 不能拿未发版 master 当基线，见 §12 |
 
-连续非 success 计数：**3**（1.21.9、1.21.10、1.21.11；26.1 记为 `skipped-no-paper-base`，不计入）。按规则 6，整个推演已**停止（halted）**，等待人工裁决三处分歧后再恢复：①`Entity.getServer()` 被上游删除后的表达方式；②Spigot 层是否重新启用（含 `buildDataRef`/`packageVersion` 取值）；③`leavesweight` / `leavesclip` 是否固定版本（当前未固定，见 §9）。26.x 尚未开始。
+连续非 success 计数：**6**（1.21.9、1.21.10、1.21.11、26.1.1、26.1.2、26.3；26.1 记为 `skipped-no-paper-base` 不计入，26.2 尚未开始）。按规则 6，整个推演继续保持**停止（halted）**，等待人工裁决后再恢复：①`Entity.getServer()` 被上游删除后的表达方式；②Spigot 层是否重新启用（含 `buildDataRef`/`packageVersion` 取值）；③`leavesweight` / `leavesclip` 是否固定版本（当前未固定，见 §9）；④1.21.11 剩余 30 个语义冲突补丁的处理方向（见 §11 清单）；⑤26.x 是否允许按手工重锚的方式继续推进（见 §12）。
 
 ## 5. 基线构建记录
 
@@ -247,4 +247,29 @@ minecraft 层漂移清单（第 10 轮，只读盘点，不改语义）：
 待人工裁决的 30 个补丁：0004 Leaves Protocol Core、0007 Leaves Fakeplayer、0018 Only-check-for-spooky-season-once-an-hour、0029 Alternative-block-placement Protocol、0033 MC Technical Survival Mode、0035 Return nether portal fix、0038 Catch-update-suppression-crash、0039 Bedrock-break-list、0043 Disable-packet-limit、0049 Optimized-dragon-respawn、0052 Elytra-aeronautics-no-chunk-load、0053 Cache-ignite-odds、0055 No-block-update-command、0059 Faster-chunk-serialization、0074 Replay-Mod-API、0079 Spider-jockeys-drop-gapples、0082 CCE-update-suppression、0088 More-Region-Format-Support、0095 Vanilla-hopper、0105 Old-Block-remove-behaviour、0110 Fix-CraftPortalEvent-logic、0114 Vanilla-player-display-name、0115 Fix-SculkCatalyst-exp-skip、0131 Old-wet-tnt-explode-behavior、0132 Old-projectile-explosion-behavior、0135 temp-fix-quick-craft、0136 Old-ender-dragon-part-can-use-end-portal、0138 Chat-command-max-length、0139 Lithium-Sleeping-Block-Entity、0141 Remove-paper-stuck-poi-check-delay。
 
 建议的人工后续：在这些语义冲突处按 Leaves 原意图重写补丁本体（不改 Paper/Spigot 层补丁），或接受上游新语义并同步调整 Leaves 功能；两者都需要作者确认，不属于可自动修的机械性偏移。Documentation / Configuration 本轮不跟进（没有成功的版本可跟随）。
+
+## 12. 队列剩余版本的门槛情报与 compat/26.1.2 第 1 轮（2026-11-22）
+
+Paper 门槛情报（官方 PaperMC/Paper，只读查询，已验证）：
+
+- `Paper` 仓库的 GitHub Releases 列表为空（`releases?per_page=100` 返回 0 条），适配情况只能看 git tags 与 `gradle.properties`。
+- tags 里存在：`1.21.11` -> `bd74bf6581`、`26.1.2` -> `76d2ac758cb3abe75aceefa88207443768f585c6`、`26.2` -> `e5fe71723e2ffde7cc9fafc085ac3bb73e63175e`；**不存在** `26.1`、`26.1.1`、`26.3` 这三个 tag。
+- `master` 的 `gradle.properties`（2026-11-20 抓取）：`mcVersion=26.3`、`apiVersion=26.3`、`channel=STABLE`、`updatingMinecraft=false`；最新提交 `d81ca50aeb`（2026-11-20）。也就是说 Paper 已经在 26.3 主干上开发，但还没给 26.3 打 tag / 发版。
+
+据此更新状态表（规则 2：Paper 未适配就记 blocked，不猜）：
+
+- `26.1`：`skipped-no-paper-base`（沿用用户裁决，不算失败）。
+- `26.1.1`：`blocked-no-paper-base` —— 官方 Paper 没有 `26.1.1` tag，它的 26.x 基线直接跳到 `26.1.2`。
+- `26.1.2`：第 1 轮失败，记 `conflict-needs-review`（见下）。
+- `26.2`：`pending-not-started` —— Paper tag 存在（`e5fe71723e`），但要和 26.1.2 一样做全量重锚，属同一类工程。
+- `26.3`：`blocked-no-paper-base` —— Paper 没有 26.3 tag（主干仍在开发中），按规则 2 不能拿未发版的 master 当基线。
+
+compat/26.1.2 第 1 轮证据（分支 `compat/26.1.2`，从 `8ba0135` 切出并已推送；worktree `E:\mc\leaves-work\Leaves-26.1.2`）：
+
+- 配置阶段已经通过：`gradle.properties` 写成 `version/mcVersion/paperRef/apiVersion = 26.1.2` + `paperRef=76d2ac758cb3…`，Gradle 9.2.1 便携 `gradle.bat` + 本机 trustStore（未提交），依赖解析和插件加载都没报错 —— 说明最新 leavesweight 插件本身能吃 26.x 的配置形状。
+- 失败点在补丁层：`:applyPaperApiFeaturePatches FAILED`，`Applying: Delete Timings`，`error: sha1 information is lacking or useless (src/main/java/co/aikar/timings/FullServerTickHandler.java)` / `Patch failed at 0001 Delete Timings`。
+- 根因判断（已验证）：paperweight/leavesweight 的 `git am` 走 `--3way`，而 26.1.2 worktree 里的补丁还是 1.21.8 时代的版本（本轮 `strip_index.py` 把 168 个补丁的 `index` 行删掉了）。没有 `index` 行 + 没有前置 blob，3-way 就报这句；而即使留着 `index` 行，那些 blob 也不在 26.1.2 的 Paper 基线里。所以 26.x 必须像 1.21.11 那样先手工重锚（api 层 9 个 + minecraft 层 imports/file/features），再用 `regenerate_patches.py` 重新导出补丁，而不是靠 gradle 自己重放。
+- 本轮没有产物，不新增 GitHub release。按规则 6（连续 2 个版本非 success）整个推演继续保持停止状态：1.21.9 / 1.21.10 / 1.21.11 / 26.1.1 / 26.1.2 / 26.3 都不是 success，等待人工裁决。
+
+人工后续的最小可行顺序：①先裁决 1.21.11 的 30 个语义冲突（§11 清单）；②用同一套机械处理器对 26.1.2 的 api 层 + minecraft 层做逐层盘点（基线必须从 `applyAllPatches` 成功的那几个层提交开始，见 E062/E067）；③每层重新生成补丁并保留 mbox 头、去掉 index 行（见 E066）；④跑通才建 `compat-<VERSION>` release，并把产物放进 `E:\mc\leaves-work\downloads\builds\<VERSION>\`。
 
