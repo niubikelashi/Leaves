@@ -359,3 +359,8 @@ compat/26.1.2 第 1 轮证据（分支 `compat/26.1.2`，从 `8ba0135` 切出并
 1. Spigot 关闭方式：保持上游（删除 `enabled` 行）还是改用别的关闭姿势？当前 `96c9ea4` 使构建脚本编译失败。
 2. 是否允许对 `paper-server/build.gradle.kts.patch` 做 ±1 行机械偏移修正（不改语义、不改取值）？这是本轮第 9 轮的硬卡点。
 3. 插件版本策略：leavesweight 只有 SNAPSHOT，是否接受「固定到某个 SNAPSHOT」或保持上游不固定？
+### 补丁格式归一化（阶段 2 收尾，compat/1.21.11）
+- 上游基线 `d93e976` 的 141 个 feature 补丁约定：**LF 行尾 + 保留 `index` 行**（141/141 含 index、0 含 CRLF）。本轮重生成出的补丁偏离了这个约定：8 个写成 CRLF，另有 4 个（0004/0033/0052/0055）仍带 `index` 行。按阶段 2 裁决「重生成补丁保留 From/Date/Subject、删 index 行」统一处理：**13 个 A 类补丁全部改为 LF 且无 `index` 行**，逐个单独提交，每个提交只改一个补丁文件。
+- 归一化后的提交（旧→新）：`9464f01`(0004) / `5d1e546`(0029) / `3755698`(0033) / `745b11d`(0039) / `4cbb305`(0043) / `874f702`(0049) / `6386893`(0052) / `ddb9538`(0055) / `83806a9`(0079) / `ace9ce9`(0114) / `5b856e2`(0131) / `97f636a`(0132)；0003 已符合约定未改动。
+- 归一化后重放验证：前缀重放到 0131 时嵌套仓库提交 156 个、工作树干净、无 `.rej`；0132 在归一化补丁上 `git apply` 直接 `Applied patch ... cleanly`（证据 `E:\mc\leaves-work\normalize-replay.txt`、`normalize-0132-check.txt`）。分支 tip 从 `c321195` 前进到 `97f636a` 并推送，未合并 master。
+- CI 证据缺失：fork 的 GitHub Actions 运行总数为 **0**（`E:\mc\leaves-work\leaves-actions.txt`），因此 1.21.11 的验证只能依赖本地 gradle 日志（第 8/9 轮），不能用 CI 绿作为门槛。
