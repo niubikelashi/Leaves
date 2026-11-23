@@ -4,7 +4,6 @@ Date: Sun, 2 Feb 2025 13:08:32 +0800
 Subject: [PATCH] Leaves Protocol Core
 
 diff --git a/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java b/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
-index 1da0347..b64f3ac 100644
 --- a/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
 +++ b/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
 @@ -46,7 +46,16 @@ public interface CustomPacketPayload {
@@ -26,7 +25,6 @@ index 1da0347..b64f3ac 100644
          };
      }
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index daeee54..99c328a 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
 @@ -1843,6 +1843,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -39,7 +37,6 @@ index daeee54..99c328a 100644
              runnable.run();
          }
 diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-index b8a4b4c..f480e86 100644
 --- a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 @@ -58,6 +58,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
@@ -119,7 +116,6 @@ index b8a4b4c..f480e86 100644
          this.connection.setReadOnly();
          // CraftBukkit - Don't wait
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 9f86d1f..361dc84 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
 @@ -244,6 +244,8 @@ public abstract class PlayerList {
