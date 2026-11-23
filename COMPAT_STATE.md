@@ -364,3 +364,37 @@ compat/26.1.2 第 1 轮证据（分支 `compat/26.1.2`，从 `8ba0135` 切出并
 - 归一化后的提交（旧→新）：`9464f01`(0004) / `5d1e546`(0029) / `3755698`(0033) / `745b11d`(0039) / `4cbb305`(0043) / `874f702`(0049) / `6386893`(0052) / `ddb9538`(0055) / `83806a9`(0079) / `ace9ce9`(0114) / `5b856e2`(0131) / `97f636a`(0132)；0003 已符合约定未改动。
 - 归一化后重放验证：前缀重放到 0131 时嵌套仓库提交 156 个、工作树干净、无 `.rej`；0132 在归一化补丁上 `git apply` 直接 `Applied patch ... cleanly`（证据 `E:\mc\leaves-work\normalize-replay.txt`、`normalize-0132-check.txt`）。分支 tip 从 `c321195` 前进到 `97f636a` 并推送，未合并 master。
 - CI 证据缺失：fork 的 GitHub Actions 运行总数为 **0**（`E:\mc\leaves-work\leaves-actions.txt`），因此 1.21.11 的验证只能依赖本地 gradle 日志（第 8/9 轮），不能用 CI 绿作为门槛。
+
+## §15 第 10 轮：三项裁决执行 + gate 收口（2026-11-23，compat/1.21.11）
+
+### 裁决 1 · Spigot（只读比对，未硬写 DSL）
+- 比对结论：唯一 success 的 **1.21.8 基线里 Spigot 层是禁用状态**。证据（`E:\mc\leaves-work\spigot-compare-round10.txt`）：
+  - `Leaves-base-1218\leaves-server\build.gradle.kts.patch` 第 44-48 行把 `-        enabled = true` 改成 `+        // enabled = true // Leaves - disable`（注释掉 = 禁用）。
+  - 应用后的 `Leaves-base-1218\leaves-server\build.gradle.kts` 第 40-43 行只剩注释行 + `buildDataRef` / `packageVersion`，没有 `enabled` 成员。
+  - 产物 jar `leaves-server-1.21.8-R0.1-SNAPSHOT.jar`（27935137 字节、18346 条目）里 `v1_21_R5` 条目 **0 个**，`org/spigotmc` 条目 12（仅 API 引用）→ Spigot 生成层确实没产出。
+- 等价关闭姿势查证：gradle 缓存里 leavesweight-core **2.0.0-SNAPSHOT**（sha1 `665e5a24194ec71c1146353e5a27e05150a19d14`）的 `SpigotExtension` 只有 `getBuildDataRef()` / `getPackageVersion()`，**没有 `getEnabled()`**；**2.1.0-SNAPSHOT**（sha1 `d2e426a340fea2a53da00e364896e12b14067bfa`）才有 `getEnabled()`。按裁决不升级插件、不自造 DSL。
+- 本轮提交 `e49e92e`（compat/1.21.11）：把 Paper 1.21.11 自带的 `        enabled = false`（原始文件第 26 行，paperRef `ba4b700e1`）恢复成补丁**上下文行**，不新增取值，spigot 形状与上游一致。
+- 第 10 轮构建取证（`E:\mc\leaves-work\1.21.11-apply-round10.log`，便携 Gradle 9.2.1 + JDK 21）：`BUILD FAILED in 12s`，**配置阶段**失败 `leaves-server/build.gradle.kts:37:9: Unresolved reference 'enabled'`（记错本 E070 命中）→ 2.0.0 插件无法编译带 `enabled` 的生成脚本 ⇒ 按裁决记 **blocked**，不改回 `true`、不删块（`AllTasks` 无条件读 `getPackageVersion()`）。
+
+### 裁决 2 · `paper-server/build.gradle.kts.patch` ±1 机械重锚
+- 本轮提交 `2ecb1f7`（compat/1.21.11）：只改写 **9 个 `@@` 头行**（`@@ -7,22 +6,34 @@` → `@@ -7,23 +6,35 @@`；第 3 个 hunk `+50,13` → `+51,13`，其余 new 侧整体 +1），文件行数不变，`+`/`-` 内容行逐条前后一致（+84 / -40），未改任何取值，无 CRLF、无 `index` 行。
+- 证据（`E:\mc\leaves-work\build-patch-reanchor.txt`）：对 paperRef `ba4b700e1` 的原始 `paper-server/build.gradle.kts`（375 行）跑 `git apply --check` → **rc = 0**；`git apply` → 应用后 419 行，`enabled = false` 保留、`activeFork = leaves` 出现，与逐 hunk 模拟结果一致。
+- 偏移正好 **±1**，未超出裁决边界；第 9 轮的 `Applied Offset Mismatch ... Expected: 51, Actual: 50` 已被这条重锚消除。
+
+### 裁决 3 · 插件版本固定（结论：不固定，记不可复现风险）
+- 时间戳坐标能从 metadata 推导（`leavesweight-core/2.0.0-SNAPSHOT/maven-metadata.xml` → `<timestamp>20250422.125601</timestamp> <buildNumber>5</buildNumber>` ⇒ `2.0.0-20250422.125601-5`），但 Reposilite **不提供 Maven 标准的时间戳版本目录**：
+  `.../leavesweight-core/2.0.0-20250422.125601-5/*.jar|pom` 与目录列举全部 **HTTP 404**；带时间戳的文件只存在于 `2.0.0-SNAPSHOT/` 目录内（`.jar` 200 / 12137119 字节，与本机缓存同尺寸）。
+- ⇒ Gradle 按显式时间戳坐标解析不到 ⇒ 固定会直接把配置阶段打挂。按裁决兜底：**保持上游浮动 `2.0.0-SNAPSHOT` 不固定**，`build.gradle.kts` 第 7 行未改动，**本轮无提交**，标注「不可复现风险，不作为 success 门槛」（缓存对应 build 5）。证据 `E:\mc\leaves-work\plugin-pin-round10.txt`。
+- 顺带记录：`2.2.0-SNAPSHOT` metadata 时间戳 `20260601.030213` build 1 —— 升级插件版本不在本轮授权范围内。
+
+### 最终 Gate 结论（第 10 轮 = 最后一轮预算）
+- 1.21.11 **仍不到 success**：卡点从「hunk 偏移」推进到「插件 DSL 缺 `spigot.enabled`」（配置阶段，12 秒即失败），属于构建插件能力边界，不是 MC 语义冲突。
+- 连续非 success 计数到达 **10**（上限）→ **收口**：不再消耗构建轮次，不再扩大 26.x；`compat/26.1.2`、`compat/26.2` 保持诊断分支，**未合并 master、未产 Release、未上传产物、未宣布 success**。
+- 转为只维护 **1.21.8 基线**：`Leaves-base-1218` detached `d93e976` + `downloads\builds\1.21.8\` 4 个 jar；上游 Releases 镜像保持 20 release / 23 assets。
+- 分支：`compat/1.21.11` HEAD `2ecb1f7`（本轮新增 `e49e92e`、`2ecb1f7`，已推送，远端 tip 复核 `2ecb1f7d182…`）；`compat/1.21.9` `8e0597c`、`compat/1.21.10` `4f6cf0f`、`compat/26.1.2` `8ba0135`、`compat/26.2` `ffb9cc5` 均未合并 master；`master` 不因 1.21.11 变更；`Documentation` / `Configuration` 未改动；A/B/C/D 语义未动。
+- `gradle.properties` 上被脚本注入的 trustStore 改动已还原（并修掉 `Set-Content -Encoding UTF8` 引入的 BOM）。
+
+### 仍需人工裁决（本轮已按边界停止，不自行扩大）
+1. 是否升级 leavesweight 到支持 `spigot.enabled` 的版本（2.1.0+ / 2.2.0-SNAPSHOT）以获得显式关闭姿势 —— 需要人工确认对 1.21.11 的兼容性与语义。
+2. 若不接受升级：是否接受「删除 `enabled` 行、依赖插件默认关闭」的姿势 —— 需人工确认默认语义，并用产物 jar 条目计数验证 Spigot 层确实未生成（参照 1.21.8 的 0 条目判据）。
+3. 插件不可复现风险是否需要另开镜像/本地缓存锁定方案（本轮只标注，未处理）。
