@@ -41,6 +41,7 @@
 +    // Leaves end - build change
 +
      spigot {
+         enabled = false
          buildDataRef = "42d18d4c4653ffc549778dbe223f6994a031d69e"
          packageVersion = "v1_21_R6" // also needs to be updated in MappingEnvironment
      }
