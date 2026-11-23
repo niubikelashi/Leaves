@@ -5,7 +5,7 @@
  import io.papermc.paperweight.attribute.DevBundleOutput
  import io.papermc.paperweight.util.*
  import java.time.Instant
-@@ -7,22 +6,34 @@ plugins {
+@@ -7,23 +6,35 @@ plugins {
      `java-library`
      `maven-publish`
      idea
@@ -45,7 +45,7 @@
          buildDataRef = "42d18d4c4653ffc549778dbe223f6994a031d69e"
          packageVersion = "v1_21_R6" // also needs to be updated in MappingEnvironment
      }
-@@ -40,15 +50,13 @@ paperweight {
+@@ -40,15 +51,13 @@ paperweight {
          "org.spigotmc",
      )
  
@@ -62,7 +62,7 @@
      )
  }
  
-@@ -104,7 +112,21 @@ if (project.providers.gradleProperty("publishDevBundle").isPresent) {
+@@ -104,7 +113,21 @@ if (project.providers.gradleProperty("publishDevBundle").isPresent) {
      }
  }
  
@@ -85,7 +85,7 @@
  configurations.named(log4jPlugins.compileClasspathConfigurationName) {
      extendsFrom(configurations.compileClasspath.get())
  }
-@@ -127,7 +149,19 @@ abstract class MockitoAgentProvider : CommandLineArgumentProvider {
+@@ -127,7 +150,19 @@ abstract class MockitoAgentProvider : CommandLineArgumentProvider {
  }
  
  dependencies {
@@ -106,7 +106,7 @@
      implementation("ca.spottedleaf:concurrentutil:0.0.7")
      implementation("org.jline:jline-terminal-ffm:3.27.1") // use ffm on java 22+
      implementation("org.jline:jline-terminal-jni:3.27.1") // fall back to jni on java 21
-@@ -154,7 +188,6 @@ dependencies {
+@@ -154,7 +189,6 @@ dependencies {
      implementation("org.spongepowered:configurate-yaml:4.2.0")
  
      // Deps that were previously in the API but have now been moved here for backwards compat, eventually to be removed
@@ -114,7 +114,7 @@
      runtimeOnly("org.xerial:sqlite-jdbc:3.49.1.0")
      runtimeOnly("com.mysql:mysql-connector-j:9.2.0")
      runtimeOnly("com.lmax:disruptor:3.4.4")
-@@ -186,26 +219,36 @@ dependencies {
+@@ -186,26 +220,36 @@ dependencies {
      implementation("me.lucko:spark-paper:1.10.152")
  }
  
@@ -157,7 +157,7 @@
              "Build-Number" to (build ?: ""),
              "Build-Time" to buildTime.toString(),
              "Git-Branch" to gitBranch,
-@@ -264,7 +307,7 @@ tasks.test {
+@@ -264,7 +308,7 @@ tasks.test {
      jvmArgumentProviders.add(provider)
  }
  
@@ -166,7 +166,7 @@
  idea {
      module {
          generatedSourceDirs.add(generatedDir.toFile())
-@@ -301,6 +344,10 @@ fun TaskContainer.registerRunTask(
+@@ -301,6 +345,10 @@ fun TaskContainer.registerRunTask(
      }
  
      args("--nogui")
@@ -177,7 +177,7 @@
      systemProperty("net.kyori.adventure.text.warnWhenLegacyFormattingDetected", true)
      if (providers.gradleProperty("paper.runDisableWatchdog").getOrElse("false") == "true") {
          systemProperty("disable.watchdog", true)
-@@ -345,30 +392,26 @@ tasks.registerRunTask("runReobfBundler") {
+@@ -345,30 +393,26 @@ tasks.registerRunTask("runReobfBundler") {
      classpath(tasks.createReobfBundlerJar.flatMap { it.outputZip })
      mainClass.set(null as String?)
  }
