@@ -408,3 +408,21 @@ compat/26.1.2 第 1 轮证据（分支 `compat/26.1.2`，从 `8ba0135` 切出并
    - 顺带把基线工作树上残留的 `gradle.properties`（脚本注入的 trustStore + BOM）还原到 `d93e976` 状态，基线证据树保持干净。
 3. **1.21.11 终态**：spigot 形状卡点 = **blocked-resolved**（插件能力边界已用「删掉 `enabled` 成员」对齐 1.21.8 姿势消除，未升级插件、未自造 DSL）；版本整体仍 **blocked**，不追 success —— 剩余卡点是 B 类语义冲突（补丁重放）与 fork GitHub Actions 运行总数 0 导致的 CI 证据缺失。
 4. **收口结论不变**：连续非 success 计数停在 10（上限），不再消耗构建轮次、不跑第 11 轮；不合 master、不产 Release、不上传产物、不动 `Documentation` / `Configuration`；只维护 1.21.8 基线，`compat/26.1.2`、`compat/26.2` 仅作诊断分支。仍开放的第 3 项（插件不可复现风险的镜像/本地缓存锁定方案）保持只标注、不处理。
+
+## §16 维护模式（2026-11-23 收口后，无构建轮次）
+
+### 诊断分支处置（按裁决关闭，不合 master、不产产物）
+- 说明（如实记录）：仓库里**不存在**名为 `diag/26.1.2-api-timings` / `diag/26.2-api-semantics` 的分支（本地、远端、packed refs 全部查过，0 条）。这两项诊断是在 `compat/26.1.2`、`compat/26.2` 两个分支及其 worktree（`E:\mc\leaves-work\Leaves-26.1.2`、`Leaves-26.2`）里做的，结论已经落在这份状态文档里，按裁决写进本节并关闭。
+- `26.1.2 api timings` → **诊断完成、有结论（§12）**：配置阶段能过（最新 leavesweight 插件吃 26.x 配置形状），卡点在 `:applyPaperApiFeaturePatches FAILED` / `Applying: Delete Timings` / `sha1 information is lacking or useless (co/aikar/timings/FullServerTickHandler.java)`；根因是 26.x 补丁仍是 1.21.8 时代版本且 `git am --3way` 没有可用前置 blob（删 index 行也一样），必须像 1.21.11 那样手工逐层重锚再用 `regenerate_patches.py` 导出（E066）。分支 `compat/26.1.2` HEAD `8ba0135` 与 master 同历史（**0 个独立提交、无产物**）→ 标记「诊断完成、有结论、无代码产出」，关闭。
+- `26.2 api semantics` → **诊断完成、有结论（§13）**：api 层手工盘点天花板 **7/9**，两个语义阻塞 —— `0001-Delete-Timings` 的待删行在 26.2 里不存在而 `co/aikar/timings` 目录仍在（Paper 重写调用点，按规则 3 不猜）、`0005-Bytebuf-API` 的落点在 26.2 `src/main/java/org/bukkit/` 已不存在（上游搬迁）；另有结构性事实（E069）：gradle 顺序 `git am` 被第 1 个冲突补丁挡死后续全部，且上层失败时 `leaves-server` 嵌套 minecraft 仓库不 clone → 26.2 的 minecraft 层连基线都拿不到。分支 `compat/26.2` HEAD `ffb9cc5`（仅 `gradle.properties` 适配到 26.2 + 9 个 api 补丁去 index 行）保持存档，不合并、不产产物 → 标记「诊断完成、有结论」，关闭。
+- 两个分支**保留为存档 ref，未删除、未合并**；关闭 = 状态标记，不再消耗轮次。
+
+### 维护模式说明
+- 唯一维护对象是 **1.21.8 基线**：`Leaves-base-1218` detached `d93e976`（工作树已还原到干净状态，`gradle.properties` 里本机 trustStore 注入已回收）+ `E:\mc\leaves-work\downloads\builds\1.21.8\` 的 4 个 jar（`leaves-api` / `leaves-server` / `leaves-bundler-mojmap` / `leaves-leavesclip-mojmap`，均为 11-20 那次唯一成功构建的产物）。
+- `compat/*` 分支**仅存档**：`compat/1.21.9` `8e0597c`、`compat/1.21.10` `4f6cf0f`、`compat/1.21.11` `9f04f9f`、`compat/26.1.2` `8ba0135`、`compat/26.2` `ffb9cc5`，均不合并 master（`branch --no-merged master` 复核：除 `compat/26.1.2` 因与 master 同历史外，其余三个都未合入）；`26.x` 仅诊断。
+- 构建轮次预算：**连续非 success 计数停在 10（上限）**，不跑第 11 轮，不追 1.21.11 success，不再扩大 26.x。维护模式下的动作只允许：状态文档更新、记错本维护、只读证据核对。
+- GitHub Releases 保持 **20 个 release / 23 个 asset**（19 个上游镜像 + `compat-1.21.8`），fork 的 GitHub Actions 运行总数仍为 **0**（CI 不能当门槛证据）。
+
+### 插件版本策略条款（浮动 SNAPSHOT 的边界）
+- 当前策略：**浮动 `2.0.0-SNAPSHOT` + 标注不可复现风险 + 不作为 success 门槛**，这只在 1.21.11 处于 **blocked**（非最终态）时允许。
+- 硬性条款：若 `1.21.11`（或任何 compat 版本）将来转为 **success** 或要**产出 Release**，必须先验证插件坐标并**固定到可复现的正式版坐标**，否则不得宣布 success、不得发 Release。固定前需重跑一次可复现构建取证并记录坐标来源；仍然禁止固定不存在的版本、禁止为固定而固定、禁止未经裁决升级插件版本。
