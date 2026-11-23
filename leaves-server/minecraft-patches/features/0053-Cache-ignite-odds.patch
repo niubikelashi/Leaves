@@ -7,24 +7,46 @@ Subject: [PATCH] Cache ignite odds
 diff --git a/net/minecraft/world/level/block/FireBlock.java b/net/minecraft/world/level/block/FireBlock.java
 --- a/net/minecraft/world/level/block/FireBlock.java
 +++ b/net/minecraft/world/level/block/FireBlock.java
-@@ -205,6 +205,7 @@ public class FireBlock extends BaseFireBlock {
-                     this.checkBurnOut(level, pos.south(), 300 + i, random, ageValue, pos);
-                     // CraftBukkit end
-                     BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
+@@ -199,24 +199,25 @@
+                 this.checkBurnOut(level, pos.below(), 250 + i, random, ageValue, pos);
+                 this.checkBurnOut(level, pos.above(), 250 + i, random, ageValue, pos);
+                 this.checkBurnOut(level, pos.north(), 300 + i, random, ageValue, pos);
+-                this.checkBurnOut(level, pos.south(), 300 + i, random, ageValue, pos);
+-                // CraftBukkit end - add source blockPos to burn calls
+-                BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
+-
+-                for (int i1 = -1; i1 <= 1; i1++) {
+-                    for (int i2 = -1; i2 <= 1; i2++) {
++                    this.checkBurnOut(level, pos.south(), 300 + i, random, ageValue, pos);
++                    // CraftBukkit end
++                    BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
 +                Object2IntOpenHashMap<BlockPos> blockPositionIgniteCache = new Object2IntOpenHashMap<>(); // Leaves - cache ignite odds
- 
-                     for (int i1 = -1; i1 <= 1; i1++) {
-                         for (int i2 = -1; i2 <= 1; i2++) {
-@@ -216,7 +217,7 @@ public class FireBlock extends BaseFireBlock {
++
++                    for (int i1 = -1; i1 <= 1; i1++) {
++                        for (int i2 = -1; i2 <= 1; i2++) {
+                         for (int i3 = -1; i3 <= 4; i3++) {
+                             if (i1 != 0 || i3 != 0 || i2 != 0) {
+                                 int i4 = 100;
+                                 if (i3 > 1) {
+                                     i4 += (i3 - 1) * 100;
+-                                }
+-
+-                                mutableBlockPos.setWithOffset(pos, i1, i3, i2);
+-                                int igniteOdds = this.getIgniteOdds(level, mutableBlockPos);
+-                                if (igniteOdds > 0) {
+-                                    int i5 = (igniteOdds + 40 + level.getDifficulty().getId() * 7) / (ageValue + 30);
+-                                    if (value) {
++                                    }
++
++                                    mutableBlockPos.setWithOffset(pos, i1, i3, i2);
++                                int igniteOdds = this.getIgniteOdds(level, mutableBlockPos, org.leavesmc.leaves.LeavesConfig.performance.cacheIgniteOdds ? blockPositionIgniteCache : null); // Leaves - cache ignite odds
++                                    if (igniteOdds > 0) {
++                                        int i5 = (igniteOdds + 40 + level.getDifficulty().getId() * 7) / (ageValue + 30);
++                                        if (isIncreasedFireBurnout) {
+                                         i5 /= 2;
                                      }
  
-                                     mutableBlockPos.setWithOffset(pos, i1, i3, i2);
--                                    int igniteOdds = this.getIgniteOdds(level, mutableBlockPos);
-+                                int igniteOdds = this.getIgniteOdds(level, mutableBlockPos, org.leavesmc.leaves.LeavesConfig.performance.cacheIgniteOdds ? blockPositionIgniteCache : null); // Leaves - cache ignite odds
-                                     if (igniteOdds > 0) {
-                                         int i5 = (igniteOdds + 40 + level.getDifficulty().getId() * 7) / (ageValue + 30);
-                                         if (isIncreasedFireBurnout) {
-@@ -319,20 +320,33 @@ public class FireBlock extends BaseFireBlock {
+@@ -315,20 +316,33 @@
          return false;
      }
  
@@ -60,3 +82,4 @@ diff --git a/net/minecraft/world/level/block/FireBlock.java b/net/minecraft/worl
  
      @Override
      protected boolean canBurn(BlockState state) {
+

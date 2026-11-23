@@ -9,15 +9,10 @@ should remove when PaperMC/Paper#11831 merged
 diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
-@@ -3945,11 +3945,11 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+@@ -4111,6 +4111,11 @@
              return null;
          } else {
              double d = this.getEyeY() - 0.3F;
--            // Paper start
--            final ItemStack tmp = stack.copy();
--            stack.setCount(0);
--            stack = tmp;
--            // Paper end
 +            // Paper start // Leaves start - wtf this for? it breaks quick craft
 +            // final ItemStack tmp = stack.copy();
 +            // stack.setCount(0);
@@ -26,3 +21,4 @@ diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/
              ItemEntity itemEntity = new ItemEntity(this.level(), this.getX(), d, this.getZ(), stack);
              itemEntity.setPickUpDelay(40);
              if (includeThrower) {
+

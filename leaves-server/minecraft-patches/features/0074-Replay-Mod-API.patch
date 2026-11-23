@@ -8,11 +8,11 @@ This patch is Powered by ReplayMod(https://github.com/ReplayMod)
 diff --git a/net/minecraft/commands/CommandSourceStack.java b/net/minecraft/commands/CommandSourceStack.java
 --- a/net/minecraft/commands/CommandSourceStack.java
 +++ b/net/minecraft/commands/CommandSourceStack.java
-@@ -580,7 +580,7 @@ public class CommandSourceStack implements ExecutionCommandSource<CommandSourceS
+@@ -562,7 +562,7 @@
  
      @Override
      public Collection<String> getOnlinePlayerNames() {
--        return this.entity instanceof ServerPlayer sourcePlayer && !sourcePlayer.getBukkitEntity().hasPermission("paper.bypass-visibility.tab-completion") ? this.getServer().getPlayerList().getPlayers().stream().filter(serverPlayer -> sourcePlayer.getBukkitEntity().canSee(serverPlayer.getBukkitEntity())).map(serverPlayer -> serverPlayer.getGameProfile().getName()).toList() : Lists.newArrayList(this.server.getPlayerNames()); // Paper - Make CommandSourceStack respect hidden players
+-        return this.entity instanceof ServerPlayer sourcePlayer && !sourcePlayer.getBukkitEntity().hasPermission("paper.bypass-visibility.tab-completion") ? this.getServer().getPlayerList().getPlayers().stream().filter(serverPlayer -> sourcePlayer.getBukkitEntity().canSee(serverPlayer.getBukkitEntity())).map(serverPlayer -> serverPlayer.getGameProfile().name()).toList() : Lists.newArrayList(this.server.getPlayerNames()); // Paper - Make CommandSourceStack respect hidden players
 +        return this.entity instanceof ServerPlayer sourcePlayer && !(sourcePlayer instanceof org.leavesmc.leaves.replay.ServerPhotographer) && !sourcePlayer.getBukkitEntity().hasPermission("paper.bypass-visibility.tab-completion") ? this.getServer().getPlayerList().getPlayers().stream().filter(serverPlayer -> sourcePlayer.getBukkitEntity().canSee(serverPlayer.getBukkitEntity())).map(serverPlayer -> serverPlayer.getGameProfile().getName()).toList() : Lists.newArrayList(this.server.getPlayerNames()); // Paper - Make CommandSourceStack respect hidden players // Leaves - only real player
      }
  
@@ -20,7 +20,7 @@ diff --git a/net/minecraft/commands/CommandSourceStack.java b/net/minecraft/comm
 diff --git a/net/minecraft/commands/arguments/selector/EntitySelector.java b/net/minecraft/commands/arguments/selector/EntitySelector.java
 --- a/net/minecraft/commands/arguments/selector/EntitySelector.java
 +++ b/net/minecraft/commands/arguments/selector/EntitySelector.java
-@@ -128,11 +128,12 @@ public class EntitySelector {
+@@ -126,11 +126,12 @@
              return this.findPlayers(source);
          } else if (this.playerName != null) {
              ServerPlayer playerByName = source.getServer().getPlayerList().getPlayerByName(this.playerName);
@@ -34,7 +34,7 @@ diff --git a/net/minecraft/commands/arguments/selector/EntitySelector.java b/net
                      if (entity.getType().isEnabled(source.enabledFeatures())) {
                          return List.of(entity);
                      }
-@@ -146,7 +147,7 @@ public class EntitySelector {
+@@ -144,7 +145,7 @@
              AABB absoluteAabb = this.getAbsoluteAabb(vec3);
              if (this.currentEntity) {
                  Predicate<Entity> predicate = this.getPredicate(vec3, absoluteAabb, null);
@@ -43,7 +43,7 @@ diff --git a/net/minecraft/commands/arguments/selector/EntitySelector.java b/net
              } else {
                  Predicate<Entity> predicate = this.getPredicate(vec3, absoluteAabb, source.enabledFeatures());
                  List<Entity> list = new ObjectArrayList<>();
-@@ -157,6 +158,7 @@ public class EntitySelector {
+@@ -155,6 +156,7 @@
                          this.addEntities(list, serverLevel1, absoluteAabb, predicate);
                      }
                  }
@@ -51,7 +51,7 @@ diff --git a/net/minecraft/commands/arguments/selector/EntitySelector.java b/net
  
                  return this.sortAndLimit(vec3, list);
              }
-@@ -192,9 +194,11 @@ public class EntitySelector {
+@@ -190,9 +192,11 @@
          this.checkPermissions(source);
          if (this.playerName != null) {
              ServerPlayer playerByName = source.getServer().getPlayerList().getPlayerByName(this.playerName);
@@ -63,7 +63,7 @@ diff --git a/net/minecraft/commands/arguments/selector/EntitySelector.java b/net
              return playerByName == null ? List.of() : List.of(playerByName);
          } else {
              Vec3 vec3 = this.position.apply(source.getPosition());
-@@ -206,12 +210,12 @@ public class EntitySelector {
+@@ -204,12 +208,12 @@
                  int resultLimit = this.getResultLimit();
                  List<ServerPlayer> players;
                  if (this.isWorldLimited()) {
@@ -81,7 +81,7 @@ diff --git a/net/minecraft/commands/arguments/selector/EntitySelector.java b/net
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1638,7 +1638,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1730,7 +1730,7 @@
      }
  
      private ServerStatus.Players buildPlayerStatus() {
@@ -90,31 +90,155 @@ diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/Mi
          int maxPlayers = this.getMaxPlayers();
          if (this.hidesOnlinePlayers()) {
              return new ServerStatus.Players(maxPlayers, players.size(), List.of());
-@@ -1852,7 +1852,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1850,143 +1850,9 @@
+             runnable.run();
+         }
  
+-        profilerFiller.popPush("send chunks");
+-
+-        for (ServerPlayer serverPlayer : this.playerList.getPlayers()) {
+-            serverPlayer.connection.chunkSender.sendNextChunks(serverPlayer);
+-            serverPlayer.connection.resumeFlushing();
+-        }
+-
+-        profilerFiller.pop();
+-        this.serverActivityMonitor.tick();
+-    }
+-
+-    // Paper start - per world respawn data - read "server global" respawn data from overworld dimension reference
+-    public void updateEffectiveRespawnData() {
+-        ServerLevel serverLevel = this.findRespawnDimension();
+-        LevelData.RespawnData respawnData = serverLevel.serverLevelData.getRespawnData();
+-        respawnData = respawnData.withLevel(serverLevel.dimension());
+-    // Paper end - per world respawn data - read "server global" respawn data from overworld dimension reference
+-        this.effectiveRespawnData = serverLevel.getWorldBorderAdjustedRespawnData(respawnData);
+-    }
+-
+-    public void tickConnection() {
+-        this.getConnection().tick();
+-    }
+-
+-    private void synchronizeTime(ServerLevel level) {
+-        this.playerList
+-            .broadcastAll(
+-                new ClientboundSetTimePacket(level.getGameTime(), level.getDayTime(), level.getGameRules().get(GameRules.ADVANCE_TIME)), level.dimension()
+-            );
+-    }
+-
+-    public void forceTimeSynchronization() {
+-        ProfilerFiller profilerFiller = Profiler.get();
+-        profilerFiller.push("timeSync");
+-
+-        for (ServerLevel serverLevel : this.getAllLevels()) {
+-            this.synchronizeTime(serverLevel);
+-        }
+-
+-        profilerFiller.pop();
+-    }
+-
+-    public void addTickable(Runnable tickable) {
+-        this.tickables.add(tickable);
+-    }
+-
+-    protected void setId(String serverId) {
+-        this.serverId = serverId;
+-    }
+-
+-    public boolean isShutdown() {
+-        return !this.serverThread.isAlive();
+-    }
+-
+-    public Path getFile(String path) {
+-        return this.getServerDirectory().resolve(path);
+-    }
+-
+-    public final ServerLevel overworld() {
+-        return this.levels.get(Level.OVERWORLD);
+-    }
+-
+-    public @Nullable ServerLevel getLevel(ResourceKey<Level> dimension) {
+-        return this.levels.get(dimension);
+-    }
+-
+-    // CraftBukkit start
+-    public void addLevel(ServerLevel level) {
+-        Map<ResourceKey<Level>, ServerLevel> oldLevels = this.levels;
+-        Map<ResourceKey<Level>, ServerLevel> newLevels = Maps.newLinkedHashMap(oldLevels);
+-        newLevels.put(level.dimension(), level);
+-        this.levels = Collections.unmodifiableMap(newLevels);
+-    }
+-
+-    public void removeLevel(ServerLevel level) {
+-        Map<ResourceKey<Level>, ServerLevel> oldLevels = this.levels;
+-        Map<ResourceKey<Level>, ServerLevel> newLevels = Maps.newLinkedHashMap(oldLevels);
+-        newLevels.remove(level.dimension());
+-        this.levels = Collections.unmodifiableMap(newLevels);
+-    }
+-    // CraftBukkit end
+-
+-    public Set<ResourceKey<Level>> levelKeys() {
+-        return this.levels.keySet();
+-    }
+-
+-    public Iterable<ServerLevel> getAllLevels() {
+-        return this.levels.values();
+-    }
+-
+-    @Override
+-    public String getServerVersion() {
+-        return SharedConstants.getCurrentVersion().name();
+-    }
+-
      @Override
      public int getPlayerCount() {
 -        return this.playerList.getPlayerCount();
+-    }
+-
+-    public String[] getPlayerNames() {
+-        return this.playerList.getPlayerNamesArray();
+-    }
+-
+-    @DontObfuscate
+-    public String getServerModName() {
+-        return org.leavesmc.leaves.LeavesConfig.mics.serverModName; // Leaves - Custom // Paper
+-    }
+-
+-    public SystemReport fillSystemReport(SystemReport systemReport) {
+-        systemReport.setDetail("Server Running", () -> Boolean.toString(this.running));
+-        if (this.playerList != null) {
+-            systemReport.setDetail(
+-                "Player Count", () -> this.playerList.getPlayerCount() + " / " + this.playerList.getMaxPlayers() + "; " + this.playerList.getPlayers()
+-            );
+-        }
+-
+-        systemReport.setDetail("Active Data Packs", () -> PackRepository.displayPackList(this.packRepository.getSelectedPacks()));
+-        systemReport.setDetail("Available Data Packs", () -> PackRepository.displayPackList(this.packRepository.getAvailablePacks()));
+-        systemReport.setDetail(
+-            "Enabled Feature Flags",
+-            () -> FeatureFlags.REGISTRY.toNames(this.worldData.enabledFeatures()).stream().map(Identifier::toString).collect(Collectors.joining(", "))
+-        );
+-        systemReport.setDetail("World Generation", () -> this.worldData.worldGenSettingsLifecycle().toString());
+-        systemReport.setDetail("World Seed", () -> String.valueOf(this.worldData.worldGenOptions().seed()));
+-        systemReport.setDetail("Suppressed Exceptions", this.suppressedExceptions::dump);
+-        if (this.serverId != null) {
+-            systemReport.setDetail("Server Id", () -> this.serverId);
+-        }
+-
+-        return this.fillServerSystemReport(systemReport);
+-    }
+-
+-    public abstract SystemReport fillServerSystemReport(SystemReport report);
+-
+-    public ModCheck getModdedStatus() {
+-        return ModCheck.identify("vanilla", this::getServerModName, "Server", MinecraftServer.class);
 +        return this.playerList.realPlayers.size(); // Leaves - only real player
      }
  
      @Override
-diff --git a/net/minecraft/server/PlayerAdvancements.java b/net/minecraft/server/PlayerAdvancements.java
---- a/net/minecraft/server/PlayerAdvancements.java
-+++ b/net/minecraft/server/PlayerAdvancements.java
-@@ -173,7 +173,7 @@ public class PlayerAdvancements {
-         }
-         // Leaves end - spectator don't get advancement
-         // Leaves start - bot can't get advancement
--        if (player instanceof org.leavesmc.leaves.bot.ServerBot) {
-+        if (player instanceof org.leavesmc.leaves.bot.ServerBot || player instanceof org.leavesmc.leaves.replay.ServerPhotographer) { // Leaves - and photographer
-             return false;
-         }
-         // Leaves end - bot can't get advancement
 diff --git a/net/minecraft/server/ServerScoreboard.java b/net/minecraft/server/ServerScoreboard.java
 --- a/net/minecraft/server/ServerScoreboard.java
 +++ b/net/minecraft/server/ServerScoreboard.java
-@@ -244,7 +244,7 @@ public class ServerScoreboard extends Scoreboard {
+@@ -251,7 +251,7 @@
      public void startTrackingObjective(Objective objective) {
          List<Packet<?>> startTrackingPackets = this.getStartTrackingPackets(objective);
  
@@ -123,7 +247,7 @@ diff --git a/net/minecraft/server/ServerScoreboard.java b/net/minecraft/server/S
              if (serverPlayer.getBukkitEntity().getScoreboard().getHandle() != this) continue; // CraftBukkit - Only players on this board
              for (Packet<?> packet : startTrackingPackets) {
                  serverPlayer.connection.send(packet);
-@@ -270,7 +270,7 @@ public class ServerScoreboard extends Scoreboard {
+@@ -277,7 +277,7 @@
      public void stopTrackingObjective(Objective objective) {
          List<Packet<?>> stopTrackingPackets = this.getStopTrackingPackets(objective);
  
@@ -135,7 +259,7 @@ diff --git a/net/minecraft/server/ServerScoreboard.java b/net/minecraft/server/S
 diff --git a/net/minecraft/server/commands/ListPlayersCommand.java b/net/minecraft/server/commands/ListPlayersCommand.java
 --- a/net/minecraft/server/commands/ListPlayersCommand.java
 +++ b/net/minecraft/server/commands/ListPlayersCommand.java
-@@ -33,7 +33,7 @@ public class ListPlayersCommand {
+@@ -33,7 +33,7 @@
      private static int format(CommandSourceStack source, Function<ServerPlayer, Component> nameExtractor) {
          PlayerList playerList = source.getServer().getPlayerList();
          // CraftBukkit start
@@ -147,51 +271,40 @@ diff --git a/net/minecraft/server/commands/ListPlayersCommand.java b/net/minecra
 diff --git a/net/minecraft/server/commands/OpCommand.java b/net/minecraft/server/commands/OpCommand.java
 --- a/net/minecraft/server/commands/OpCommand.java
 +++ b/net/minecraft/server/commands/OpCommand.java
-@@ -25,7 +25,7 @@ public class OpCommand {
+@@ -25,10 +25,10 @@
                              (commandContext, suggestionsBuilder) -> {
                                  PlayerList playerList = commandContext.getSource().getServer().getPlayerList();
                                  return SharedSuggestionProvider.suggest(
 -                                    playerList.getPlayers()
 +                                    playerList.realPlayers // Leaves - only real player
                                          .stream()
-                                         .filter(serverPlayer -> !playerList.isOp(serverPlayer.getGameProfile()))
-                                         .map(serverPlayer -> serverPlayer.getGameProfile().getName()),
-diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
---- a/net/minecraft/server/level/ServerLevel.java
-+++ b/net/minecraft/server/level/ServerLevel.java
-@@ -2693,7 +2693,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
-             if (entity instanceof ServerPlayer serverPlayer) {
-                 ServerLevel.this.players.add(serverPlayer);
-                 // Leaves start - skip
--                if (!(serverPlayer instanceof org.leavesmc.leaves.bot.ServerBot)) {
-+                if (!(serverPlayer instanceof org.leavesmc.leaves.bot.ServerBot) && !(serverPlayer instanceof org.leavesmc.leaves.replay.ServerPhotographer)) { // and photographer
-                     ServerLevel.this.realPlayers.add(serverPlayer);
-                 }
-                 // Leaves end - skip
-@@ -2776,7 +2776,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
-             if (entity instanceof ServerPlayer serverPlayer) {
-                 ServerLevel.this.players.remove(serverPlayer);
-                 // Leaves start - skip
--                if (!(serverPlayer instanceof org.leavesmc.leaves.bot.ServerBot)) {
-+                if (!(serverPlayer instanceof org.leavesmc.leaves.bot.ServerBot) && !(serverPlayer instanceof org.leavesmc.leaves.replay.ServerPhotographer)) { // and photographer
-                     ServerLevel.this.realPlayers.remove(serverPlayer);
-                 }
-                 // Leaves end - skip
+-                                        .filter(serverPlayer -> !playerList.isOp(serverPlayer.nameAndId()))
+-                                        .map(serverPlayer -> serverPlayer.getGameProfile().name()),
++                                        .filter(serverPlayer -> !playerList.isOp(serverPlayer.getGameProfile()))
++                                        .map(serverPlayer -> serverPlayer.getGameProfile().getName()),
+                                     suggestionsBuilder
+                                 );
+                             }
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -130,6 +130,7 @@ public abstract class PlayerList {
+@@ -127,9 +127,10 @@
+     public final PlayerDataStorage playerIo;
+     private final LayeredRegistryAccess<RegistryLayer> registries;
+     private int viewDistance;
+-    private int simulationDistance;
      private boolean allowCommandsForAllPlayers;
-     private static final boolean ALLOW_LOGOUTIVATOR = false;
++    private static final boolean ALLOW_LOGOUTIVATOR = false;
      private int sendAllPlayerInfoIn;
 +    public final List<ServerPlayer> realPlayers = new java.util.concurrent.CopyOnWriteArrayList(); // Leaves - replay api
  
      // CraftBukkit start
      private org.bukkit.craftbukkit.CraftServer cserver;
-@@ -148,6 +149,125 @@ public abstract class PlayerList {
+@@ -152,6 +153,125 @@
+     }
  
      abstract public void loadAndSaveFiles(); // Paper - fix converting txt to json file; moved from DedicatedPlayerList constructor
- 
++
 +    // Leaves start - replay mod api
 +    public void placeNewPhotographer(Connection connection, org.leavesmc.leaves.replay.ServerPhotographer player, ServerLevel worldserver) {
 +        player.isRealPlayer = true; // Paper
@@ -310,19 +423,28 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
 +        }
 +    }
 +    // Leaves end - replay mod api
-+
+ 
      public void placeNewPlayer(Connection connection, ServerPlayer player, CommonListenerCookie cookie) {
          player.isRealPlayer = true; // Paper
-         player.loginTime = System.currentTimeMillis(); // Paper - Replace OfflinePlayer#getLastPlayed
-@@ -310,6 +430,7 @@ public abstract class PlayerList {
+@@ -226,11 +346,12 @@
+             player.sendServerStatus(status);
+         }
  
-             // player.connection.send(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(this.players)); // CraftBukkit - replaced with loop below
-             this.players.add(player);
+-        // player.connection.send(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(this.players)); // CraftBukkit - replaced with loop below
+-        this.players.add(player);
+-        this.playersByName.put(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT), player); // Spigot
+-        this.playersByUUID.put(player.getUUID(), player);
+-        // this.broadcastAll(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(player))); // CraftBukkit - replaced with loop below
++            // player.connection.send(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(this.players)); // CraftBukkit - replaced with loop below
++            this.players.add(player);
 +            this.realPlayers.add(player); // Leaves - replay api
-             this.playersByName.put(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT), player); // Spigot
-             this.playersByUUID.put(player.getUUID(), player);
-             // this.broadcastAll(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(player))); // CraftBukkit - replaced with loop below
-@@ -503,6 +624,7 @@ public abstract class PlayerList {
++            this.playersByName.put(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT), player); // Spigot
++            this.playersByUUID.put(player.getUUID(), player);
++            // this.broadcastAll(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(player))); // CraftBukkit - replaced with loop below
+         // Paper start - Fire PlayerJoinEvent when Player is actually ready; correctly register player BEFORE PlayerJoinEvent, so the entity is valid and doesn't require tick delay hacks
+         player.suppressTrackerForLogin = true;
+         this.sendLevelInfo(player, serverLevel);
+@@ -420,6 +541,7 @@
      }
  
      protected void save(ServerPlayer player) {
@@ -330,10 +452,11 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
          if (!player.getBukkitEntity().isPersistent()) return; // CraftBukkit
          player.lastSave = MinecraftServer.currentTick; // Paper - Incremental chunk and player saving
          this.playerIo.save(player);
-@@ -517,6 +639,43 @@ public abstract class PlayerList {
+@@ -434,7 +556,44 @@
          }
      }
  
+-    public net.kyori.adventure.text.@Nullable Component remove(ServerPlayer player) { // CraftBukkit - return string // Paper - return Component
 +    // Leaves start - replay mod api
 +    public void removePhotographer(org.leavesmc.leaves.replay.ServerPhotographer entityplayer) {
 +        ServerLevel worldserver = entityplayer.level();
@@ -371,10 +494,11 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
 +    }
 +    // Leaves stop - replay mod api
 +
-     public @Nullable net.kyori.adventure.text.Component remove(ServerPlayer player) { // CraftBukkit - return string // Paper - return Component
++    public @Nullable net.kyori.adventure.text.Component remove(ServerPlayer player) { // CraftBukkit - return string // Paper - return Component
          // Paper start - Fix kick event leave message not being sent
          return this.remove(player, net.kyori.adventure.text.Component.translatable("multiplayer.player.left", net.kyori.adventure.text.format.NamedTextColor.YELLOW, io.papermc.paper.configuration.GlobalConfiguration.get().messages.useDisplayNameInQuitMessage ? player.getBukkitEntity().displayName() : io.papermc.paper.adventure.PaperAdventure.asAdventure(player.getDisplayName())));
-@@ -590,6 +749,7 @@ public abstract class PlayerList {
+     }
+@@ -507,6 +666,7 @@
          player.retireScheduler(); // Paper - Folia schedulers
          player.getAdvancements().stopListening();
          this.players.remove(player);
@@ -382,32 +506,18 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
          this.playersByName.remove(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT)); // Spigot
          this.server.getCustomBossEvents().onPlayerDisconnect(player);
          UUID uuid = player.getUUID();
-@@ -964,14 +1124,14 @@ public abstract class PlayerList {
+@@ -883,10 +1043,10 @@
      }
  
-     public String[] getPlayerNamesArray() {
--        String[] strings = new String[this.players.size() + this.server.getBotList().bots.size()]; // Leaves - fakeplayer support
-+        String[] strings = new String[this.realPlayers.size() + this.server.getBotList().bots.size()]; // Leaves - fakeplayer support, and skip photographer
- 
--        for (int i = 0; i < this.players.size(); i++) {
--            strings[i] = this.players.get(i).getGameProfile().getName();
-+        for (int i = 0; i < this.realPlayers.size(); i++) { // Leaves - only real players
-+            strings[i] = this.realPlayers.get(i).getGameProfile().getName(); // Leaves - only real players
-         }
-         // Leaves start - fakeplayer support
--        for (int i = this.players.size(); i < strings.length; ++i) {
--            strings[i] = this.server.getBotList().bots.get(i - this.players.size()).getGameProfile().getName();
-+        for (int i = this.realPlayers.size(); i < strings.length; ++i) { // Leaves - only real players
-+            strings[i] = this.server.getBotList().bots.get(i - this.realPlayers.size()).getGameProfile().getName(); // Leaves - only real players
-         }
-         // Leaves end - fakeplayer support
- 
-@@ -1030,7 +1190,7 @@ public abstract class PlayerList {
- 
      // Paper start - whitelist verify event / login event
-     public LoginResult canBypassFullServerLogin(final GameProfile profile, final LoginResult currentResult) {
--        final boolean shouldKick = this.players.size() >= this.maxPlayers && !this.canBypassPlayerLimit(profile);
+-    public LoginResult canBypassFullServerLogin(final NameAndId nameAndId, final LoginResult currentResult) {
+-        final boolean shouldKick = this.players.size() >= this.getMaxPlayers() && !this.canBypassPlayerLimit(nameAndId);
++    public LoginResult canBypassFullServerLogin(final GameProfile profile, final LoginResult currentResult) {
 +        final boolean shouldKick = this.realPlayers.size() >= this.maxPlayers && !this.canBypassPlayerLimit(profile); // Leaves - only real player
          final io.papermc.paper.event.player.PlayerServerFullCheckEvent fullCheckEvent = new io.papermc.paper.event.player.PlayerServerFullCheckEvent(
-             com.destroystokyo.paper.profile.CraftPlayerProfile.asBukkitMirror(profile),
+-            new com.destroystokyo.paper.profile.CraftPlayerProfile(nameAndId),
++            com.destroystokyo.paper.profile.CraftPlayerProfile.asBukkitMirror(profile),
              io.papermc.paper.adventure.PaperAdventure.asAdventure(currentResult.message),
+             shouldKick
+         );
+

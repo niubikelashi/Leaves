@@ -7,11 +7,11 @@ Subject: [PATCH] Chat command max length
 diff --git a/net/minecraft/network/protocol/game/ServerboundChatCommandPacket.java b/net/minecraft/network/protocol/game/ServerboundChatCommandPacket.java
 --- a/net/minecraft/network/protocol/game/ServerboundChatCommandPacket.java
 +++ b/net/minecraft/network/protocol/game/ServerboundChatCommandPacket.java
-@@ -11,11 +11,11 @@ public record ServerboundChatCommandPacket(String command) implements Packet<Ser
+@@ -12,11 +12,11 @@
      );
  
      private ServerboundChatCommandPacket(FriendlyByteBuf buffer) {
--        this(buffer.readUtf());
+-        this(buffer.readUtf(MAX_CHAT_PACKET_INPUT_SIZE)); // Paper - limit chat command inputs
 +        this(buffer.readUtf(org.leavesmc.leaves.LeavesConfig.mics.chatCommandMaxLength)); // Leaves - chat command max length
      }
  
@@ -24,11 +24,11 @@ diff --git a/net/minecraft/network/protocol/game/ServerboundChatCommandPacket.ja
 diff --git a/net/minecraft/network/protocol/game/ServerboundChatCommandSignedPacket.java b/net/minecraft/network/protocol/game/ServerboundChatCommandSignedPacket.java
 --- a/net/minecraft/network/protocol/game/ServerboundChatCommandSignedPacket.java
 +++ b/net/minecraft/network/protocol/game/ServerboundChatCommandSignedPacket.java
-@@ -16,11 +16,11 @@ public record ServerboundChatCommandSignedPacket(
+@@ -16,11 +16,11 @@
      );
  
      private ServerboundChatCommandSignedPacket(FriendlyByteBuf buffer) {
--        this(buffer.readUtf(), buffer.readInstant(), buffer.readLong(), new ArgumentSignatures(buffer), new LastSeenMessages.Update(buffer));
+-        this(buffer.readUtf(net.minecraft.network.protocol.game.ServerboundChatCommandPacket.MAX_CHAT_PACKET_INPUT_SIZE), buffer.readInstant(), buffer.readLong(), new ArgumentSignatures(buffer), new LastSeenMessages.Update(buffer)); // Paper - limit chat command inputs
 +        this(buffer.readUtf(org.leavesmc.leaves.LeavesConfig.mics.chatCommandMaxLength), buffer.readInstant(), buffer.readLong(), new ArgumentSignatures(buffer), new LastSeenMessages.Update(buffer)); // Leaves - chat command max length
      }
  
@@ -38,3 +38,4 @@ diff --git a/net/minecraft/network/protocol/game/ServerboundChatCommandSignedPac
          buffer.writeInstant(this.timeStamp);
          buffer.writeLong(this.salt);
          this.argumentSignatures.write(buffer);
+

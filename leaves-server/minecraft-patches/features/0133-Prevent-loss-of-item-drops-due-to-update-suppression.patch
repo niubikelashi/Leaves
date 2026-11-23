@@ -6,11 +6,13 @@ Subject: [PATCH] Prevent loss of item drops due to update suppression when
 diff --git a/net/minecraft/server/level/ServerPlayerGameMode.java b/net/minecraft/server/level/ServerPlayerGameMode.java
 --- a/net/minecraft/server/level/ServerPlayerGameMode.java
 +++ b/net/minecraft/server/level/ServerPlayerGameMode.java
-@@ -399,7 +399,14 @@ public class ServerPlayerGameMode {
+@@ -398,8 +398,15 @@
+                 org.bukkit.block.BlockState state = bblock.getState();
                  this.level.captureDrops = new java.util.ArrayList<>();
                  // CraftBukkit end
-                 BlockState blockState1 = block.playerWillDestroy(this.level, pos, blockState, this.player);
+-                BlockState blockState1 = org.leavesmc.leaves.command.subcommands.BlockUpdateCommand.isNoBlockUpdate() ? blockState : block.playerWillDestroy(this.level, pos, blockState, this.player); // Leaves - no block update
 -                boolean flag = this.level.removeBlock(pos, false);
++                BlockState blockState1 = block.playerWillDestroy(this.level, pos, blockState, this.player);
 +                boolean flag; // Leaves start - Prevent loss of item drops due to update suppression when breaking blocks
 +                org.leavesmc.leaves.util.UpdateSuppressionException ex = null;
 +                try {
@@ -22,7 +24,7 @@ diff --git a/net/minecraft/server/level/ServerPlayerGameMode.java b/net/minecraf
                  if (SharedConstants.DEBUG_BLOCK_BREAK) {
                      LOGGER.info("server broke {} {} -> {}", pos, blockState1, this.level.getBlockState(pos));
                  }
-@@ -431,6 +438,8 @@ public class ServerPlayerGameMode {
+@@ -431,6 +438,8 @@
                  if (event.isDropItems()) {
                      org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockDropItemEvent(bblock, state, this.player, itemsToDrop); // Paper - capture all item additions to the world
                  }
@@ -31,8 +33,9 @@ diff --git a/net/minecraft/server/level/ServerPlayerGameMode.java b/net/minecraf
  
                  // Drop event experience
                  if (flag) {
-@@ -584,3 +593,4 @@ public class ServerPlayerGameMode {
+@@ -584,3 +593,4 @@
          this.level = level;
      }
  }
 +
+

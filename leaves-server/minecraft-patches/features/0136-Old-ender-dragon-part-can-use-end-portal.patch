@@ -28,34 +28,52 @@ This patch is Powered by CrystalCarpetAddition(https://github.com/Crystal0404/Cr
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -185,7 +185,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
-     // Paper end - Share random for entities to make them more random
-     public @Nullable org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason spawnReason; // Paper - Entity#getEntitySpawnReason
+@@ -185,11 +185,11 @@
+         }
  
--    private volatile @Nullable org.bukkit.craftbukkit.entity.CraftEntity bukkitEntity; // Paper - Folia schedulers - volatile
+         // Paper - replace random
+-    }
+     // Paper end - Share random for entities to make them more random
+-    public org.bukkit.event.entity.CreatureSpawnEvent.@Nullable SpawnReason spawnReason; // Paper - Entity#getEntitySpawnReason
+-
+-    private volatile org.bukkit.craftbukkit.entity.@Nullable CraftEntity bukkitEntity; // Paper - Folia schedulers - volatile
++    public @Nullable org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason spawnReason; // Paper - Entity#getEntitySpawnReason
++
 +    public volatile @Nullable org.bukkit.craftbukkit.entity.CraftEntity bukkitEntity; // Paper - Folia schedulers - volatile // Leaves - private -> public
-     public boolean collisionLoadChunks = false; // Paper
++    public boolean collisionLoadChunks = false; // Paper
  
      public org.bukkit.craftbukkit.entity.CraftEntity getBukkitEntity() {
-@@ -3955,7 +3955,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
-     @Nullable
-     public Entity teleport(TeleportTransition teleportTransition) {
+         if (this.bukkitEntity == null) {
+@@ -4031,10 +4031,10 @@
+         this.portalCooldown = entity.portalCooldown;
+         this.portalProcess = entity.portalProcess;
+     }
+-
+-    public @Nullable Entity teleport(TeleportTransition teleportTransition) {
++    @Nullable
++    public Entity teleport(TeleportTransition teleportTransition) {
          // Paper start - Fix item duplication and teleport issues
 -        if ((!this.isAlive() || !this.valid) && (teleportTransition.newLevel() != this.level)) {
 +        if (!(org.leavesmc.leaves.LeavesConfig.modify.oldMC.enderDragonPartCanUseEndPortal && this instanceof net.minecraft.world.entity.boss.EnderDragonPart)) if ((!this.isAlive() || !this.valid) && (teleportTransition.newLevel() != this.level)) { // Leaves - endDragonPartCanUseEndPortal
              LOGGER.warn("Illegal Entity Teleport {} to {}:{}", this, teleportTransition.newLevel(), teleportTransition.position(), new Throwable());
              return null;
          }
-@@ -4071,7 +4071,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -4149,11 +4149,11 @@
+             // Paper end - Fix item duplication and teleport issues
              entityx.restoreFrom(this);
              this.removeAfterChangingDimensions();
-             entityx.teleportSetPosition(PositionMoveRotation.of(teleportTransition), teleportTransition.relatives());
+-            entityx.teleportSetPosition(PositionMoveRotation.of(this), PositionMoveRotation.of(teleportTransition), teleportTransition.relatives());
 -            if (this.inWorld) newLevel.addDuringTeleport(entityx); // CraftBukkit - Don't spawn the new entity if the current entity isn't spawned
++            entityx.teleportSetPosition(PositionMoveRotation.of(teleportTransition), teleportTransition.relatives());
 +            if (this.inWorld || (org.leavesmc.leaves.LeavesConfig.modify.oldMC.enderDragonPartCanUseEndPortal && this instanceof net.minecraft.world.entity.boss.EnderDragonPart)) newLevel.addDuringTeleport(entityx); // CraftBukkit - Don't spawn the new entity if the current entity isn't spawned // Leaves - endDragonPartCanUseEndPortal
  
              for (Entity entity2 : list) {
-                 entity2.startRiding(entityx, true);
-@@ -4206,6 +4206,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+-                entity2.startRiding(entityx, true, false);
++                entity2.startRiding(entityx, true);
+             }
+ 
+             newLevel.resetEmptyTime();
+@@ -4267,6 +4267,7 @@
      }
  
      public boolean canTeleport(Level fromLevel, Level toLevel) {
@@ -66,8 +84,12 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
 diff --git a/net/minecraft/world/entity/Mob.java b/net/minecraft/world/entity/Mob.java
 --- a/net/minecraft/world/entity/Mob.java
 +++ b/net/minecraft/world/entity/Mob.java
-@@ -385,6 +385,16 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
-         if (!this.level().isClientSide && this.tickCount % 5 == 0) {
+@@ -389,9 +389,19 @@
+     @Override
+     public void tick() {
+         super.tick();
+-        if (!this.level().isClientSide() && this.tickCount % 5 == 0) {
++        if (!this.level().isClientSide && this.tickCount % 5 == 0) {
              this.updateControlFlags();
          }
 +        // Leaves start - ender dragon part can use end portal
@@ -86,8 +108,11 @@ diff --git a/net/minecraft/world/entity/Mob.java b/net/minecraft/world/entity/Mo
 diff --git a/net/minecraft/world/entity/PortalProcessor.java b/net/minecraft/world/entity/PortalProcessor.java
 --- a/net/minecraft/world/entity/PortalProcessor.java
 +++ b/net/minecraft/world/entity/PortalProcessor.java
-@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.Portal;
+@@ -4,10 +4,9 @@
+ import net.minecraft.server.level.ServerLevel;
+ import net.minecraft.world.level.block.Portal;
  import net.minecraft.world.level.portal.TeleportTransition;
+-import org.jspecify.annotations.Nullable;
  
  public class PortalProcessor {
 -    private final Portal portal;
@@ -95,3 +120,4 @@ diff --git a/net/minecraft/world/entity/PortalProcessor.java b/net/minecraft/wor
      private BlockPos entryPosition;
      private int portalTime;
      private boolean insidePortalThisTick;
+
