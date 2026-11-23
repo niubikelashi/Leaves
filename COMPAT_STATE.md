@@ -398,3 +398,13 @@ compat/26.1.2 第 1 轮证据（分支 `compat/26.1.2`，从 `8ba0135` 切出并
 1. 是否升级 leavesweight 到支持 `spigot.enabled` 的版本（2.1.0+ / 2.2.0-SNAPSHOT）以获得显式关闭姿势 —— 需要人工确认对 1.21.11 的兼容性与语义。
 2. 若不接受升级：是否接受「删除 `enabled` 行、依赖插件默认关闭」的姿势 —— 需人工确认默认语义，并用产物 jar 条目计数验证 Spigot 层确实未生成（参照 1.21.8 的 0 条目判据）。
 3. 插件不可复现风险是否需要另开镜像/本地缓存锁定方案（本轮只标注，未处理）。
+
+### 收口后的两项裁决（第 10 轮收口通过，2026-11-23 14:2x，本轮不再消耗构建轮次）
+1. **不升级 leavesweight**（已关闭上面第 1 项）：保持 `build.gradle.kts` 第 7 行 `id("org.leavesmc.leavesweight.patcher") version "2.0.0-SNAPSHOT"`，不可复现风险继续标注、不作为 success 门槛。升级属扩大战场，且 2.1.0-SNAPSHOT 同样不可复现、还会改变 spigot DSL 形状，风险大于收益。
+2. **接受「删掉 `enabled` 成员、依赖插件默认关闭」**，先做只读核对、不跑构建（已关闭上面第 2 项）。
+   - 版本核对证据：`Leaves-base-1218`（detached `d93e976`）的 `git show d93e976:build.gradle.kts` 第 7 行与 `Leaves-1.21.11\build.gradle.kts` 第 7 行**完全相同**，都是 `id("org.leavesmc.leavesweight.patcher") version "2.0.0-SNAPSHOT"`；两边 `settings.gradle.kts` 的 `pluginManagement` 都没有覆盖该版本（只声明 `foojay-resolver-convention 0.9.0`）。⇒ 同一插件版本，证据链闭合。
+   - 默认禁用成立：2.0.0-SNAPSHOT 的 `SpigotExtension` 只有 `getBuildDataRef()` / `getPackageVersion()`，没有 `getEnabled()`；1.21.8 生成脚本无 `enabled` 成员（第 41 行只是 `// enabled = true // Leaves - disable` 注释行，不是 DSL 成员）；产物 jar 18346 条目中 `v1_21_R5` **0 个**、`org/spigotmc` 12 个（仅 API 引用）→ Spigot 生成层未产出 = 默认禁用。
+   - 机械对齐提交 **`9f04f9f`**（compat/1.21.11，已推送，远端 tip 复核 `9f04f9fa326…`）：把 `e49e92e` 恢复的 `         enabled = false` 上下文行改成 `-        enabled = false` 删除行，并随之 ±1 重锚 9 个 `@@` 头（`@@ -7,23 +6,34 @@`、`@@ -40,15 +50,13 @@`、`+112/149/188/219/307/344/392`）。与 HEAD 的差异共 **10 行**：9 个 `@@` 头 + 1 个内容行（上下文 → 删除），`-` 侧 40 → 41（只多这一条）、`+` 侧保持 84 条，取值未变，无 CRLF、无 `index` 行。对 paperRef `ba4b700e1` 的原始 375 行脚本 `git apply --check` → **rc = 0**；`git apply` → 418 行，spigot 块（第 36-39 行）为 `buildDataRef` + `packageVersion`，**无 `enabled` 成员**，与 1.21.8 生成形状一致。证据 `E:\mc\leaves-work\spigot-align-round11.txt`。本轮**未跑 gradle 构建**。
+   - 顺带把基线工作树上残留的 `gradle.properties`（脚本注入的 trustStore + BOM）还原到 `d93e976` 状态，基线证据树保持干净。
+3. **1.21.11 终态**：spigot 形状卡点 = **blocked-resolved**（插件能力边界已用「删掉 `enabled` 成员」对齐 1.21.8 姿势消除，未升级插件、未自造 DSL）；版本整体仍 **blocked**，不追 success —— 剩余卡点是 B 类语义冲突（补丁重放）与 fork GitHub Actions 运行总数 0 导致的 CI 证据缺失。
+4. **收口结论不变**：连续非 success 计数停在 10（上限），不再消耗构建轮次、不跑第 11 轮；不合 master、不产 Release、不上传产物、不动 `Documentation` / `Configuration`；只维护 1.21.8 基线，`compat/26.1.2`、`compat/26.2` 仅作诊断分支。仍开放的第 3 项（插件不可复现风险的镜像/本地缓存锁定方案）保持只标注、不处理。
