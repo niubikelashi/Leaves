@@ -5,6 +5,7 @@ Subject: [PATCH] Force minecraft command
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/command/CraftCommandMap.java b/src/main/java/org/bukkit/craftbukkit/command/CraftCommandMap.java
+index 90ed57a7fbcd0625b64084347460e9864216f610..e3598f7a0d183255ba17bc0f08cee284a0898cef 100644
 --- a/src/main/java/org/bukkit/craftbukkit/command/CraftCommandMap.java
 +++ b/src/main/java/org/bukkit/craftbukkit/command/CraftCommandMap.java
 @@ -14,4 +14,18 @@ public class CraftCommandMap extends SimpleCommandMap {

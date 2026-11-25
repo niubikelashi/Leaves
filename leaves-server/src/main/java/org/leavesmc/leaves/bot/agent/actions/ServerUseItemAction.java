@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.leavesmc.leaves.bot.ServerBot;
 import org.leavesmc.leaves.entity.bot.actions.CraftUseItemAction;
 
-public class ServerUseItemAction extends ServerUseBotAction<ServerUseItemAction> {
+public class ServerUseItemAction extends AbstractUseBotAction<ServerUseItemAction> {
 
     public ServerUseItemAction() {
         super("use", ServerUseItemAction::new);
@@ -18,6 +18,7 @@ public class ServerUseItemAction extends ServerUseBotAction<ServerUseItemAction>
     }
 
     public static @NotNull InteractionResult useItem(@NotNull ServerBot bot, InteractionHand hand) {
+        bot.updateItemInHand(hand);
         InteractionResult result = bot.gameMode.useItem(bot, bot.level(), bot.getItemInHand(hand), hand);
         if (shouldSwing(result)) {
             bot.swing(hand);

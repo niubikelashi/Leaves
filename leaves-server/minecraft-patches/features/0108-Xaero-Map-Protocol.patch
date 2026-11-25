@@ -1,0 +1,18 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: violetc <58360096+s-yh-china@users.noreply.github.com>
+Date: Fri, 7 Feb 2025 14:23:43 +0800
+Subject: [PATCH] Xaero Map Protocol
+
+
+diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
+index f376b03e267ae9c3acc9636b6ccee733497027d2..5661e05cc1ffbfc7015ca45cf0820e0ba616bcc6 100644
+--- a/net/minecraft/server/players/PlayerList.java
++++ b/net/minecraft/server/players/PlayerList.java
+@@ -1204,6 +1204,7 @@ public abstract class PlayerList {
+         player.connection.send(new ClientboundSetChunkCacheRadiusPacket(level.spigotConfig.viewDistance));
+         player.connection.send(new ClientboundSetSimulationDistancePacket(level.spigotConfig.simulationDistance));
+         // Paper end
++        org.leavesmc.leaves.protocol.XaeroMapProtocol.onSendWorldInfo(player); // Leaves - xaero map protocol
+         if (level.isRaining()) {
+             // CraftBukkit start - handle player weather
+             // player.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.START_RAINING, 0.0F));

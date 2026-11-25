@@ -5,6 +5,7 @@ Subject: [PATCH] Cache ignite odds
 
 
 diff --git a/net/minecraft/world/level/block/FireBlock.java b/net/minecraft/world/level/block/FireBlock.java
+index c03ad7be16fbb9f98c28bc09de59bf33d4edf5d7..8c0b2eb643ccaaa921a90dc2963ce4abcede854d 100644
 --- a/net/minecraft/world/level/block/FireBlock.java
 +++ b/net/minecraft/world/level/block/FireBlock.java
 @@ -205,6 +205,7 @@ public class FireBlock extends BaseFireBlock {

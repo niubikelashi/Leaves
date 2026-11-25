@@ -5,6 +5,7 @@ Subject: [PATCH] Build changes
 
 
 diff --git a/src/main/java/com/destroystokyo/paper/Metrics.java b/src/main/java/com/destroystokyo/paper/Metrics.java
+index 9f4d73fd321f6f0cd19fdd1b63068d2ea6c0816b..339d4c13daafc3fd7fdf6fc8909a7e7f80ba8ece 100644
 --- a/src/main/java/com/destroystokyo/paper/Metrics.java
 +++ b/src/main/java/com/destroystokyo/paper/Metrics.java
 @@ -593,7 +593,8 @@ public class Metrics {
@@ -92,6 +93,7 @@ diff --git a/src/main/java/com/destroystokyo/paper/Metrics.java b/src/main/java/
      }
  }
 diff --git a/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java b/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java
+index 74ffdc823e66fc5ec027c4b7c462382bcbfe2be2..f38f8e5851ec65a8f3f98018d55de74ea6ff165c 100644
 --- a/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java
 +++ b/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java
 @@ -30,7 +30,7 @@ public record ServerBuildInfoImpl(
@@ -104,18 +106,28 @@ diff --git a/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java b/src/main/
      private static final String BUILD_DEV = "DEV";
  
 diff --git a/src/main/java/io/papermc/paper/command/PaperVersionCommand.java b/src/main/java/io/papermc/paper/command/PaperVersionCommand.java
+index bfacb856623b5cb6af4f1b65ee89200cdfb1ef13..a427a962ea90b089bef1a8177b187f4ba1063582 100644
 --- a/src/main/java/io/papermc/paper/command/PaperVersionCommand.java
 +++ b/src/main/java/io/papermc/paper/command/PaperVersionCommand.java
-@@ -45,7 +45,7 @@ public class PaperVersionCommand {
+@@ -24,7 +24,6 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+ import net.minecraft.server.MinecraftServer;
+ import org.bukkit.Bukkit;
+ import org.bukkit.command.CommandSender;
+-import org.bukkit.craftbukkit.util.CraftMagicNumbers;
+ import org.bukkit.plugin.Plugin;
+ import org.bukkit.util.StringUtil;
+ import org.jspecify.annotations.NullMarked;
+@@ -45,7 +44,7 @@ public class PaperVersionCommand {
      private static final Component FAILED_TO_FETCH = Component.text("Could not fetch version information!", NamedTextColor.RED);
      private static final Component FETCHING = Component.text("Checking version, please wait...", NamedTextColor.WHITE, TextDecoration.ITALIC);
  
--    private final VersionFetcher versionFetcher = new PaperVersionFetcher();
+-    private final VersionFetcher versionFetcher = CraftMagicNumbers.INSTANCE.getVersionFetcher();
 +    private final VersionFetcher versionFetcher = new org.leavesmc.leaves.util.LeavesVersionFetcher(); // Leaves - build change
      private CompletableFuture<ComputedVersion> computedVersion = CompletableFuture.completedFuture(new ComputedVersion(Component.empty(), -1)); // Precompute-- someday move that stuff out of bukkit
  
      public static LiteralCommandNode<CommandSourceStack> create() {
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
+index 5bd6da467a1f536eb56c93ea00f98050cfaa36d0..26b30fac9a12c88b3e8ed114a9225f57603b937e 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
 @@ -231,7 +231,7 @@ public class Main {
@@ -128,6 +140,7 @@ diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/
                      }
                  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+index f83067eaa4eedc8108460c254782ba45a2933372..98baec88662eb1519468eb0095b0a23ae7dfe876 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 @@ -481,7 +481,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
@@ -140,6 +153,7 @@ diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
+index 774556a62eb240da42e84db4502e2ed43495be17..fdef98a7796d84c7b0ee61241859e10cc514534c 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
 @@ -11,7 +11,7 @@ public final class Versioning {
@@ -152,6 +166,7 @@ diff --git a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java b/src/mai
  
          if (stream != null) {
 diff --git a/src/main/java/org/spigotmc/WatchdogThread.java b/src/main/java/org/spigotmc/WatchdogThread.java
+index e2dc6644ae44ce02821100275ede4b0712cf260d..c7a7870199065aa853b4848f9aea75cc952eb6e6 100644
 --- a/src/main/java/org/spigotmc/WatchdogThread.java
 +++ b/src/main/java/org/spigotmc/WatchdogThread.java
 @@ -75,14 +75,14 @@ public class WatchdogThread extends ca.spottedleaf.moonrise.common.util.TickThre
@@ -197,12 +212,14 @@ diff --git a/src/main/java/org/spigotmc/WatchdogThread.java b/src/main/java/org/
  
                  logger.log(Level.SEVERE, "------------------------------");
 diff --git a/src/main/resources/META-INF/services/ca.spottedleaf.moonrise.common.PlatformHooks b/src/main/resources/META-INF/services/ca.spottedleaf.moonrise.common.PlatformHooks
+index e57c3ca79677b1dfe7cf3db36f0406de7ea5bd0a..86edd824ec42e550dd1419fd57d93a21fe2d648d 100644
 --- a/src/main/resources/META-INF/services/ca.spottedleaf.moonrise.common.PlatformHooks
 +++ b/src/main/resources/META-INF/services/ca.spottedleaf.moonrise.common.PlatformHooks
 @@ -1 +1 @@
 -ca.spottedleaf.moonrise.paper.PaperHooks
 +org.leavesmc.leaves.region.LeavesHooks
 diff --git a/src/main/resources/logo.png b/src/main/resources/logo.png
+index 8b924977b7886df9ab8790b1e4ff9b1c04a2af45..e6a7ee1232cb34840f454187f50f44d17300ad9c 100644
 GIT binary patch
 literal 51130
 zcmeEt^;aCt^ECwb;BE`S-66QU1QvI9cPDso2n2WC#WlFQdvFLE+!yD|^Z6^@AKsa>

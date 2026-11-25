@@ -1,7 +1,7 @@
 package org.leavesmc.leaves.entity.bot.actions;
 
-import org.leavesmc.leaves.bot.agent.actions.*;
-import org.leavesmc.leaves.entity.bot.action.*;
+import org.leavesmc.leaves.bot.agent.actions.ServerUseItemToAction;
+import org.leavesmc.leaves.entity.bot.action.UseItemToAction;
 
 public class CraftUseItemToAction extends CraftTimerBotAction<UseItemToAction, ServerUseItemToAction> implements UseItemToAction {
 
@@ -10,13 +10,13 @@ public class CraftUseItemToAction extends CraftTimerBotAction<UseItemToAction, S
     }
 
     @Override
-    public int getUseTick() {
-        return serverAction.getUseTick();
+    public int getUseTickTimeout() {
+        return serverAction.getUseTickTimeout();
     }
 
     @Override
-    public CraftUseItemToAction setUseTick(int useTick) {
-        serverAction.setUseTick(useTick);
+    public CraftUseItemToAction setUseTickTimeout(int timeout) {
+        serverAction.setUseTickTimeout(timeout);
         return this;
     }
 }

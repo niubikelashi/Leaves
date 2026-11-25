@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>org.leavesmc.leavesweight</groupId>
+  <artifactId>leavesweight-core</artifactId>
+  <versioning>
+    <lastUpdated>20260523044214</lastUpdated>
+    <snapshot>
+      <timestamp>20260523.044214</timestamp>
+      <buildNumber>4</buildNumber>
+    </snapshot>
+    <snapshotVersions>
+        <extension>jar</extension>
+        <value>2.1.0-20260523.044214-4</value>
+        <updated>20260523044214</updated>
+      </snapshotVersion>
+        <classifier>javadoc</classifier>
+        <extension>jar</extension>
+        <value>2.1.0-20260523.044214-4</value>
+        <updated>20260523044214</updated>
+      </snapshotVersion>
+        <classifier>sources</classifier>
+        <extension>jar</extension>
+        <value>2.1.0-20260523.044214-4</value>
+        <updated>20260523044214</updated>
+      </snapshotVersion>
+        <extension>pom</extension>
+        <value>2.1.0-20260523.044214-4</value>
+        <updated>20260523044214</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+  <version>2.1.0-SNAPSHOT</version>
+</metadata>

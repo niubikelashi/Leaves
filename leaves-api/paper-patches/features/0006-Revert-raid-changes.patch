@@ -1,9 +1,11 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: huanli233 <392352840@qq.com>
 Date: Thu, 6 Feb 2025 12:49:03 +0800
 Subject: [PATCH] Revert raid changes
 
+
 diff --git a/src/main/java/org/bukkit/event/entity/EntityPotionEffectEvent.java b/src/main/java/org/bukkit/event/entity/EntityPotionEffectEvent.java
-index 054a38983..4a20f0e8a 100644
+index 22e14ba522510d659c191d72536cde895458d9ed..253f937dbd130fac064963b4af7572e1302fee8f 100644
 --- a/src/main/java/org/bukkit/event/entity/EntityPotionEffectEvent.java
 +++ b/src/main/java/org/bukkit/event/entity/EntityPotionEffectEvent.java
 @@ -221,9 +221,7 @@ public class EntityPotionEffectEvent extends EntityEvent implements Cancellable

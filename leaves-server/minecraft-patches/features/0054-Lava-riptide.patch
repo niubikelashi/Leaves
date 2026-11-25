@@ -5,6 +5,7 @@ Subject: [PATCH] Lava riptide
 
 
 diff --git a/net/minecraft/world/item/TridentItem.java b/net/minecraft/world/item/TridentItem.java
+index fac4c58ea5d467a8686e42676e2323fbddeb8c7b..0afe875e003704a53856fac72d2feb8b664c1207 100644
 --- a/net/minecraft/world/item/TridentItem.java
 +++ b/net/minecraft/world/item/TridentItem.java
 @@ -70,7 +70,7 @@ public class TridentItem extends Item implements ProjectileItem {

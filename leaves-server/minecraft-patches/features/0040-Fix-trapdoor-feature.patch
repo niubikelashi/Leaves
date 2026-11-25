@@ -5,6 +5,7 @@ Subject: [PATCH] Fix trapdoor feature
 
 
 diff --git a/net/minecraft/world/level/block/TrapDoorBlock.java b/net/minecraft/world/level/block/TrapDoorBlock.java
+index a2140d22dc58aa2df1afbeb5170d04fd65739d55..fcea4fa82e97fc262726cfcf9c4f8002b66700f5 100644
 --- a/net/minecraft/world/level/block/TrapDoorBlock.java
 +++ b/net/minecraft/world/level/block/TrapDoorBlock.java
 @@ -139,6 +139,8 @@ public class TrapDoorBlock extends HorizontalDirectionalBlock implements SimpleW

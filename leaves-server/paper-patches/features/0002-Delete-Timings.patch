@@ -5,6 +5,7 @@ Subject: [PATCH] Delete Timings
 
 
 diff --git a/src/main/java/io/papermc/paper/plugin/manager/PaperEventManager.java b/src/main/java/io/papermc/paper/plugin/manager/PaperEventManager.java
+index 7ce9ebba8ce304d1f3f21d4f15ee5f3560d7700b..a589689e3a9de1fffef62e0e3dcd79bb2e848c5b 100644
 --- a/src/main/java/io/papermc/paper/plugin/manager/PaperEventManager.java
 +++ b/src/main/java/io/papermc/paper/plugin/manager/PaperEventManager.java
 @@ -1,6 +1,5 @@
@@ -32,6 +33,7 @@ diff --git a/src/main/java/io/papermc/paper/plugin/manager/PaperEventManager.jav
          }
          return ret;
 diff --git a/src/main/java/io/papermc/paper/plugin/manager/PaperPluginManagerImpl.java b/src/main/java/io/papermc/paper/plugin/manager/PaperPluginManagerImpl.java
+index 097500a59336db1bbfffcd1aa4cff7a8586e46ec..a40398e68e2239a182f36f5b886ac00deb7af082 100644
 --- a/src/main/java/io/papermc/paper/plugin/manager/PaperPluginManagerImpl.java
 +++ b/src/main/java/io/papermc/paper/plugin/manager/PaperPluginManagerImpl.java
 @@ -232,7 +232,7 @@ public class PaperPluginManagerImpl implements PluginManager, DependencyContext

@@ -24,18 +24,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CampfireBlock;
-import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
-import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BrewingStandBlockEntity;
-import net.minecraft.world.level.block.entity.CalibratedSculkSensorBlockEntity;
-import net.minecraft.world.level.block.entity.ChiseledBookShelfBlockEntity;
-import net.minecraft.world.level.block.entity.CommandBlockEntity;
-import net.minecraft.world.level.block.entity.ComparatorBlockEntity;
-import net.minecraft.world.level.block.entity.HopperBlockEntity;
-import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
-import net.minecraft.world.level.block.entity.LecternBlockEntity;
-import net.minecraft.world.level.block.entity.TrialSpawnerBlockEntity;
+import net.minecraft.world.level.block.entity.*;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -52,23 +41,12 @@ import org.leavesmc.leaves.protocol.jade.payload.ReceiveDataPayload;
 import org.leavesmc.leaves.protocol.jade.payload.RequestBlockPayload;
 import org.leavesmc.leaves.protocol.jade.payload.RequestEntityPayload;
 import org.leavesmc.leaves.protocol.jade.payload.ServerHandshakePayload;
-import org.leavesmc.leaves.protocol.jade.provider.IJadeProvider;
-import org.leavesmc.leaves.protocol.jade.provider.IServerDataProvider;
-import org.leavesmc.leaves.protocol.jade.provider.IServerExtensionProvider;
+import org.leavesmc.leaves.protocol.jade.provider.JadeProvider;
+import org.leavesmc.leaves.protocol.jade.provider.ServerDataProvider;
+import org.leavesmc.leaves.protocol.jade.provider.ServerExtensionProvider;
 import org.leavesmc.leaves.protocol.jade.provider.ItemStorageExtensionProvider;
 import org.leavesmc.leaves.protocol.jade.provider.ItemStorageProvider;
-import org.leavesmc.leaves.protocol.jade.provider.block.BeehiveProvider;
-import org.leavesmc.leaves.protocol.jade.provider.block.BlockNameProvider;
-import org.leavesmc.leaves.protocol.jade.provider.block.BrewingStandProvider;
-import org.leavesmc.leaves.protocol.jade.provider.block.CampfireProvider;
-import org.leavesmc.leaves.protocol.jade.provider.block.ChiseledBookshelfProvider;
-import org.leavesmc.leaves.protocol.jade.provider.block.CommandBlockProvider;
-import org.leavesmc.leaves.protocol.jade.provider.block.FurnaceProvider;
-import org.leavesmc.leaves.protocol.jade.provider.block.HopperLockProvider;
-import org.leavesmc.leaves.protocol.jade.provider.block.JukeboxProvider;
-import org.leavesmc.leaves.protocol.jade.provider.block.LecternProvider;
-import org.leavesmc.leaves.protocol.jade.provider.block.MobSpawnerCooldownProvider;
-import org.leavesmc.leaves.protocol.jade.provider.block.RedstoneProvider;
+import org.leavesmc.leaves.protocol.jade.provider.block.*;
 import org.leavesmc.leaves.protocol.jade.provider.entity.AnimalOwnerProvider;
 import org.leavesmc.leaves.protocol.jade.provider.entity.MobBreedingProvider;
 import org.leavesmc.leaves.protocol.jade.provider.entity.MobGrowthProvider;
@@ -92,18 +70,18 @@ import java.util.Set;
 public class JadeProtocol implements LeavesProtocol {
 
     public static final String PROTOCOL_ID = "jade";
-    public static final String PROTOCOL_VERSION = "8";
-    public static final HierarchyLookup<IServerDataProvider<EntityAccessor>> entityDataProviders = new HierarchyLookup<>(Entity.class);
-    public static final PairHierarchyLookup<IServerDataProvider<BlockAccessor>> blockDataProviders = new PairHierarchyLookup<>(new HierarchyLookup<>(Block.class), new HierarchyLookup<>(BlockEntity.class));
-    public static final WrappedHierarchyLookup<IServerExtensionProvider<ItemStack>> itemStorageProviders = WrappedHierarchyLookup.forAccessor();
+    public static final String PROTOCOL_VERSION = "9";
+    public static final HierarchyLookup<ServerDataProvider<EntityAccessor>> entityDataProviders = new HierarchyLookup<>(Entity.class);
+    public static final PairHierarchyLookup<ServerDataProvider<BlockAccessor>> blockDataProviders = new PairHierarchyLookup<>(new HierarchyLookup<>(Block.class), new HierarchyLookup<>(BlockEntity.class));
+    public static final WrappedHierarchyLookup<ServerExtensionProvider<ItemStack>> itemStorageProviders = WrappedHierarchyLookup.forAccessor();
     private static final Set<ServerPlayer> enabledPlayers = new HashSet<>();
 
-    public static PriorityStore<ResourceLocation, IJadeProvider> priorities;
+    public static PriorityStore<ResourceLocation, JadeProvider> priorities;
     private static List<Block> shearableBlocks = null;
 
     @Contract("_ -> new")
     public static ResourceLocation id(String path) {
-        return ResourceLocation.tryBuild(PROTOCOL_ID, path);
+        return ResourceLocation.fromNamespaceAndPath(PROTOCOL_ID, path);
     }
 
     @Contract("_ -> new")
@@ -113,7 +91,7 @@ public class JadeProtocol implements LeavesProtocol {
 
     @ProtocolHandler.Init
     public static void init() {
-        priorities = new PriorityStore<>(IJadeProvider::getDefaultPriority, IJadeProvider::getUid);
+        priorities = new PriorityStore<>(JadeProvider::getDefaultPriority, JadeProvider::getUid);
 
         // core plugin
         blockDataProviders.register(BlockEntity.class, BlockNameProvider.INSTANCE);
@@ -195,13 +173,13 @@ public class JadeProtocol implements LeavesProtocol {
                 return;
             }
 
-            List<IServerDataProvider<EntityAccessor>> providers = entityDataProviders.get(entity);
+            List<ServerDataProvider<EntityAccessor>> providers = entityDataProviders.get(entity);
             if (providers.isEmpty()) {
                 return;
             }
 
             CompoundTag tag = new CompoundTag();
-            for (IServerDataProvider<EntityAccessor> provider : providers) {
+            for (ServerDataProvider<EntityAccessor> provider : providers) {
                 if (!payload.dataProviders().contains(provider)) {
                     continue;
                 }
@@ -233,7 +211,7 @@ public class JadeProtocol implements LeavesProtocol {
                 return;
             }
 
-            List<IServerDataProvider<BlockAccessor>> providers;
+            List<ServerDataProvider<BlockAccessor>> providers;
             if (blockEntity != null) {
                 providers = blockDataProviders.getMerged(block, blockEntity);
             } else {
@@ -245,7 +223,7 @@ public class JadeProtocol implements LeavesProtocol {
             }
 
             CompoundTag tag = new CompoundTag();
-            for (IServerDataProvider<BlockAccessor> provider : providers) {
+            for (ServerDataProvider<BlockAccessor> provider : providers) {
                 if (!payload.dataProviders().contains(provider)) {
                     continue;
                 }

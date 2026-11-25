@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.leavesmc.leaves.bot.ServerBot;
 import org.leavesmc.leaves.entity.bot.actions.CraftFishAction;
 
-public class ServerFishAction extends ServerTimerBotAction<ServerFishAction> {
+public class ServerFishAction extends AbstractTimerBotAction<ServerFishAction> {
 
     public ServerFishAction() {
         super("fish", ServerFishAction::new);
@@ -38,8 +38,8 @@ public class ServerFishAction extends ServerTimerBotAction<ServerFishAction> {
     @Override
     public void load(@NotNull CompoundTag nbt) {
         super.load(nbt);
-        this.initialFishInterval = nbt.getInt("initialFishInterval").orElseThrow();
-        this.tickToNextFish = nbt.getInt("tickToNextFish").orElseThrow();
+        this.initialFishInterval = nbt.getIntOr("initialFishInterval", this.initialFishInterval);
+        this.tickToNextFish = nbt.getIntOr("tickToNextFish", this.tickToNextFish);
     }
 
     @Override
