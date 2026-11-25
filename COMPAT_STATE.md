@@ -575,3 +575,44 @@ compat/26.1.2 第 1 轮证据（分支 `compat/26.1.2`，从 `8ba0135` 切出并
 **记错本同步**：E118（Reposilite 时间戳工件 + vendored 本地仓库 + Gradle 快照目录规则）、E119（legacy buildscript + apply 使 plugins DSL 扩展失效）、E120（`checkoutPaperRepo` 偶发 fetch 128 → 先手动 fetch）、E121（`* text=auto` 规范化 vendored 文件 → binary 属性 + blob sha256 比对），并修正被推翻的旧结论「插件字节钉不住 / 不可复现」；记错本现 1504 行，索引行 121 与正文条目 121 对齐。
 
 **下一个目标**：按 1.21.11 手法推进 `compat/1.21.10` → `compat/1.21.9`（两者现为 conflict-needs-review），并把插件固定手法一并带过去；随后评估 26.x（26.1 / 26.1.1 / 26.3 blocked-no-paper-base，26.1.2 / 26.2 conflict-needs-review）。
+
+## §21 第 26 轮：compat/1.21.10 达成完整构建 success（2026-11-26，Asia/Shanghai）
+
+**目标版本与当前 ref**：目标 `1.21.10`（高于 1.21.8 基线，与 1.21.8 并存）。分支 `compat/1.21.10`，本轮提交 `6a63f73ebcbfdf0105aadfad9afcfd699194d48f`，`ls-remote` 读到的远端 ref 与本地 HEAD 同 sha（`4f6cf0f..6a63f73`），tag `leaves-1.21.10-compat` 的 ref object 也等于该 commit，汇报与实际 ref 一致。起点是上一轮的 blocked 提交 `4f6cf0f`。
+
+**路线裁决（为什么整体采纳上游基线，而不是继续在旧基线上打补丁）**：旧 `gradle.properties` 的 `paperRef=bae47d3e…` 早于上游 `dev/1.21.10` 的 `af06383701d3c02e3e3cbd2ef5c5b55e2bbd0742`（mache 停留在 `1.21.10+build.1`、fill 1.0.7），因此我方三层补丁是 1.21.9 时代写的，上下文与上游 1.21.10 错位；同时失败运行残留的生成物 `leaves-server/build.gradle.kts` 里是上游 Paper 的 `io.papermc.paperweight.core`（无版本号），配置期就崩，`applyAllPatches` 根本不执行。结论：以 `LeavesMC/Leaves dev/1.21.10`（tree sha `9bc5f5b07e48c45296e0dabe9446e8f5c4ada040`）为权威基线做整体采纳，是改写量最小、可复现性最强的路线；这条路线由我自己裁决并记录，不再请示。
+
+**采纳内容（三层补丁 + 两个 build 补丁）**：用 `adopt_upstream_12110.py` 递归替换补丁目录 —— `leaves-server/minecraft-patches` 143、`leaves-server/paper-patches` 17（含 `features/`、`files/`）、`leaves-api/paper-patches` 9，标题映射 matched=全量、only_our=0、only_up=0；采纳上游 `leaves-server/build.gradle.kts.patch`（含 `spigot` 块）与 `leaves-api/build.gradle.kts.patch`；写 `gradle.properties` 为上游内容（LF、无 BOM）。`.gitattributes` 追加 `plugin-pin/** binary`（见 §19 的字节保真手法）。
+
+**关键坑：上游的 `leaves-server/src/main/java` 与 `leaves-api/src` 不是生成物**。`.gitignore` 只忽略 `/leaves-server/src/minecraft`、`/paper-server`、`/paper-api` 与两个生成 `build.gradle.kts`；这两个主源码目录是仓库真实 tracked 源码（上游 tree 里 server_main 344 blob、api_src 53 blob）。我此前只替换了补丁目录，主源码仍是 master 旧版遗留 → `:leaves-server:compileJava` 报 100 个错误（`程序包 org.leavesmc.leaves.command.leaves.subcommands 不存在` 6、`找不到符号` 71、`方法不会覆盖或实现超类型的方法` 5、`GameProfile 无法转换为 NameAndId` 3、`boolean 无法转换为 IPlayerDataStorage` 2 等）。用 `adopt_main_src_12110.py` 按上游 tree + raw 逐文件采纳 397 个文件（`ok=397 fail=0`），并删除上游已不存在的同名旧文件 43 个（旧命令体系 `LeavesCommand*/subcommands`、旧 bot 体系 `BotCommand/IPlayerDataStorage/subcommands`、旧 config validator、jade accessor）。采纳后编译直接绿，**语义改写清单本轮为 0**：上游同名补丁体与上游主源码就是权威落点，无需手工重写任何语义。
+
+**流水线改造（两处，都留证据）**：
+1. `leaves-server/build.gradle.kts.patch` 的 **hunk #10 被 `git apply` 拒收**（`error: patch failed: paper-server/build.gradle.kts:344` + `Rejected hunk #10`；#1–#9 含 offset 全部 applied cleanly）——原因是 hunk #9 与 #10 的上下文区间重叠。paperweight 自身重放不受影响，但为了让 `git apply --check` 与后续重生成一致，用 `manual_hunk10_12110.py` 按上游补丁体逐行手工落地：删 `runPaperclip`/`runReobfPaperclip` 与 `fill { }`，换成 `runLeavesclip`/`runReobfLeavesclip`（指向 `createMojmapLeavesclipJar`）与 `createLeavesConfig`。校验输出：旧块唯一匹配 1 次、`runLeavesclip=1`、`runReobfLeavesclip=1`、`createLeavesConfig=1`、`runPaperclip=0`、无 `fill{}`/`BuildChannel`、`leavesweight.core=True`、`paperweight.core=False`、`fill.gradle=False`，`mache("io.papermc:mache:1.21.10+build.9")`、`leavesclip("org.leavesmc:leavesclip:3.0.8")`，总行数 422。证据 `E:\mc\leaves-work\round25-12110-hunk10-manual.txt`。等价性：内容逐行照抄上游补丁意图，未新增语义。
+2. **网络抖动**：`checkoutPaperRepo` 的 fetch 反复 rc=128（真实根因 `error: RPC failed; curl 56 Recv failure: Connection was reset` / `fatal: expected flush after ref listing`）；解法是先手动带 `GIT_SSL_CAINFO` 对嵌套缓存仓库 `fetch origin af063837…`（rc=0）再重跑 gradle（E120 姿势）。期间也验证过本地 `paper-mirror.git` 能直接供对象（`git -C <cache> fetch E:/mc/leaves-work/paper-mirror.git af063837…` rc=0），但把 origin 指向 mirror 无效——paperweight 会把 origin 还原成 GitHub URL，所以 mirror 只作对象供给，不作 origin 改写。推送侧同样抖：`git push` 反复 `curl 28 Failed to connect`，改用 `-c http.postBuffer=524288000 -c http.version=HTTP/1.1` 一次成功。
+
+**可复现插件坐标（沿用 §19 的 vendored 手法）**：构建插件钉为不可覆盖的时间戳快照 `org.leavesmc.leavesweight.patcher` marker `2.1.0-SNAPSHOT` → 实际解析 `2.1.0-20260523.044214-4`（buildNumber 4）。vendored 目录 `plugin-pin/`（Reposilite 的 groupId 点转目录布局）：`leavesweight-core/2.1.0-SNAPSHOT` 放 jar 12,129,279 B sha256 `c9b0afad2355c8718f974e5539610f24c7282f8cfe5b0465f9fec7afb1a91386`、pom 2,036 B sha256 `54c71509b01dffdaaf0f370d97d907369e9ba12d05a52aae39aafa8a42adcadd`（无 `<dependencies>`，已 shadowed）、瘦身 metadata 1,124 B sha256 `d29586d4265fdb23bf91861745f57ad0f4cfd21a8ddfd8a35be5d95cef37bd8d`；marker pom 把依赖写成时间戳坐标（原件 1,956 B sha256 `85ae2515…` → 改写 1,965 B sha256 `2e3be319b10da7969e1a715e184ceda7c211ccfb2574048ea2c3cfc7ef87aebd`），marker metadata 瘦身 633 B sha256 `a57673ae9c936a87ee16c090926640f2f59939bbe7b27f7384efdc81ec2aabbe`。`settings.gradle.kts` 的 `pluginManagement` 首块插入 `plugin-pin` 仓库（`includeGroupByRegex("org\\.leavesmc\\.leavesweight.*")`），root `build.gradle.kts` 钉 `version "2.1.0-20260523.044214-4"`。`leavesclip` 走不可变正式版 `org.leavesmc:leavesclip:3.0.8`（jar 2,989,341 B sha256 `4c5f8fceb75b50982ca811b489fb7a7e420c4fbb9a0c865646c46527dd142ea7`），无需 vendored。
+
+**Spigot 开关裁决**：采纳上游 dev/1.21.10 的 `spigot { enabled = true; buildDataRef = "42d18d4c4653ffc549778dbe223f6994a031d69e"; packageVersion = "v1_21_R6" }`（我方旧补丁是 `enabled = false` + `v1_21_R5`，那是 1.21.9 时代的语义；且插件需 ≥2.1.0 才有 `enabled` 成员，2.0.0 上没有）。实测 Spigot 映射链 `cloneSpigotBuildData → unpackSpigotBuildData → generateSpigotMappings → spigotRemapJar` 全部成功，说明 1.21.10 走 Spigot 启用路线是可行的，不需要关闭开关。
+
+**构建结果（门槛只有本地 gradle 日志；fork GitHub Actions `total_count = 0`，已记录为证据缺失）**：
+- `applyAllPatches`：`BUILD SUCCESSFUL in 10m 32s`，日志含 `Applied 899 paper minecraft patches`、`Importing 1 classes from library sources`，无 spigot 报错、无 warning/error 行（`1.21.10-round26-apply-all2.log`）。此前两次 FAILED 分别是网络 fetch 128（`-round26-apply-all.log`）与 `gradle.properties` 被 BOM 污染后的配置期问题。
+- `:leaves-server:compileJava` + `:leaves-api:compileJava`：`BUILD SUCCESSFUL in 2m 14s`（`-round26-compile2.log`），只剩 incubator.vector / deprecation 警告。上一轮 100 错误（`-round26-compile.log`）由主源码采纳解决。
+- `:leaves-api:jar`、`:leaves-server:jar`、`:leaves-server:createMojmapBundlerJar`、`:leaves-server:createMojmapLeavesclipJar`：分别 `BUILD SUCCESSFUL`（28s / 4m 11s / 44s / 1m 37s，含 `--no-build-cache` 的从零重建）。注意 `reobfJar` 被上游禁用，交付走 mojmap；多任务混在一次调用会触发隐式依赖失败，必须分次调用。
+
+**产物（已发布到独立 Release，未覆盖已有 asset）**：交付目录 `E:\mc\leaves-work\downloads\builds\1.21.10`
+- `leaves-api-1.21.10-R0.1-SNAPSHOT.jar` 2,752,317 B sha256 `8f40121a3437d5b31417e3e260844defb84027b6f0daea13a6d3ead4fdcbfdc3`（判据条目 2452）
+- `leaves-server-1.21.10-R0.1-SNAPSHOT.jar` 28,656,208 B sha256 `e4b639df21e4cde1f7096ee03e576d0b6019792f235eb7517736b2782a00ee28`（判据条目 18888）
+- `leaves-bundler-1.21.10-R0.1-SNAPSHOT-mojmap.jar` 109,046,083 B sha256 `2da0deca29fc1fe576347d6b94830fe53ddbe04e2c0e2020b96a0527937905c7`（判据条目 58283）
+- `leaves-leavesclip-1.21.10-R0.1-SNAPSHOT-mojmap.jar` 64,960,881 B sha256 `fd1993650b4a7abdb1d45a953724782f4be9d326fab32bd0bb7f42c68ea96267`（判据条目 14039）
+
+**可复现判据**：删除 `leaves-server/build`、`leaves-api/build` 后，四个任务各自带 `--no-build-cache` 分次重跑（上游 `org.gradle.caching=true` 会让重建走 `FROM-CACHE`，严格复现必须关掉构建缓存），再按 zip 逐条目 CRC32（嵌套 jar 递归展开）比对；排除规则按 **basename**：`MANIFEST.MF` / `versions.list` / `patches.list` / `*.jar.patch`（含构建期哈希与时间戳，逐次重建必然不同；按完整路径排除会漏掉 `META-INF/versions/9/OSGI-INF/MANIFEST.MF` 这类嵌套条目，造成假差异）。两侧规则同一套、现算，不拿旧 JSON 快照当基线。结果：四个产物缺失 0 / 多余 0 / CRC 差异 0，**总差异条目 = 0，结论=可复现**（`round26-repro-vs-delivered.txt`）。字节级 sha256 不同只来自被排除项。
+
+**发布**：新 tag `leaves-1.21.10-compat`（ref object = commit `6a63f73…`，与分支 ref 完全一致）+ Release id `458635670`（draft=False、prerelease=True、target_commitish=`6a63f73…`），4 个 asset 上传大小与交付目录一致。releases 21→22、assets 35→39；已有 release 的 id 集合无消失、asset 数无变动（`round26-release-12110.txt`）。API 姿势补充：`POST /git/tags` 必须带 `"type"`，缺它报 422。
+
+**未合并 master 的理由（与 §17/§18 一致）**：每版本独立分支、不合 master 是既定路线，master 只承担文档与基线说明；本轮只追加本文档，不把 1.21.10 的源码树并入 master（否则会覆盖 1.21.11 的发布树）。这一偏离是有意裁决，写在这里备查。
+
+**底线复核**：`Leaves-base-1218` detached `d93e9766d3797d130f66179e70a1b374c546fef7`、工作树干净、四个 1.21.8 jar 未动；已有 Release/asset 未删未覆盖；本轮 success 后才宣布并发 Release，证据齐全。
+
+**记错本同步**：新增 E122（`gradle_task.ps1` 用 `Set-Content -Encoding UTF8` 给 `gradle.properties` 写进 BOM+CRLF 且不还原 → 提交前必须用 python 去 BOM/CRLF）、E123（github.com 大 pack push/pull 反复 `curl 28/56` → `-c http.postBuffer=524288000 -c http.version=HTTP/1.1` 重试，或先用本地 mirror 供对象）、E124（复现判据排除规则必须按 basename，且两侧同一套现算）、E125（上游 `leaves-server/src/main/java` 与 `leaves-api/src` 是真实 tracked 源码，跨版本移植必须整体采纳，否则 compileJava 上百个符号错误）；E120 追加本轮复现与 push 侧同族抖动。记错本行数与索引行在下一轮校验对齐。
+
+**下一个目标**：`compat/1.21.9`（现为 conflict-needs-review）按同一手法推进——先对齐上游 `dev/1.21.9` 权威基线（补丁层 + 主源码 + build 补丁 + vendored 插件），再 apply → compile → jar/bundler/clip → 逐条目 CRC；随后评估 26.x（26.1.2 / 26.2 conflict-needs-review；26.1 / 26.1.1 / 26.3 blocked-no-paper-base）。
