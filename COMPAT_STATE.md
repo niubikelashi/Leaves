@@ -516,3 +516,32 @@ compat/26.1.2 第 1 轮证据（分支 `compat/26.1.2`，从 `8ba0135` 切出并
 - 不合 master（§17 裁决：master 承载 1.21.8 补丁体与 Paper base，合并会破坏基线可复现）；不同步 Documentation/Configuration（无经构建验证的 1.21.11 配置语义清单，硬写会产出未验证说明）。
 - 记错本：本轮追加 E103–E117（索引与条目同步，现 117 条 / 1439 行）；其中 E109（插件字节钉不住）、E116（paperweight 需要 git 身份）、E117（旧 daemon 不继承新环境变量）是本轮新踩坑。
 - 队列终态：1.21.8 success（基线）；**1.21.11 success（本轮）**；1.21.9 / 1.21.10 conflict-needs-review；26.1 skipped-no-paper-base；26.1.1 / 26.3 blocked-no-paper-base；26.1.2 / 26.2 conflict-needs-review。下一个目标：按 1.21.11 的收口手法（上游权威落点 + Paper tag 加层重放 + harvest）推进 1.21.10 → 1.21.9，再评估 26.x 是否具备 Paper 基线。
+
+## §19 插件字节收口（第 22–23 轮，compat/1.21.11 之上追加，不动语义）
+
+**目标**：在不改动补丁语义的前提下，把构建插件 `org.leavesmc.leavesweight.patcher` 从「浮动 SNAPSHOT」变成可复现的固定字节。第 21 轮已 success 并发过 Release，这一节只补可复现性，不重开 success 判据。
+
+**网上查到的真实解法（此前结论被推翻）**：
+- `repo.leavesmc.org` 是 **Reposilite**，没有 `/api/repos`、`/api/storage`、`/api/repo/<repo>/browse`（全部 404）；目录列表走 HTML index（`https://repo.leavesmc.org/snapshots/<path>/`），链接引号混用 → 枚举正则要写成 `href=['"]([^'"]+)['"]`。
+- Reposilite 把 groupId 的点转成目录：插件 marker 实际在 `snapshots/org/leavesmc/leavesweight/patcher/org.leavesmc.leavesweight.patcher.gradle.plugin/<VER>/`，不是点分目录（点分路径全 404）。
+- SNAPSHOT 目录里存在**不可覆盖的时间戳工件**：版本级 `maven-metadata.xml` 的 `snapshotVersions.snapshotVersion.value` 给出真实文件名。实测候选全部 HTTP 200 且与本地 Gradle 缓存字节一致：`leavesweight-core-2.0.0-20250422.125601-5.{jar,pom,module}`（jar 12,137,119 B，sha256 `8be5d531…`）、marker pom 1,956 B（sha256 `50732027…`）。`/releases/…maven-metadata.xml` 全 404 → 确实没有正式版；`repo.papermc.io` 无 leavesweight；`portal.gradle.org` DNS 不可达。
+- `leavesweight-core` jar 是 shadowed 自包含（7531 条目，内含 jgit/httpclient/gson/kotlin），并自带 plugin 描述符 `META-INF/gradle-plugins/org.leavesmc.leavesweight.patcher.properties` → `io.papermc.paperweight.patcher.PaperweightPatcher`；pom 无 `<dependencies>` → 单一 classpath 依赖即可。
+
+**落地写法**（`compat/1.21.11`，工作树改动两处 + 一个新目录）：
+- `build.gradle.kts` 第 7 行版本写成不可覆盖的时间戳坐标：`id("org.leavesmc.leavesweight.patcher") version "2.0.0-20250422.125601-5"`。
+- `settings.gradle.kts` 的 `pluginManagement.repositories` 首位加 vendored 本地仓库，并用内容过滤把 leavesweight 组只交给它：
+  `maven(url = settingsDir.resolve("plugin-pin").toURI()) { name = "plugin-pin"; content { includeGroupByRegex("org\\.leavesmc\\.leavesweight.*") } }`，远端仓库保留在后位作为其它组的来源。
+- `plugin-pin/`（vendored 仓库，Maven 布局是 groupId 的点换成目录）：
+  `org/leavesmc/leavesweight/leavesweight-core/2.0.0-SNAPSHOT/` 放仓库下载的时间戳 jar + pom（pom 去掉 `do_not_remove: published-with-gradle-metadata` 提示，不放 `.module`）+ 瘦身后的 `maven-metadata.xml`（只保留 jar/pom 的 `snapshotVersion`，删掉 module/sources/javadoc，避免 Gradle 去找不存在的文件）；
+  `org/leavesmc/leavesweight/patcher/org.leavesmc.leavesweight.patcher.gradle.plugin/2.0.0-SNAPSHOT/` 放自建 marker pom（sha256 `87003402…`，依赖直接指向 `leavesweight-core:2.0.0-20250422.125601-5`）+ 瘦身 `maven-metadata.xml`。
+- **Gradle 的快照规则**（本轮踩到并已记错本）：请求时间戳坐标时，Gradle 仍然去 `2.0.0-SNAPSHOT/` 目录，靠 `maven-metadata.xml` 取精确时间戳文件名；直接按 `2.0.0-20250422.125601-5/` 目录放文件会报 `Could not find …`。独立探针工程验证：`classpath 条目数=1`，解析到 `leavesweight-core-2.0.0-20250422.125601-5.jar`，sha256 `8be5d531…`（`E:\mc\leaves-work\pin-probe.log`）。
+
+**决定性验证（插件确实只来自本地 vendored 目录）**：临时把远端 `repo.leavesmc.org/snapshots/` 加内容过滤 `excludeGroupByRegex("org.leavesmc.leavesweight.*")` 后跑 `applyAllPatches` → **BUILD SUCCESSFUL**（`E:\mc\leaves-work\1.21.11-round23-apply-localonly.log`，`Applied 1 patches` 等任务照常执行）；此时 leavesweight 组没有任何远端来源，且本地 file 仓库产物不进 Gradle 缓存（缓存里只有 `leavesweight-core` 的 `2.0.0-SNAPSHOT`/`2.1.0-SNAPSHOT` 目录，没有时间戳目录）。验证脚本 `prove_local_plugin_only.py`，证据 `round23-local-only-proof.txt`；settings 已还原成 vendored+远端并存版本。
+
+**构建结果**：第 23 轮全量重跑见 `E:\mc\leaves-work\round23-final-pass.txt`（`applyAllPatches` → `:leaves-server:compileJava` → `:leaves-api:jar` → `:leaves-server:jar` → `:leaves-server:createMojmapBundlerJar` → `:leaves-server:createMojmapLeavesclipJar`）。产物与第 21 轮交付目录按「逐条目 CRC32（嵌套 jar 递归，排除 MANIFEST.MF/versions.list/patches.list/`*.jar.patch`）」判据比对，见 `round23-repro-vs-delivered.txt`。
+
+**本轮遇到的两处环境抖动（已记错本）**：
+- `legacy buildscript + apply(plugin=...)` 写法会让 `plugins {}` DSL 的扩展访问失效：`Script compilation errors: 16 errors`，首个是 `'paperweight'` 与第 84–87 行 `upstreamPath/excludes/patchesDir/outputDir` 的 `Unresolved reference` → 保持 plugins DSL + 时间戳版本，不用 legacy apply。
+- `checkoutPaperRepo` 第一次报 `PaperweightException: Command finished with 128 exit code: git … fetch origin ba4b700e…`（`1.21.11-round23-apply-all.log`）；同一命令手动带 `GIT_SSL_CAINFO` 跑 rc=0，随后重跑任务 BUILD SUCCESSFUL（`1.21.11-round23-checkout-paper2.log`）→ 收口前先手动 fetch 目标 sha 更稳。
+
+**底线复核**：`Leaves-base-1218` detached `d93e976…` 与四个 1.21.8 jar 未动；已有 20 个 release / 23 个 asset 未删未覆盖；本节的分支/commit 以实际 ref 为准。
