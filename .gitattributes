@@ -7,3 +7,6 @@ gradlew text eol=lf
 *.jar binary
 
 *.patch binary
+
+# vendored 插件仓库：逐字节保持原样，不做换行规范化
+plugin-pin/** binary
