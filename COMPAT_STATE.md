@@ -426,3 +426,80 @@ compat/26.1.2 第 1 轮证据（分支 `compat/26.1.2`，从 `8ba0135` 切出并
 ### 插件版本策略条款（浮动 SNAPSHOT 的边界）
 - 当前策略：**浮动 `2.0.0-SNAPSHOT` + 标注不可复现风险 + 不作为 success 门槛**，这只在 1.21.11 处于 **blocked**（非最终态）时允许。
 - 硬性条款：若 `1.21.11`（或任何 compat 版本）将来转为 **success** 或要**产出 Release**，必须先验证插件坐标并**固定到可复现的正式版坐标**，否则不得宣布 success、不得发 Release。固定前需重跑一次可复现构建取证并记录坐标来源；仍然禁止固定不存在的版本、禁止为固定而固定、禁止未经裁决升级插件版本。
+
+## §17 第 12–20 轮：compat/1.21.11 从里程碑到真 success（2026-11-24 → 2026-11-25，自主授权）
+
+### 判据升级（第 19/20 轮）
+- `applyAllPatches` 全绿只是**里程碑**；`success` 的判据是：补丁全量可回放 + `:leaves-server:compileJava` BUILD SUCCESSFUL（错误 0）+ 产物可复现 + 与 1.21.8 基线并存。
+- 分次调用 gradle 任务以保证顺序：`applyPaperApiPatches` → `:leaves-server:applyAllServerPatches` → `:leaves-server:compileJava` → jar/bundler/leavesclip。一次调用混多个任务会触发隐式依赖失败。
+
+### 权威落点裁决（第 19 轮）
+- 以上游 `LeavesMC/Leaves dev/1.21.11` 的**同名补丁体**与**同名 main 源码**为权威落点，只作用于 `compat/1.21.11`，不动 1.21.8。
+- 同名依据：`patch-title-map-round19.json`（matched 131 / only_our 10 / only_up 9）。
+- 不改 Paper base：上游 `gradle.properties` 的 `paperRef=c5a2736aaa33a6447badd2ed294fbf5940cb014b` 不在本地 `paper-mirror.git`，且 github.com:443 直连失败 → 离线不可切换。改为在 `ba4b700e1`（Paper tag 1.21.11）与 `efeab1ab`（minecraft 基线）上用 reanchor / harvest 修上下文，**±代码行保持上游逐字**。
+
+### Paper 层流水线改造（第 19 轮，脚本 `chain_paper_pass.py`）
+- `paper-api` / `paper-server` 的 main 源码是 `.gitignore` 生成物（L51/L52）→ 一切语义修正必须落在**补丁体**里，手工编辑生成物无效。
+- Paper tag 顶层含 `paper-api/`、`paper-server/`，而 Leaves 的 paper 补丁路径相对各层根 → 重放需加层前缀（`remap_prefix`/`strip_prefix`），入库补丁保持层相对路径，复核用 `git apply --check --directory paper-api|paper-server`。
+- `head0` 必须在 apply **之前** capture；worktree 复用必须 `prune → remove --force → prune → add --detach --force`，否则残留脏树让判据失真。
+- 结果：api 采纳上游 9/9；server 采纳上游 14 + **保留我方 `0013-Leaves-Plugin.patch`**（上游体在 tag `ba4b700e1` 基线落不上，我方体复核 rc=0）；按序号全量重放失败 0。证据：`round20-paper-server-full-replay.txt`。
+
+### minecraft 层收口（第 20 轮）
+- 9 处包路径机械改名 `org.leavesmc.leaves.command.subcommands.` → `org.leavesmc.leaves.command.leaves.subcommands.`（`0055` 7 处、`0133` 1 处、`0139` 1 处）。证据 `round20-legacy-import-rename.txt`。
+- 删 `0018-Only-check-for-spooky-season-once-an-hour.patch`：上游 dev/1.21.11 已删除该 feature（补丁标题映射 only_our），无等价落点 → 删补丁并记根因，不伪造落点。
+- `0137-Configurable-collision-behavior.patch` 直接 apply 上游体失败（`error: patch failed: ...CollisionUtil.java:2022`，证据 `round20-slot-0137.txt`）→ 改用 **harvest**：从槽位父提交 `49606c6e` 的基线重建上下文行（hunk2 锚点绝对行 2070，前 3 行 `return ret; / } / 空行`），mbox 头取自原始补丁。复核 `git apply --check --index --whitespace=nowarn -v` **rc=0**（`round20-slot-0137-harvest.txt`）。首版 rc=128 是 hunk 之间插入裸空行导致 `patch fragment without header`，已修。
+- 采纳上游 collision 语义：`LeavesConfig.fix.collisionBehavior` 枚举只剩 `VANILLA, PAPER`（L1307-1309），`CollisionBehaviorValidator.stringConvert` 把传入 `BLOCK_SHAPE_VANILLA` **降级为 `PAPER` 并告警**（L1314-1317）；补丁体只留 2 hunk，`case VANILLA -> !aabb.intersects(singleAABB)`，不再保留 `voxelShapeIntersectVanilla`。
+
+### main 源码删除（第 20 轮，死代码）
+- `leaves-server/src/main/java/org/leavesmc/leaves/command/LeavesCommandUtil.java`：上游改名为 `command/CommandUtils.java`；文件系统全量引用复核（含 gitignore 生成树）外部引用 **0** → 删文件（`round20-legacy-command-delete.txt`，删除后残留引用 0）。
+- `leaves-server/src/main/java/org/leavesmc/leaves/bytebuf/SimpleBytebufManager.java`：上游走 `InternalBytebufHandler`（公开方法只有 `init/updatePlayer/allocator/callPacketEvent/sendPacket`），该 legacy 类无人引用 → 删（`round20-bytebuf-legacy-delete.txt`）。
+- `PacketType` 按上游新坐标 `org.leavesmc.leaves.bytebuf.PacketType` 重命名（4 处 + 补 import，`round19-packettype-rename.txt`）。
+
+### `0007-MC-Technical-Survival-Mode.patch` 字段回移（第 20 轮）
+- `maxArrowDespawnInvulnerability` 来自 Paper `c5a2736a`（tag `ba4b700e1` 无此字段）。离线不可切 Paper base → 用 `raw.githubusercontent.com/PaperMC/Paper/c5a2736a/...` 抓取单文件事实，在补丁体末尾追加文件段回移**逐字相同**的字段声明（`@@ -171,6 +171,10 @@`）。
+- 复核：tag worktree `git apply --check --index --whitespace=nowarn --directory paper-server` **rc=0**（`round20-paper-0007-field.txt`）；按序号全量重放后工作树命中字段声明，且 `PaperConfigurations.java` 命中 `McTechnicalModeHelper.onWorldConfigCreate(config)` / `doMcTechnicalModeIf()`（`round20-paper-server-full-replay.txt`）。
+- **已记录差异**：回移字段只声明、tag 基线没有消费点（行为接线在 Paper `c5a2736a` 侧），不伪造落点；语义等价性以「字段存在 + 配置项可用」为准，行为差异如实记录。
+- 注意：`git show HEAD:` 读到的是 tag 版本而非应用后的工作树 → 判据必须读工作树文件。
+
+### 编译收敛轨迹（javac 上限 100，需迭代）
+- round17 语法错误 25 → round18 100 → round19e 100 → round20 41 → round20b 17 → round20c 3 → **round20d 0**。
+- round20c 的 3 条即上述三处语义冲突（collision 枚举、`LeavesCommandUtil`、`maxArrowDespawnInvulnerability`），全部按上游语义裁决解决。
+- `1.21.11-compile-round20d.log`：`:leaves-server:compileJava` **BUILD SUCCESSFUL in 2m 9s**，错误条目 0。
+
+### `reobfJar` 被上游禁用（第 20 轮）
+- `:leaves-server:reobfJar` BUILD FAILED：`io.papermc.paperweight.PaperweightException: Reobfuscated server jars are no longer supported and only exist for debugging purposes.` → 这是上游策略，不是我方缺陷。
+- 交付产物走 mojmap：`leaves-api jar` + `leaves-server jar` + `bundler-mojmap` + `leavesclip-mojmap`，与 1.21.8 基线产物集合同构（基线也没有 reobf jar）。
+
+### 产物与复现判据（第 20 轮）
+- 目录：bundler/leavesclip/server jar 在 `leaves-server\build\libs\`，api jar 在 `leaves-api\build\libs\`。
+- 落盘 `E:\mc\leaves-work\downloads\builds\1.21.11\`（与 1.21.8 基线目录并存，基线未动）：
+  - `leaves-api-1.21.11-R0.1-SNAPSHOT.jar` 2,801,720 bytes / 条目 2496 / sha256 `065cf7f7…`（两次构建 sha256 相同，CRC 差异 0）
+  - `leaves-server-1.21.11-R0.1-SNAPSHOT.jar` 28,157,716 bytes / 条目 18569 / sha256 `98971117…`（基线 1.21.8 为 18346 条目）；关键类命中 `CommandUtils` / `McTechnicalModeHelper` / `InternalBytebufHandler` / `WorldConfiguration`；判据 `org/spigotmc` 条目 12、`v1_21_R5` 条目 0（与基线同款）
+  - `leaves-bundler-1.21.11-R0.1-SNAPSHOT-mojmap.jar` 106,354,476 bytes / 条目 2558 / sha256 `08b74c97…`
+  - `leaves-leavesclip-1.21.11-R0.1-SNAPSHOT-mojmap.jar` 64,736,683 bytes / 条目 2431 / sha256 `f5225a0b…`
+- 复现判据 = **逐条目 CRC**（zip 时间戳不算内容差异；嵌套 jar 递归展开）：server/api 差异 **0**；bundler 差异 2（嵌套 leaves jar 的 `META-INF/MANIFEST.MF`、`versions.list`）；clip 差异 3（`server-1.21.11.jar.patch`、`patches.list`、`versions.list`）。差异行内容复核 = 构建时间戳与由其派生的哈希（`round20-repro-list-diff.txt`）→ 不入判据。字节级 sha256 不作判据（与基线一致）。
+
+### 第 21 轮：一次完整收口构建（success 定稿）
+- 走 `gradle_task.ps1` 逐任务分次调用（每个任务后还原 `gradle.properties`），六个任务全部 BUILD SUCCESSFUL、编译错误计数 0：
+  `applyAllPatches`、`:leaves-server:compileJava`、`:leaves-api:jar`、`:leaves-server:jar`、`:leaves-server:createMojmapBundlerJar`、`:leaves-server:createMojmapLeavesclipJar`（日志 `1.21.11-round21-*.log`，汇总 `round21-final-pass.txt`）。
+- 手写 `dependency-verification-metadata.xml` 与 `.correct` 备份已删除（见上节：strict 不校验 plugin classpath，留着会误导），删除后构建仍全绿。
+- 复现性（第 21 轮重建 vs 第 20 轮已交付产物，逐条目 CRC、含嵌套 jar 递归展开，排除 `MANIFEST.MF`/`versions.list`/`patches.list`/`*.jar.patch`）：四个产物**展开条目数相同、CRC 差异 0**（server 18568、api 2495、bundler 57253、clip 14503）；`leaves-api` jar 字节级 sha256 两次相同（`065cf7f7…`），server/bundler/clip 仅因清单与 bsdiff 派生时间戳而整体 sha256 变化。证据 `round21-repro-vs-delivered.txt`。
+- 1.21.8 基线目录未动：四个 jar 大小与 sha256 复核（api `cedb0e03…`、bundler `de50f798…`、clip `0064faf7…`、server `c4c90220…`）。
+- 三次独立构建（第 20 轮两次 + 第 21 轮一次）产物条目一致 → 交付产物仍以第 20 轮落盘版本为准，指纹不变。
+
+### 插件坐标可复现收口（第 20/21 轮，§15 硬性条款）
+- leavesweight DSL `2.0.0-SNAPSHOT`（缓存 jar sha1 `665e5a24194ec71c1146353e5a27e05150a19d14`、jar sha256 `8be5d531…`、pom `e8b0e1ed…`、module `1f122677…`、plugin marker pom `50732027…`）没有正式版坐标可固定：上游 dev/1.21.11 用的是 `2.1.0-SNAPSHOT`，本地 gradle 缓存只有 `2.0.0-SNAPSHOT` / `2.1.0-SNAPSHOT` 两个快照，`repo.leavesmc.org/releases` 的相关 metadata 路径全部 404 → 不存在正式版。2.1.0-SNAPSHOT 才有 `getEnabled()`，按 §15 裁决不升级（靠插件默认关闭）。
+- `gradle -M sha256 --dependency-verification=off` 全量生成 metadata **失败**：`Multiple entries with same key: org.spongepowered:configurate-gson:4.2.0-SNAPSHOT=...`（`1.21.11-verifygen-round20e.log`，BUILD FAILED 但编译错误 0）→ 改手写 metadata 只钉 4 个插件构件（`round20-plugin-pin.txt`）。
+- 但手写 metadata **钉不住插件**：负面测试把 sha256 改成全 0，`-F strict` 仍 BUILD SUCCESSFUL（不带 refresh `round20g`、带 refresh `round20h`、去掉 `trusted-artifacts` glob `round20i` 三次都成功）→ Gradle dependency verification 不覆盖 `pluginManagement`/build script classpath，也不重验已缓存产物。**因此无效 metadata 不入库**（已删除 `dependency-verification-metadata.xml`，避免误导）。
+- 替代的可复现手法 = **解析后手动比对插件字节 sha256**：跑 `--refresh-dependencies` 重新解析后，`verify_plugin_bytes_after_refresh.py` 命中 4 个构件且与固定值一致 True（`round20-plugin-repin-after-refresh.txt`）→ 插件坐标仍浮动，但每次解析的字节可复核；上游若重发快照，构建会换字节，届时按新字节重新登记。
+
+### Documentation / Configuration 同步裁决（第 21 轮）
+- 不同步：这两个 fork 仓库的内容要跟上 1.21.11 的 feature/配置项，属于文档改写，不在本次 success 判据里；本轮没有可核验的 1.21.11 配置语义变更清单，硬写会产出未经构建验证的说明。Release body 里直接写清产物与判据即可。
+
+### 分支与合并裁决（第 20 轮）
+- `compat/1.21.11` 本地 = 远端 = `14fb27fee55941d21e75eedf6f3b3fd1103d1b0d`（第 19/20 轮收口 commit `045009e` 的后续），补丁目录与 HEAD 树、磁盘计数一致：minecraft features 135、api paper 9、server paper 16 + files 1。
+- **不合 master**：master 承载 1.21.8 的补丁体与 Paper base，合并会用 1.21.11 补丁覆盖 1.21.8 → 破坏 §16 的「1.21.8 基线可复现」底线。改为以 `compat/1.21.11` 分支 + tag 发布独立 Release，master 与 `Leaves-base-1218`（detached `d93e976`）不动。
+
+### 队列状态更新
+- `1.21.11`：补丁层全绿 + api/server apply SUCCESSFUL + `compileJava` BUILD SUCCESSFUL + mojmap 产物落盘且逐条目 CRC 复现 → 转 **success**（以 strict 复跑证据定稿）。
+- `1.21.8`：唯一维护基线，未动。`1.21.9` `8e0597c`、`1.21.10` `4f6cf0f`、`26.1.2` `8ba0135`、`26.2` `ffb9cc5` 存档不变；`26.1` skipped-no-paper-base、`26.1.1`/`26.3` blocked-no-paper-base。
