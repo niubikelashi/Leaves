@@ -545,3 +545,33 @@ compat/26.1.2 第 1 轮证据（分支 `compat/26.1.2`，从 `8ba0135` 切出并
 - `checkoutPaperRepo` 第一次报 `PaperweightException: Command finished with 128 exit code: git … fetch origin ba4b700e…`（`1.21.11-round23-apply-all.log`）；同一命令手动带 `GIT_SSL_CAINFO` 跑 rc=0，随后重跑任务 BUILD SUCCESSFUL（`1.21.11-round23-checkout-paper2.log`）→ 收口前先手动 fetch 目标 sha 更稳。
 
 **底线复核**：`Leaves-base-1218` detached `d93e976…` 与四个 1.21.8 jar 未动；已有 20 个 release / 23 个 asset 未删未覆盖；本节的分支/commit 以实际 ref 为准。
+
+## §20 提交后全量复核（第 24 轮，从已入库的 compat/1.21.11 HEAD 重建）
+
+**起点**：`compat/1.21.11` 本地=远端 `0abd6f35be6bb24ae7d05dd810fbebaaede45741`（本轮三个提交：`6ed34bc` 插件固定改动、`6c05543` §19 文档、`0abd6f3` vendored 目录 binary 属性）。`master` 本地=远端 `a08854d429349f011d205767a139308fb2936b07`（§19 入库）。
+
+**入库字节核对**（`round24-pin-bytes-and-tag.txt`）：`git show HEAD:<path>` 的原始字节 sha256 与上游 Reposilite 时间戳工件一致 ——
+- `plugin-pin/.../leavesweight-core-2.0.0-20250422.125601-5.jar`（12,137,119 B）→ `8be5d5311e76943f86a6d7fd347dbcefde4e3ddafe8a75964c386629f6318e34`
+- `plugin-pin/.../leavesweight-core-2.0.0-20250422.125601-5.pom` → `88773d797463e4cf9f73f7b82feb0a3de2e4479e2cc917ccabf55caffcebe332`
+- `plugin-pin/.../org.leavesmc.leavesweight.patcher.gradle.plugin-2.0.0-20250422.125601-5.pom` → `870034021f748ad7dd6f883958f13647e062f24892d14d9c28a9c032b6f8835b`
+
+**为什么要加 `plugin-pin/** binary`**：仓库根 `.gitattributes` 有 `* text=auto`，`git add` 时对 vendored 的 pom/xml 报 `warning: in the working copy of '…pom', LF will be replaced by CRLF the next time Git touches it`，即工作树与 blob 的换行可能被规范化；标成 binary 后逐字节保持原样（已记错本 E121）。
+
+**构建结果（从实际提交重跑，非工作树残留）**：`round24-final-pass.txt` 六项全绿，工作树无残留 ——
+`applyAllPatches` / `:leaves-server:compileJava` / `:leaves-api:jar` / `:leaves-server:jar` / `:leaves-server:createMojmapBundlerJar` / `:leaves-server:createMojmapLeavesclipJar`，日志 `1.21.11-round24-*.log`。收口前先手动 fetch paper 基线 `ba4b700e133f6de66101393b56f4d9068cd4d3b0`（rc=0），避免 §19 记到的 fetch 128 抖动。
+
+**复现判据结果**（`round24-repro-vs-delivered.txt`，逐条目 CRC32、嵌套 jar 递归展开、排除 `META-INF/MANIFEST.MF` / `versions.list` / `patches.list` / `*.jar.patch`）：四个产物条目集合完全相同、**CRC 差异 0** ——
+- server：交付 28,157,716 B / 重建 28,157,718 B，两侧展开 18,568，差异 0
+- api：交付与重建字节相同（sha256 两侧 `065cf7f74ccb8919…`），展开 2,495，差异 0
+- bundler-mojmap：交付 106,354,476 B / 重建 106,351,557 B，展开 57,253，差异 0
+- leavesclip-mojmap：交付 64,736,683 B / 重建 64,732,619 B，展开 14,503，差异 0
+
+字节级 sha256 不同只来自被排除的时间戳派生项（MANIFEST / versions.list / patches.list 的写入时刻与长度），因此按条目 CRC 判据判可复现；交付目录里的四个 jar 未被覆盖。
+
+**底线复核**：`Leaves-base-1218` detached `d93e9766d3797d130f66179e70a1b374c546fef7`、工作树干净，四个 1.21.8 jar 字节未动（api `cedb0e03…` / server `c4c90220…` / bundler `de50f798…` / clip `0064faf7…`）；GitHub 当前 releases=21、assets=35（第 21 轮新增的 `leaves-1.21.11-compat` 之外，镜像的 20 release / 23 asset 未删未覆盖）；tag `leaves-1.21.11-compat` 的 tag object `47f0ebad9a4d837d3f4939f509d3f2f96f67c4d5`，目标 commit 仍是发布提交 `34c9920cb3b9c040a1ea035eb362b4e9e7b4a271`，后续文档/构建提交未动 tag；compat tracked patch 163、master tracked patch 171。
+
+**语义改写清单**：本轮无新增语义改写，只有构建/依赖与文档改动；§17 的语义清单保持不变。
+
+**记错本同步**：E118（Reposilite 时间戳工件 + vendored 本地仓库 + Gradle 快照目录规则）、E119（legacy buildscript + apply 使 plugins DSL 扩展失效）、E120（`checkoutPaperRepo` 偶发 fetch 128 → 先手动 fetch）、E121（`* text=auto` 规范化 vendored 文件 → binary 属性 + blob sha256 比对），并修正被推翻的旧结论「插件字节钉不住 / 不可复现」；记错本现 1504 行，索引行 121 与正文条目 121 对齐。
+
+**下一个目标**：按 1.21.11 手法推进 `compat/1.21.10` → `compat/1.21.9`（两者现为 conflict-needs-review），并把插件固定手法一并带过去；随后评估 26.x（26.1 / 26.1.1 / 26.3 blocked-no-paper-base，26.1.2 / 26.2 conflict-needs-review）。
