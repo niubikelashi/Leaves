@@ -616,3 +616,9 @@ compat/26.1.2 第 1 轮证据（分支 `compat/26.1.2`，从 `8ba0135` 切出并
 **记错本同步**：新增 E122（`gradle_task.ps1` 用 `Set-Content -Encoding UTF8` 给 `gradle.properties` 写进 BOM+CRLF 且不还原 → 提交前必须用 python 去 BOM/CRLF）、E123（github.com 大 pack push/pull 反复 `curl 28/56` → `-c http.postBuffer=524288000 -c http.version=HTTP/1.1` 重试，或先用本地 mirror 供对象）、E124（复现判据排除规则必须按 basename，且两侧同一套现算）、E125（上游 `leaves-server/src/main/java` 与 `leaves-api/src` 是真实 tracked 源码，跨版本移植必须整体采纳，否则 compileJava 上百个符号错误）；E120 追加本轮复现与 push 侧同族抖动。记错本行数与索引行在下一轮校验对齐。
 
 **下一个目标**：`compat/1.21.9`（现为 conflict-needs-review）按同一手法推进——先对齐上游 `dev/1.21.9` 权威基线（补丁层 + 主源码 + build 补丁 + vendored 插件），再 apply → compile → jar/bundler/clip → 逐条目 CRC；随后评估 26.x（26.1.2 / 26.2 conflict-needs-review；26.1 / 26.1.1 / 26.3 blocked-no-paper-base）。
+
+### §21 补充（记错本同步修正与文档姿势修正）
+
+本轮记错本实际新增 **E122–E128**（不止上面写的 E122–E125）：E122（`gradle_task.ps1` 给 `gradle.properties` 写进 BOM+CRLF，提交前必须用 python 去 BOM/CRLF）、E123（github.com 大 pack push/pull 反复 `curl 28/56` → `-c http.postBuffer=524288000 -c http.version=HTTP/1.1`；fetch 侧先手动带 `GIT_SSL_CAINFO` fetch，或本地 mirror 只作对象供给、不改 origin）、E124（复现判据按 basename 排除 + 两侧同一套现算）、E125（上游 `leaves-server/src/main/java` / `leaves-api/src` 是 tracked 源码，移植必须整体采纳）、E126（GitHub `POST /git/tags` 必须带 `"type": "tag"`；Release 会把 tag ref 直接指向 commit）、E127（PS 5.1 里 `& $script <参数>` 报 BadExpression，不要写链式 wrapper，逐次直接调 `gradle_task.ps1`）。E120 出现次数升到 3（本轮复现 + 真实根因 `curl 56 Recv failure`）。另补 E128：`-c` 是 git 顶层选项，写在 `push` 子命令后面报 `error: unknown switch 'c'`（本文件 §21 的文档提交第一次就踩了，rc=129，改顺序后 rc=0）。记错本现 1601 行，索引行 128 与正文条目 128 对齐（模板行 `### Exxx` 不计入），证据 `round26-notebook-update.txt`、`round26-notebook-e128.txt`。
+
+**文档提交的真实推送结果**：`master` 从 `4cfe97f` 推到 **`7d74523241b61dc0f7bfe08157f2681675b71343`**（`git -c http.postBuffer=524288000 -c http.version=HTTP/1.1 push origin master`，`ls-remote` 与本地 HEAD 一致）。本轮未把 1.21.10 源码树并入 master，理由见 §21「未合并 master 的理由」。
