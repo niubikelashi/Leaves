@@ -503,3 +503,16 @@ compat/26.1.2 第 1 轮证据（分支 `compat/26.1.2`，从 `8ba0135` 切出并
 ### 队列状态更新
 - `1.21.11`：补丁层全绿 + api/server apply SUCCESSFUL + `compileJava` BUILD SUCCESSFUL + mojmap 产物落盘且逐条目 CRC 复现 → 转 **success**（以 strict 复跑证据定稿）。
 - `1.21.8`：唯一维护基线，未动。`1.21.9` `8e0597c`、`1.21.10` `4f6cf0f`、`26.1.2` `8ba0135`、`26.2` `ffb9cc5` 存档不变；`26.1` skipped-no-paper-base、`26.1.1`/`26.3` blocked-no-paper-base。
+
+## §18 第 21 轮收口：发布与收尾（2026-11-25）
+- 目标达成：**compat/1.21.11 完整构建 success** —— 补丁全量可回放 + `:leaves-server:compileJava` 全绿 + 四个 mojmap 产物落盘且可复现。
+- 第 21 轮定稿构建（走 `gradle_task.ps1`，逐任务分次调用，跑完还原 `gradle.properties`）：`applyAllPatches`、`:leaves-server:compileJava`、`:leaves-api:jar`、`:leaves-server:jar`、`createMojmapBundlerJar`、`createMojmapLeavesclipJar` 全部 BUILD SUCCESSFUL，错误计数 0（`1.21.11-round21-*.log`，汇总 `round21-final-pass.txt`）。
+- 手写 `dependency-verification-metadata.xml` 已删除（§17：strict 不覆盖 plugin classpath，留着会误导），删除后构建仍全绿；插件字节改为「刷新解析后手动比对缓存 sha256」固定（`round20-plugin-repin-after-refresh.txt`）。
+- 复现性第三次确认（第 21 轮重建 vs 第 20 轮交付，逐条目 CRC 含嵌套 jar）：四个产物条目数相同、CRC 差异 0（`round21-repro-vs-delivered.txt`）；`leaves-api` 字节级 sha256 两次相同。
+- 1.21.8 基线未动：`Leaves-base-1218` detached `d93e976`，四个 1.21.8 jar 大小/sha256 复核一致（`round21-repro-vs-delivered.txt` 尾部）。
+- 文档入库：master `e8fc5d0`（§17，429 → 506 行）；compat `34c9920`（同一份 COMPAT_STATE.md）；tag `leaves-1.21.11-compat` → `34c9920`，均已推远端（`round21-docs-commit.txt`）。补丁层文件未变（master tracked patch 171、compat tracked patch 163）。
+- 发布：新 Release id `458297960`，tag `leaves-1.21.11-compat`（prerelease），12 个 asset（4 jar + 4 sha256 + 4 crc.txt）。发布前后：release 20 → 21、asset 23 → 35，**旧 release 20 个 / 23 asset 全部未动**（`round21-release-publish.txt`）。
+- 发布后复核：下载 api/server jar，sha256 与交付一致 True（api `065cf7f7…`、server `98971117…`），asset 尺寸与本地一致（`round21-release-verify.txt`）。
+- 不合 master（§17 裁决：master 承载 1.21.8 补丁体与 Paper base，合并会破坏基线可复现）；不同步 Documentation/Configuration（无经构建验证的 1.21.11 配置语义清单，硬写会产出未验证说明）。
+- 记错本：本轮追加 E103–E117（索引与条目同步，现 117 条 / 1439 行）；其中 E109（插件字节钉不住）、E116（paperweight 需要 git 身份）、E117（旧 daemon 不继承新环境变量）是本轮新踩坑。
+- 队列终态：1.21.8 success（基线）；**1.21.11 success（本轮）**；1.21.9 / 1.21.10 conflict-needs-review；26.1 skipped-no-paper-base；26.1.1 / 26.3 blocked-no-paper-base；26.1.2 / 26.2 conflict-needs-review。下一个目标：按 1.21.11 的收口手法（上游权威落点 + Paper tag 加层重放 + harvest）推进 1.21.10 → 1.21.9，再评估 26.x 是否具备 Paper 基线。
