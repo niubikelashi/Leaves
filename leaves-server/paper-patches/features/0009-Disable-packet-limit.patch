@@ -7,7 +7,7 @@ Subject: [PATCH] Disable packet limit
 diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 --- a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 +++ b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
-@@ -286,7 +286,7 @@ public class GlobalConfiguration extends ConfigurationPart {
+@@ -269,7 +269,7 @@ public class GlobalConfiguration extends ConfigurationPart {
              }
  
              public boolean isEnabled() {
@@ -16,3 +16,4 @@ diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.ja
              }
  
              public enum ViolateAction {
+

@@ -1,11 +1,13 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: huanli233 <392352840@qq.com>
 Date: Thu, 6 Feb 2025 12:49:03 +0800
 Subject: [PATCH] Revert raid changes
 
+
 diff --git a/src/main/java/org/bukkit/event/entity/EntityPotionEffectEvent.java b/src/main/java/org/bukkit/event/entity/EntityPotionEffectEvent.java
 --- a/src/main/java/org/bukkit/event/entity/EntityPotionEffectEvent.java
 +++ b/src/main/java/org/bukkit/event/entity/EntityPotionEffectEvent.java
-@@ -221,9 +221,7 @@ public class EntityPotionEffectEvent extends EntityEvent implements Cancellable
+@@ -225,9 +225,7 @@ public class EntityPotionEffectEvent extends EntityEvent implements Cancellable
          /**
           * When a player gets bad omen after killing a patrol captain.
           *
@@ -15,3 +17,4 @@ diff --git a/src/main/java/org/bukkit/event/entity/EntityPotionEffectEvent.java 
          PATROL_CAPTAIN,
          /**
           * When a potion effect is modified through the plugin methods.
+

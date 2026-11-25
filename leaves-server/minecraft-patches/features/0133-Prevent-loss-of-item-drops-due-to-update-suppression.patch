@@ -10,7 +10,7 @@ diff --git a/net/minecraft/server/level/ServerPlayerGameMode.java b/net/minecraf
                  org.bukkit.block.BlockState state = bblock.getState();
                  this.level.captureDrops = new java.util.ArrayList<>();
                  // CraftBukkit end
--                BlockState blockState1 = org.leavesmc.leaves.command.subcommands.BlockUpdateCommand.isNoBlockUpdate() ? blockState : block.playerWillDestroy(this.level, pos, blockState, this.player); // Leaves - no block update
+-                BlockState blockState1 = org.leavesmc.leaves.command.leaves.subcommands.BlockUpdateCommand.isNoBlockUpdate() ? blockState : block.playerWillDestroy(this.level, pos, blockState, this.player); // Leaves - no block update
 -                boolean flag = this.level.removeBlock(pos, false);
 +                BlockState blockState1 = block.playerWillDestroy(this.level, pos, blockState, this.player);
 +                boolean flag; // Leaves start - Prevent loss of item drops due to update suppression when breaking blocks

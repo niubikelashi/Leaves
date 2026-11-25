@@ -1,6 +1,8 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Lumine1909 <133463833+Lumine1909@users.noreply.github.com>
 Date: Wed, 22 May 2024 10:12:04 +0800
 Subject: [PATCH] Bytebuf API
+
 
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
 --- a/src/main/java/org/bukkit/Bukkit.java
@@ -11,36 +13,31 @@ diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Buk
      // Leaves end - Photographer API
 +
 +    // Leaves start - Bytebuf API
-+    public static org.leavesmc.leaves.bytebuf.BytebufManager getBytebufManager() {
-+        return server.getBytebufManager();
++    public static org.leavesmc.leaves.bytebuf.BytebufAllocator getBytebufManager() {
++        return server.getBytebufAllocator();
 +    }
 +    // Leaves end - Bytebuf API
  }
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
-@@ -2773,4 +2773,8 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
-     // Leaves start - Photographer API
-     @NotNull org.leavesmc.leaves.entity.photographer.PhotographerManager getPhotographerManager();
-     // Leaves end - Photographer API
+@@ -2772,4 +2772,6 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+     // Leaves end - Bot API
+ 
+     @NotNull org.leavesmc.leaves.entity.photographer.PhotographerManager getPhotographerManager(); // Leaves - Photographer API
 +
-+    // Leaves start - Bytebuf API
-+    org.leavesmc.leaves.bytebuf.BytebufManager getBytebufManager();
-+    // Leaves end - Bytebuf API
++    org.leavesmc.leaves.bytebuf.BytebufAllocator getBytebufAllocator(); // Leaves - Bytebuf API
  }
 diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
 --- a/src/main/java/org/bukkit/entity/Player.java
 +++ b/src/main/java/org/bukkit/entity/Player.java
-@@ -3930,6 +3930,12 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
-     boolean isChunkSent(long chunkKey);
-     // Paper end
+@@ -64,7 +64,7 @@ import org.jspecify.annotations.Nullable;
+  * Represents a player, connected or not
+  */
+ @NullMarked
+-public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginMessageRecipient, net.kyori.adventure.identity.Identified, net.kyori.adventure.bossbar.BossBarViewer, com.destroystokyo.paper.network.NetworkClient { // Paper
++public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginMessageRecipient, net.kyori.adventure.identity.Identified, net.kyori.adventure.bossbar.BossBarViewer, com.destroystokyo.paper.network.NetworkClient, org.leavesmc.leaves.bytebuf.PacketAudience { // Paper // Leaves - Bytbuf API
  
-+    // Leaves start - Bytebuf API
-+    void sendPacket(org.leavesmc.leaves.bytebuf.packet.Packet packet);
-+
-+    void sendPacket(org.leavesmc.leaves.bytebuf.Bytebuf buf, org.leavesmc.leaves.bytebuf.PacketType type);
-+    // Leaves end - Bytebuf API
-+
+     // Paper start
      @Override
-     Spigot spigot();
-     // Spigot end
+

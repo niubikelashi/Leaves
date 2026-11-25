@@ -16,3 +16,4 @@ diff --git a/src/main/java/com/destroystokyo/paper/profile/PaperAuthenticationSe
  
      public PaperAuthenticationService(Proxy proxy) {
          super(proxy);
+

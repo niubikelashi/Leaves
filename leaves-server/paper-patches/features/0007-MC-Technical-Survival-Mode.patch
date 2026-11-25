@@ -8,7 +8,20 @@ Will automatically overwrite some configuration after startup
 diff --git a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
 --- a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
 +++ b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
-@@ -336,6 +336,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -317,7 +317,11 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+     public WorldConfiguration createWorldConfig(final ContextMap contextMap) {
+         final String levelName = contextMap.require(WORLD_NAME);
+         try {
+-            return super.createWorldConfig(contextMap);
++            // Leaves start - technical mode
++            WorldConfiguration config = super.createWorldConfig(contextMap);
++            org.leavesmc.leaves.util.McTechnicalModeHelper.onWorldConfigCreate(config);
++            return config;
++            // Leaves end - technical mode
+         } catch (IOException exception) {
+             throw new RuntimeException("Could not create world config for " + levelName, exception);
+         }
+@@ -335,6 +339,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
              for (ServerLevel level : server.getAllLevels()) {
                  this.createWorldConfig(createWorldContextMap(level), reloader(this.worldConfigClass, level.paperConfig()));
              }
@@ -16,3 +29,17 @@ diff --git a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.ja
          } catch (Exception ex) {
              throw new RuntimeException("Could not reload paper configuration files", ex);
          }
+diff --git a/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java b/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java
+--- a/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java
++++ b/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java
+@@ -171,6 +171,10 @@
+         public class Spawning extends ConfigurationPart {
+             public ArrowDespawnRate nonPlayerArrowDespawnRate = ArrowDespawnRate.def(WorldConfiguration.this.spigotConfig);
+             public ArrowDespawnRate creativeArrowDespawnRate = ArrowDespawnRate.def(WorldConfiguration.this.spigotConfig);
++            // Leaves start - MC Technical Survival Mode
++            // Backported field from Paper paperRef c5a2736a (absent in Paper tag ba4b700e)
++            public IntOr.Disabled maxArrowDespawnInvulnerability = new IntOr.Disabled(OptionalInt.of(200));
++            // Leaves end - MC Technical Survival Mode
+             public boolean filterBadTileEntityNbtFromFallingBlocks = true;
+             public List<NbtPathArgument.NbtPath> filteredEntityTagNbtPaths = NbtPathSerializer.fromString(List.of("Pos", "Motion", "sleeping_pos"));
+             public boolean disableMobSpawnerSpawnEggTransformation = false;

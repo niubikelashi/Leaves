@@ -11,7 +11,7 @@ diff --git a/net/minecraft/server/level/ServerPlayerGameMode.java b/net/minecraf
                  this.level.captureDrops = new java.util.ArrayList<>();
                  // CraftBukkit end
 -                BlockState blockState1 = block.playerWillDestroy(this.level, pos, blockState, this.player);
-+                BlockState blockState1 = org.leavesmc.leaves.command.subcommands.BlockUpdateCommand.isNoBlockUpdate() ? blockState : block.playerWillDestroy(this.level, pos, blockState, this.player); // Leaves - no block update
++                BlockState blockState1 = org.leavesmc.leaves.command.leaves.subcommands.BlockUpdateCommand.isNoBlockUpdate() ? blockState : block.playerWillDestroy(this.level, pos, blockState, this.player); // Leaves - no block update
                  boolean flag = this.level.removeBlock(pos, false);
                  if (SharedConstants.DEBUG_BLOCK_BREAK) {
                      LOGGER.info("server broke {} {} -> {}", pos, blockState1, this.level.getBlockState(pos));
@@ -23,7 +23,7 @@ diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Le
      @Override
      public boolean setBlock(BlockPos pos, BlockState state, @Block.UpdateFlags int flags, int recursionLeft) {
 +        // Leaves start - no block update
-+        if (org.leavesmc.leaves.command.subcommands.BlockUpdateCommand.isNoBlockUpdate()) {
++        if (org.leavesmc.leaves.command.leaves.subcommands.BlockUpdateCommand.isNoBlockUpdate()) {
 +            flags = flags & ~1 | net.minecraft.world.level.block.Block.UPDATE_SKIP_ON_PLACE;
 +        }
 +        // Leaves end - no block update
@@ -35,7 +35,7 @@ diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Le
          BlockState blockState = oldState;
          BlockState blockState1 = currentState;
 +        // Leaves start - no block update
-+        if (org.leavesmc.leaves.command.subcommands.BlockUpdateCommand.isNoBlockUpdate()) {
++        if (org.leavesmc.leaves.command.leaves.subcommands.BlockUpdateCommand.isNoBlockUpdate()) {
 +            flags = flags & ~1 | net.minecraft.world.level.block.Block.UPDATE_SKIP_ON_PLACE;
 +        }
 +        // Leaves end - no block update
@@ -48,7 +48,7 @@ diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Le
                  int i = flags & -34;
 -
 +                // Leaves start - no block update
-+                if (org.leavesmc.leaves.command.subcommands.BlockUpdateCommand.isNoBlockUpdate()) {
++                if (org.leavesmc.leaves.command.leaves.subcommands.BlockUpdateCommand.isNoBlockUpdate()) {
 +                    this.updatePOIOnBlockStateChange(pos, blockState, blockState1);
 +                    return;
 +                }
@@ -63,7 +63,7 @@ diff --git a/net/minecraft/world/level/block/piston/PistonBaseBlock.java b/net/m
      }
  
      private void checkIfExtend(Level level, BlockPos pos, BlockState state) {
-+        if (org.leavesmc.leaves.command.subcommands.BlockUpdateCommand.isNoBlockUpdate()) return; // Leaves - no block update
++        if (org.leavesmc.leaves.command.leaves.subcommands.BlockUpdateCommand.isNoBlockUpdate()) return; // Leaves - no block update
          Direction direction = state.getValue(FACING);
          boolean neighborSignal = this.getNeighborSignal(level, pos, direction);
          if (neighborSignal && !state.getValue(EXTENDED)) {
@@ -75,7 +75,7 @@ diff --git a/net/minecraft/world/level/redstone/NeighborUpdater.java b/net/minec
          LevelAccessor level, Direction direction, BlockPos pos, BlockPos neighborPos, BlockState neighborState, @Block.UpdateFlags int flags, int recursionLeft
      ) {
 +        // Leaves start - no block update
-+        if (org.leavesmc.leaves.command.subcommands.BlockUpdateCommand.isNoBlockUpdate()) {
++        if (org.leavesmc.leaves.command.leaves.subcommands.BlockUpdateCommand.isNoBlockUpdate()) {
 +            flags = flags & ~1 | net.minecraft.world.level.block.Block.UPDATE_SKIP_ON_PLACE;
 +        }
 +        // Leaves end - no block update
@@ -86,7 +86,7 @@ diff --git a/net/minecraft/world/level/redstone/NeighborUpdater.java b/net/minec
  
      static void executeUpdate(Level level, BlockState state, BlockPos pos, Block neighborBlock, @Nullable Orientation orientation, boolean movedByPiston, BlockPos sourcePos) {
          // Paper end - Add source block to BlockPhysicsEvent
-+        if (org.leavesmc.leaves.command.subcommands.BlockUpdateCommand.isNoBlockUpdate()) return; // Leaves - no block update
++        if (org.leavesmc.leaves.command.leaves.subcommands.BlockUpdateCommand.isNoBlockUpdate()) return; // Leaves - no block update
          try {
              // CraftBukkit start
              org.bukkit.event.block.BlockPhysicsEvent event = new org.bukkit.event.block.BlockPhysicsEvent(org.bukkit.craftbukkit.block.CraftBlock.at(level, pos), org.bukkit.craftbukkit.block.data.CraftBlockData.fromData(state), org.bukkit.craftbukkit.block.CraftBlock.at(level, sourcePos)); // Paper - Add source block to BlockPhysicsEvent
