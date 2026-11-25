@@ -38,7 +38,7 @@ diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/buk
 +    // Leaves start - Bytebuf API
 +    void sendPacket(org.leavesmc.leaves.bytebuf.packet.Packet packet);
 +
-+    void sendPacket(org.leavesmc.leaves.bytebuf.Bytebuf buf, org.leavesmc.leaves.bytebuf.packet.PacketType type);
++    void sendPacket(org.leavesmc.leaves.bytebuf.Bytebuf buf, org.leavesmc.leaves.bytebuf.PacketType type);
 +    // Leaves end - Bytebuf API
 +
      @Override

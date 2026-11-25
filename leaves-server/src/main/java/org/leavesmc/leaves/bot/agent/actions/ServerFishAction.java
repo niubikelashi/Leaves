@@ -7,12 +7,13 @@ import net.minecraft.world.item.FishingRodItem;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.leavesmc.leaves.bot.ServerBot;
+import org.leavesmc.leaves.entity.bot.actions.CraftBotAction;
 import org.leavesmc.leaves.entity.bot.actions.CraftFishAction;
 
-public class ServerFishAction extends ServerTimerBotAction<ServerFishAction> {
+public class ServerFishAction extends AbstractTimerBotAction<ServerFishAction> {
 
     public ServerFishAction() {
-        super("fish", ServerFishAction::new);
+        super("fish");
     }
 
     private static final int CATCH_ENTITY_DELAY = 20;
@@ -38,8 +39,8 @@ public class ServerFishAction extends ServerTimerBotAction<ServerFishAction> {
     @Override
     public void load(@NotNull CompoundTag nbt) {
         super.load(nbt);
-        this.initialFishInterval = nbt.getInt("initialFishInterval").orElseThrow();
-        this.tickToNextFish = nbt.getInt("tickToNextFish").orElseThrow();
+        this.initialFishInterval = nbt.getIntOr("initialFishInterval", this.initialFishInterval);
+        this.tickToNextFish = nbt.getIntOr("tickToNextFish", this.tickToNextFish);
     }
 
     @Override
@@ -74,7 +75,7 @@ public class ServerFishAction extends ServerTimerBotAction<ServerFishAction> {
     }
 
     @Override
-    public Object asCraft() {
+    public CraftBotAction<?, ServerFishAction> asCraft() {
         return new CraftFishAction(this);
     }
 }

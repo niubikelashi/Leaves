@@ -3,6 +3,7 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Mon, 3 Feb 2025 15:48:19 +0800
 Subject: [PATCH] Leaves Extra Yggdrasil Service
 
+
 diff --git a/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java b/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java
 --- a/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java
 +++ b/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java
@@ -39,8 +40,4 @@ diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/Mi
      private final NotificationManager notificationManager;
      private final ServerActivityMonitor serverActivityMonitor;
      private long lastServerStatus;
-@@ -3091,3 +3091,4 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
-     // Paper end - API to check if the server is sleeping
- }
- 
-+
+

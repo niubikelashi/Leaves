@@ -3,6 +3,7 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Sun, 2 Jul 2023 09:25:00 +0800
 Subject: [PATCH] Elytra aeronautics no chunk load
 
+
 diff --git a/net/minecraft/server/level/ChunkMap.java b/net/minecraft/server/level/ChunkMap.java
 --- a/net/minecraft/server/level/ChunkMap.java
 +++ b/net/minecraft/server/level/ChunkMap.java
@@ -11,8 +12,8 @@ diff --git a/net/minecraft/server/level/ChunkMap.java b/net/minecraft/server/lev
  
      private boolean skipPlayer(ServerPlayer player) {
 -        return player.isSpectator() && !this.level.getGameRules().get(GameRules.SPECTATORS_GENERATE_CHUNKS);
-+        return (player.isSpectator() && !this.level.getGameRules().get(GameRules.SPECTATORS_GENERATE_CHUNKS))
-+            || (org.leavesmc.leaves.LeavesConfig.modify.elytraAeronautics.enableNoChunkLoad && player.elytraAeronauticsNoChunk); // Leaves - Elytra aeronautics
++        return (player.isSpectator() && !this.level.getGameRules().get(GameRules.SPECTATORS_GENERATE_CHUNKS)
++            || (org.leavesmc.leaves.LeavesConfig.modify.elytraAeronautics.enableNoChunkLoad && player.elytraAeronauticsNoChunk)); // Leaves - Elytra aeronautics
      }
  
      void updatePlayerStatus(ServerPlayer player, boolean track) {
@@ -27,16 +28,16 @@ diff --git a/net/minecraft/server/level/ChunkMap.java b/net/minecraft/server/lev
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
-@@ -875,6 +875,9 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
-                         }
+@@ -883,6 +883,9 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
                      }
                  );
+             profilerFiller.popPush("blockEntities");
 +            if (org.leavesmc.leaves.LeavesConfig.modify.elytraAeronautics.enableNoChunkLoad) {
 +                org.leavesmc.leaves.util.ElytraAeronauticsHelper.tick(this);
 +            }
-             profilerFiller.popPush("blockEntities");
              this.tickBlockEntities();
              profilerFiller.pop();
+         }
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
@@ -75,7 +76,7 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
              ProfilerFiller profilerFiller = Profiler.get();
              profilerFiller.push("move");
              if (this.stuckSpeedMultiplier.lengthSqr() > 1.0E-7) {
-@@ -2201,6 +2207,7 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
+@@ -2211,6 +2217,7 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
          this.yo = y;
          this.zo = d1;
          this.setPos(d, y, d1);
@@ -149,3 +150,4 @@ diff --git a/net/minecraft/world/item/FireworkRocketItem.java b/net/minecraft/wo
                  // Paper start - PlayerElytraBoostEvent
                  final Projectile.Delayed<FireworkRocketEntity> delayed = Projectile.spawnProjectileDelayed(new FireworkRocketEntity(level, itemInHand, player), serverLevel, itemInHand, f -> f.spawningEntity = player.getUUID()); // Paper - firework api - assign spawning entity uuid
                  com.destroystokyo.paper.event.player.PlayerElytraBoostEvent event = new com.destroystokyo.paper.event.player.PlayerElytraBoostEvent((org.bukkit.entity.Player) player.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(itemInHand), (org.bukkit.entity.Firework) delayed.projectile().getBukkitEntity(), org.bukkit.craftbukkit.CraftEquipmentSlot.getHand(hand));
+

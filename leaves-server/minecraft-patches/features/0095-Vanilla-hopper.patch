@@ -8,7 +8,7 @@ This is a temporary solution designed to attempt to restore the vanilla behavior
 diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -307,36 +307,48 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -308,36 +308,58 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
          ItemStack movedItem = origItemStack;
          final int originalItemCount = origItemStack.getCount();
          final int movedItemCount = Math.min(level.spigotConfig.hopperAmount, originalItemCount);
@@ -24,6 +24,16 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
 -                // site for IMIE did not exhibit the same behavior
 +        // Leaves start - fix vanilla
 +        if (org.leavesmc.leaves.LeavesConfig.fix.vanillaHopper && movedItem.getCount() <= movedItemCount) {
++            if (!skipPullModeEventFire) {
++                movedItem = callPullMoveEvent(hopper, container, movedItem);
++                if (movedItem == null) { // cancelled
++                    origItemStack.setCount(originalItemCount);
++                    // Drastically improve performance by returning true.
++                    // No plugin could have relied on the behavior of false as the other call
++                    // site for IMIE did not exhibit the same behavior
++                    return true;
++                }
++            }
 +            movedItem = origItemStack.copy();
 +            final ItemStack remainingItem = addItem(container, hopper,  container.removeItem(i, movedItemCount), null);
 +            if (remainingItem.isEmpty()) {
@@ -79,5 +89,6 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
 -        origItemStack.setCount(originalItemCount);
 +        // Leaves end - fix vanilla
  
-         if (level.paperConfig().hopper.cooldownWhenFull && !org.leavesmc.leaves.LeavesConfig.modify.mcTechnicalMode) { // Leaves
+         if (level.paperConfig().hopper.cooldownWhenFull && !org.leavesmc.leaves.LeavesConfig.modify.mcTechnicalMode) { // Leaves - mc technical survival mode
              applyCooldown(hopper);
+

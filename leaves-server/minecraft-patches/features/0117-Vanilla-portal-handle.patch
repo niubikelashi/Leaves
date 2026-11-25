@@ -3,6 +3,7 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Thu, 15 May 2025 12:17:30 +0800
 Subject: [PATCH] Vanilla portal handle
 
+
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
@@ -23,3 +24,16 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
          if (this.canSpawnSprintParticle()) {
              this.spawnSprintParticle();
          }
+diff --git a/net/minecraft/world/entity/vehicle/minecart/AbstractMinecart.java b/net/minecraft/world/entity/vehicle/minecart/AbstractMinecart.java
+--- a/net/minecraft/world/entity/vehicle/minecart/AbstractMinecart.java
++++ b/net/minecraft/world/entity/vehicle/minecart/AbstractMinecart.java
+@@ -296,7 +296,7 @@ public abstract class AbstractMinecart extends VehicleEntity {
+ 
+         this.checkBelowWorld();
+         this.computeSpeed();
+-        // this.handlePortal(); // CraftBukkit - handled in postTick
++        if (org.leavesmc.leaves.LeavesConfig.fix.vanillaPortalHandle) this.handlePortal(); // CraftBukkit - handled in postTick // Leaves - vanilla
+         this.behavior.tick();
+         // CraftBukkit start
+         org.bukkit.World bworld = this.level().getWorld();
+

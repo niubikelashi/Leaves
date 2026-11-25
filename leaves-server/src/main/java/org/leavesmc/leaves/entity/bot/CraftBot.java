@@ -9,8 +9,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.leavesmc.leaves.bot.BotList;
 import org.leavesmc.leaves.bot.ServerBot;
-import org.leavesmc.leaves.bot.agent.actions.*;
-import org.leavesmc.leaves.entity.bot.action.*;
+import org.leavesmc.leaves.bot.agent.actions.AbstractBotAction;
+import org.leavesmc.leaves.entity.bot.action.BotAction;
 import org.leavesmc.leaves.entity.bot.actions.CraftBotAction;
 import org.leavesmc.leaves.event.bot.BotActionStopEvent;
 import org.leavesmc.leaves.event.bot.BotRemoveEvent;
@@ -29,8 +29,8 @@ public class CraftBot extends CraftPlayer implements Bot {
     }
 
     @Override
-    public @NotNull String getRealName() {
-        return this.getHandle().createState.realName();
+    public @NotNull String getRawName() {
+        return this.getHandle().createState.rawName();
     }
 
     @Override
@@ -40,15 +40,20 @@ public class CraftBot extends CraftPlayer implements Bot {
 
     @Override
     public <T extends BotAction<T>> void addAction(@NotNull T action) {
-        switch (action) {
-            case CraftBotAction act -> this.getHandle().addBotAction(act.getHandle(), null);
-            default -> throw new IllegalArgumentException("Action " + action.getClass().getName() + " is not a valid BotAction type!");
+        if (action instanceof CraftBotAction<?, ?> act) {
+            this.getHandle().addBotAction(act.getHandle(), null);
+        } else {
+            throw new IllegalArgumentException("Action " + action.getClass().getName() + " is not a valid BotAction type!");
         }
+    }
+
+    public void addAction(@NotNull AbstractBotAction<?> action) {
+        this.getHandle().addBotAction(action, null);
     }
 
     @Override
     public BotAction<?> getAction(int index) {
-        return (BotAction<?>) this.getHandle().getBotActions().get(index).asCraft();
+        return this.getHandle().getBotActions().get(index).asCraft();
     }
 
     @Override
@@ -63,15 +68,19 @@ public class CraftBot extends CraftPlayer implements Bot {
 
     @Override
     public void stopAllActions() {
-        for (ServerBotAction<?> action : this.getHandle().getBotActions()) {
+        for (AbstractBotAction<?> action : this.getHandle().getBotActions()) {
             action.stop(this.getHandle(), BotActionStopEvent.Reason.PLUGIN);
         }
     }
 
     @Override
     public boolean remove(boolean save) {
-        BotList.INSTANCE.removeBot(this.getHandle(), BotRemoveEvent.RemoveReason.PLUGIN, null, save);
-        return true;
+        return BotList.INSTANCE.removeBot(this.getHandle(), BotRemoveEvent.RemoveReason.PLUGIN, null, save, false);
+    }
+
+    @Override
+    public boolean remove(boolean save, boolean resume) {
+        return BotList.INSTANCE.removeBot(this.getHandle(), BotRemoveEvent.RemoveReason.PLUGIN, null, save, resume);
     }
 
     @Override

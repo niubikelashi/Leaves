@@ -50,3 +50,4 @@ diff --git a/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java b/ca/
      public static boolean getEntityHardCollisions(final Level world, final Entity entity, AABB aabb,
                                                    final List<AABB> into, final int collisionFlags, final Predicate<Entity> predicate) {
          final boolean checkOnly = (collisionFlags & COLLISION_FLAG_CHECK_ONLY) != 0;
+

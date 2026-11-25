@@ -3,6 +3,7 @@ From: Fortern <blueten.ki@gmail.com>
 Date: Sat, 17 May 2025 03:01:48 +0000
 Subject: [PATCH] Fix chunk reload detector
 
+
 diff --git a/net/minecraft/server/level/ServerEntity.java b/net/minecraft/server/level/ServerEntity.java
 --- a/net/minecraft/server/level/ServerEntity.java
 +++ b/net/minecraft/server/level/ServerEntity.java
@@ -15,3 +16,4 @@ diff --git a/net/minecraft/server/level/ServerEntity.java b/net/minecraft/server
          }
  
          if (!this.entity.getPassengers().isEmpty()) {
+

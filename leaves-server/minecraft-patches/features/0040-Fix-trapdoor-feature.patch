@@ -3,6 +3,7 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Mon, 3 Feb 2025 16:42:23 +0800
 Subject: [PATCH] Fix trapdoor feature
 
+
 diff --git a/net/minecraft/world/level/block/TrapDoorBlock.java b/net/minecraft/world/level/block/TrapDoorBlock.java
 --- a/net/minecraft/world/level/block/TrapDoorBlock.java
 +++ b/net/minecraft/world/level/block/TrapDoorBlock.java
@@ -27,3 +28,4 @@ diff --git a/net/minecraft/world/level/block/TrapDoorBlock.java b/net/minecraft/
                      state = state.setValue(OPEN, hasNeighborSignal);
                      this.playSound(null, level, pos, hasNeighborSignal);
                  }
+

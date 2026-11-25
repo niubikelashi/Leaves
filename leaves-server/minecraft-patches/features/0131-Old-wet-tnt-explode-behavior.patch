@@ -3,17 +3,11 @@ From: MC_XiaoHei <xor7xiaohei@gmail.com>
 Date: Fri, 4 Jul 2025 08:55:31 +0800
 Subject: [PATCH] Old wet tnt explode behavior
 
+
 diff --git a/net/minecraft/world/level/ServerExplosion.java b/net/minecraft/world/level/ServerExplosion.java
 --- a/net/minecraft/world/level/ServerExplosion.java
 +++ b/net/minecraft/world/level/ServerExplosion.java
-@@ -710,20 +710,21 @@ public class ServerExplosion implements Explosion {
-     @Override
-     public boolean canTriggerBlocks() {
-         return this.blockInteraction == Explosion.BlockInteraction.TRIGGER_BLOCK
-             && (this.source == null || this.source.getType() != EntityType.BREEZE_WIND_CHARGE || this.level.getGameRules().get(GameRules.MOB_GRIEFING));
-     }
- 
-     @Override
+@@ -717,6 +717,7 @@ public class ServerExplosion implements Explosion {
      public boolean shouldAffectBlocklikeEntities() {
          boolean flag = this.level.getGameRules().get(GameRules.MOB_GRIEFING);
          boolean flag1 = this.source == null || this.source.getType() != EntityType.BREEZE_WIND_CHARGE && this.source.getType() != EntityType.WIND_CHARGE;
@@ -21,10 +15,4 @@ diff --git a/net/minecraft/world/level/ServerExplosion.java b/net/minecraft/worl
          return flag ? flag1 : this.blockInteraction.shouldAffectBlocklikeEntities() && flag1;
      }
  
-     public boolean isSmall() {
-         return this.radius < 2.0F || !this.interactsWithBlocks();
-     }
- 
-     static class StackCollector {
-         final BlockPos pos;
-         ItemStack stack;
+

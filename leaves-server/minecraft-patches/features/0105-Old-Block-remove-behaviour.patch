@@ -7,7 +7,7 @@ Subject: [PATCH] Old Block remove behaviour
 diff --git a/net/minecraft/world/Containers.java b/net/minecraft/world/Containers.java
 --- a/net/minecraft/world/Containers.java
 +++ b/net/minecraft/world/Containers.java
-@@ -51,4 +51,15 @@
+@@ -51,4 +51,15 @@ public class Containers {
      public static void updateNeighboursAfterDestroy(BlockState state, Level level, BlockPos pos) {
          level.updateNeighbourForOutputSignal(pos, state.getBlock());
      }
@@ -26,7 +26,7 @@ diff --git a/net/minecraft/world/Containers.java b/net/minecraft/world/Container
 diff --git a/net/minecraft/world/level/block/AbstractFurnaceBlock.java b/net/minecraft/world/level/block/AbstractFurnaceBlock.java
 --- a/net/minecraft/world/level/block/AbstractFurnaceBlock.java
 +++ b/net/minecraft/world/level/block/AbstractFurnaceBlock.java
-@@ -51,6 +51,26 @@
+@@ -51,6 +51,26 @@ public abstract class AbstractFurnaceBlock extends BaseEntityBlock {
          return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
      }
  
@@ -56,7 +56,7 @@ diff --git a/net/minecraft/world/level/block/AbstractFurnaceBlock.java b/net/min
 diff --git a/net/minecraft/world/level/block/BarrelBlock.java b/net/minecraft/world/level/block/BarrelBlock.java
 --- a/net/minecraft/world/level/block/BarrelBlock.java
 +++ b/net/minecraft/world/level/block/BarrelBlock.java
-@@ -49,6 +49,14 @@
+@@ -49,6 +49,14 @@ public class BarrelBlock extends BaseEntityBlock {
          return InteractionResult.SUCCESS;
      }
  
@@ -74,7 +74,7 @@ diff --git a/net/minecraft/world/level/block/BarrelBlock.java b/net/minecraft/wo
 diff --git a/net/minecraft/world/level/block/BasePressurePlateBlock.java b/net/minecraft/world/level/block/BasePressurePlateBlock.java
 --- a/net/minecraft/world/level/block/BasePressurePlateBlock.java
 +++ b/net/minecraft/world/level/block/BasePressurePlateBlock.java
-@@ -125,6 +125,19 @@
+@@ -125,6 +125,19 @@ public abstract class BasePressurePlateBlock extends Block {
          }
      }
  
@@ -97,7 +97,7 @@ diff --git a/net/minecraft/world/level/block/BasePressurePlateBlock.java b/net/m
 diff --git a/net/minecraft/world/level/block/BaseRailBlock.java b/net/minecraft/world/level/block/BaseRailBlock.java
 --- a/net/minecraft/world/level/block/BaseRailBlock.java
 +++ b/net/minecraft/world/level/block/BaseRailBlock.java
-@@ -121,6 +121,23 @@
+@@ -121,6 +121,23 @@ public abstract class BaseRailBlock extends Block implements SimpleWaterloggedBl
          }
      }
  
@@ -124,7 +124,7 @@ diff --git a/net/minecraft/world/level/block/BaseRailBlock.java b/net/minecraft/
 diff --git a/net/minecraft/world/level/block/BrewingStandBlock.java b/net/minecraft/world/level/block/BrewingStandBlock.java
 --- a/net/minecraft/world/level/block/BrewingStandBlock.java
 +++ b/net/minecraft/world/level/block/BrewingStandBlock.java
-@@ -78,6 +78,14 @@
+@@ -78,6 +78,14 @@ public class BrewingStandBlock extends BaseEntityBlock {
          level.addParticle(ParticleTypes.SMOKE, d, d1, d2, 0.0, 0.0, 0.0);
      }
  
@@ -142,7 +142,7 @@ diff --git a/net/minecraft/world/level/block/BrewingStandBlock.java b/net/minecr
 diff --git a/net/minecraft/world/level/block/ButtonBlock.java b/net/minecraft/world/level/block/ButtonBlock.java
 --- a/net/minecraft/world/level/block/ButtonBlock.java
 +++ b/net/minecraft/world/level/block/ButtonBlock.java
-@@ -132,6 +132,19 @@
+@@ -132,6 +132,19 @@ public class ButtonBlock extends FaceAttachedHorizontalDirectionalBlock {
          return isOn ? this.type.buttonClickOn() : this.type.buttonClickOff();
      }
  
@@ -165,12 +165,10 @@ diff --git a/net/minecraft/world/level/block/ButtonBlock.java b/net/minecraft/wo
 diff --git a/net/minecraft/world/level/block/CampfireBlock.java b/net/minecraft/world/level/block/CampfireBlock.java
 --- a/net/minecraft/world/level/block/CampfireBlock.java
 +++ b/net/minecraft/world/level/block/CampfireBlock.java
-@@ -105,8 +105,22 @@
+@@ -105,6 +105,20 @@ public class CampfireBlock extends BaseEntityBlock implements SimpleWaterloggedB
          return InteractionResult.TRY_WITH_EMPTY_HAND;
      }
  
--    @Override
--    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier, boolean pastEdges) {
 +    // Leaves start - behaviour 1.21.1-
 +    @Override
 +    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
@@ -185,23 +183,16 @@ diff --git a/net/minecraft/world/level/block/CampfireBlock.java b/net/minecraft/
 +    }
 +    // Leaves end - behaviour 1.21.1-
 +
-+    @Override
-+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier) {
+     @Override
+     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier, boolean pastEdges) {
          if (!new io.papermc.paper.event.entity.EntityInsideBlockEvent(entity.getBukkitEntity(), org.bukkit.craftbukkit.block.CraftBlock.at(level, pos)).callEvent()) { return; } // Paper - Add EntityInsideBlockEvent
-         if (state.getValue(LIT) && entity instanceof LivingEntity) {
-             entity.hurt(level.damageSources().campfire().eventBlockDamager(level, pos), this.fireDamage); // CraftBukkit
 diff --git a/net/minecraft/world/level/block/ChestBlock.java b/net/minecraft/world/level/block/ChestBlock.java
 --- a/net/minecraft/world/level/block/ChestBlock.java
 +++ b/net/minecraft/world/level/block/ChestBlock.java
-@@ -277,8 +277,16 @@
+@@ -280,6 +280,14 @@ public class ChestBlock extends AbstractChestBlock<ChestBlockEntity> implements
+         return this.chestCanConnectTo(blockState) && blockState.getValue(TYPE) == ChestType.SINGLE ? blockState.getValue(FACING) : null;
+     }
  
-     private @Nullable Direction candidatePartnerFacing(Level level, BlockPos pos, Direction direction) {
-         BlockState blockState = level.getBlockState(pos.relative(direction));
--        return this.chestCanConnectTo(blockState) && blockState.getValue(TYPE) == ChestType.SINGLE ? blockState.getValue(FACING) : null;
--    }
-+        return blockState.is(this) && blockState.getValue(TYPE) == ChestType.SINGLE ? blockState.getValue(FACING) : null;
-+    }
-+
 +    // Leaves start - behaviour 1.21.1-
 +    @Override
 +    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
@@ -209,13 +200,14 @@ diff --git a/net/minecraft/world/level/block/ChestBlock.java b/net/minecraft/wor
 +        super.onRemove(state, level, pos, newState, isMoving);
 +    }
 +    // Leaves end - behaviour 1.21.1-
- 
++
      @Override
      protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+         Containers.updateNeighboursAfterDestroy(state, level, pos);
 diff --git a/net/minecraft/world/level/block/ChiseledBookShelfBlock.java b/net/minecraft/world/level/block/ChiseledBookShelfBlock.java
 --- a/net/minecraft/world/level/block/ChiseledBookShelfBlock.java
 +++ b/net/minecraft/world/level/block/ChiseledBookShelfBlock.java
-@@ -149,6 +149,27 @@
+@@ -149,6 +149,27 @@ public class ChiseledBookShelfBlock extends BaseEntityBlock implements Selectabl
          SLOT_OCCUPIED_PROPERTIES.forEach(property -> builder.add(property));
      }
  
@@ -246,7 +238,7 @@ diff --git a/net/minecraft/world/level/block/ChiseledBookShelfBlock.java b/net/m
 diff --git a/net/minecraft/world/level/block/CrafterBlock.java b/net/minecraft/world/level/block/CrafterBlock.java
 --- a/net/minecraft/world/level/block/CrafterBlock.java
 +++ b/net/minecraft/world/level/block/CrafterBlock.java
-@@ -128,6 +128,14 @@
+@@ -128,6 +128,14 @@ public class CrafterBlock extends BaseEntityBlock {
          }
      }
  
@@ -264,7 +256,7 @@ diff --git a/net/minecraft/world/level/block/CrafterBlock.java b/net/minecraft/w
 diff --git a/net/minecraft/world/level/block/CreakingHeartBlock.java b/net/minecraft/world/level/block/CreakingHeartBlock.java
 --- a/net/minecraft/world/level/block/CreakingHeartBlock.java
 +++ b/net/minecraft/world/level/block/CreakingHeartBlock.java
-@@ -152,6 +152,16 @@
+@@ -152,6 +152,16 @@ public class CreakingHeartBlock extends BaseEntityBlock {
          builder.add(AXIS, STATE, NATURAL);
      }
  
@@ -284,7 +276,7 @@ diff --git a/net/minecraft/world/level/block/CreakingHeartBlock.java b/net/minec
 diff --git a/net/minecraft/world/level/block/DecoratedPotBlock.java b/net/minecraft/world/level/block/DecoratedPotBlock.java
 --- a/net/minecraft/world/level/block/DecoratedPotBlock.java
 +++ b/net/minecraft/world/level/block/DecoratedPotBlock.java
-@@ -164,6 +164,14 @@
+@@ -164,6 +164,14 @@ public class DecoratedPotBlock extends BaseEntityBlock implements SimpleWaterlog
          return new DecoratedPotBlockEntity(pos, state);
      }
  
@@ -302,7 +294,7 @@ diff --git a/net/minecraft/world/level/block/DecoratedPotBlock.java b/net/minecr
 diff --git a/net/minecraft/world/level/block/DiodeBlock.java b/net/minecraft/world/level/block/DiodeBlock.java
 --- a/net/minecraft/world/level/block/DiodeBlock.java
 +++ b/net/minecraft/world/level/block/DiodeBlock.java
-@@ -175,6 +175,16 @@
+@@ -175,6 +175,16 @@ public abstract class DiodeBlock extends HorizontalDirectionalBlock {
          this.updateNeighborsInFront(level, pos, state);
      }
  
@@ -322,7 +314,7 @@ diff --git a/net/minecraft/world/level/block/DiodeBlock.java b/net/minecraft/wor
 diff --git a/net/minecraft/world/level/block/DispenserBlock.java b/net/minecraft/world/level/block/DispenserBlock.java
 --- a/net/minecraft/world/level/block/DispenserBlock.java
 +++ b/net/minecraft/world/level/block/DispenserBlock.java
-@@ -147,6 +147,14 @@
+@@ -147,6 +147,14 @@ public class DispenserBlock extends BaseEntityBlock {
          return this.defaultBlockState().setValue(FACING, context.getNearestLookingDirection().getOpposite());
      }
  
@@ -340,7 +332,7 @@ diff --git a/net/minecraft/world/level/block/DispenserBlock.java b/net/minecraft
 diff --git a/net/minecraft/world/level/block/HopperBlock.java b/net/minecraft/world/level/block/HopperBlock.java
 --- a/net/minecraft/world/level/block/HopperBlock.java
 +++ b/net/minecraft/world/level/block/HopperBlock.java
-@@ -121,6 +121,14 @@
+@@ -121,6 +121,14 @@ public class HopperBlock extends BaseEntityBlock {
          }
      }
  
@@ -358,7 +350,7 @@ diff --git a/net/minecraft/world/level/block/HopperBlock.java b/net/minecraft/wo
 diff --git a/net/minecraft/world/level/block/JukeboxBlock.java b/net/minecraft/world/level/block/JukeboxBlock.java
 --- a/net/minecraft/world/level/block/JukeboxBlock.java
 +++ b/net/minecraft/world/level/block/JukeboxBlock.java
-@@ -73,6 +73,19 @@
+@@ -73,6 +73,19 @@ public class JukeboxBlock extends BaseEntityBlock {
          }
      }
  
@@ -381,7 +373,7 @@ diff --git a/net/minecraft/world/level/block/JukeboxBlock.java b/net/minecraft/w
 diff --git a/net/minecraft/world/level/block/LecternBlock.java b/net/minecraft/world/level/block/LecternBlock.java
 --- a/net/minecraft/world/level/block/LecternBlock.java
 +++ b/net/minecraft/world/level/block/LecternBlock.java
-@@ -198,6 +198,36 @@
+@@ -198,6 +198,36 @@ public class LecternBlock extends BaseEntityBlock {
          changePowered(level, pos, state, false);
      }
  
@@ -421,7 +413,7 @@ diff --git a/net/minecraft/world/level/block/LecternBlock.java b/net/minecraft/w
 diff --git a/net/minecraft/world/level/block/LeverBlock.java b/net/minecraft/world/level/block/LeverBlock.java
 --- a/net/minecraft/world/level/block/LeverBlock.java
 +++ b/net/minecraft/world/level/block/LeverBlock.java
-@@ -124,6 +124,19 @@
+@@ -124,6 +124,19 @@ public class LeverBlock extends FaceAttachedHorizontalDirectionalBlock {
          }
      }
  
@@ -444,7 +436,7 @@ diff --git a/net/minecraft/world/level/block/LeverBlock.java b/net/minecraft/wor
 diff --git a/net/minecraft/world/level/block/LightningRodBlock.java b/net/minecraft/world/level/block/LightningRodBlock.java
 --- a/net/minecraft/world/level/block/LightningRodBlock.java
 +++ b/net/minecraft/world/level/block/LightningRodBlock.java
-@@ -120,6 +120,18 @@
+@@ -120,6 +120,18 @@ public class LightningRodBlock extends RodBlock implements SimpleWaterloggedBloc
          }
      }
  
@@ -466,7 +458,7 @@ diff --git a/net/minecraft/world/level/block/LightningRodBlock.java b/net/minecr
 diff --git a/net/minecraft/world/level/block/ObserverBlock.java b/net/minecraft/world/level/block/ObserverBlock.java
 --- a/net/minecraft/world/level/block/ObserverBlock.java
 +++ b/net/minecraft/world/level/block/ObserverBlock.java
-@@ -127,6 +127,17 @@
+@@ -127,6 +127,17 @@ public class ObserverBlock extends DirectionalBlock {
          }
      }
  
@@ -487,7 +479,7 @@ diff --git a/net/minecraft/world/level/block/ObserverBlock.java b/net/minecraft/
 diff --git a/net/minecraft/world/level/block/RedStoneWireBlock.java b/net/minecraft/world/level/block/RedStoneWireBlock.java
 --- a/net/minecraft/world/level/block/RedStoneWireBlock.java
 +++ b/net/minecraft/world/level/block/RedStoneWireBlock.java
-@@ -362,6 +362,27 @@
+@@ -362,6 +362,27 @@ public class RedStoneWireBlock extends Block {
          }
      }
  
@@ -518,7 +510,7 @@ diff --git a/net/minecraft/world/level/block/RedStoneWireBlock.java b/net/minecr
 diff --git a/net/minecraft/world/level/block/RedstoneTorchBlock.java b/net/minecraft/world/level/block/RedstoneTorchBlock.java
 --- a/net/minecraft/world/level/block/RedstoneTorchBlock.java
 +++ b/net/minecraft/world/level/block/RedstoneTorchBlock.java
-@@ -53,6 +53,15 @@
+@@ -53,6 +53,15 @@ public class RedstoneTorchBlock extends BaseTorchBlock {
          }
      }
  
@@ -537,7 +529,7 @@ diff --git a/net/minecraft/world/level/block/RedstoneTorchBlock.java b/net/minec
 diff --git a/net/minecraft/world/level/block/SculkSensorBlock.java b/net/minecraft/world/level/block/SculkSensorBlock.java
 --- a/net/minecraft/world/level/block/SculkSensorBlock.java
 +++ b/net/minecraft/world/level/block/SculkSensorBlock.java
-@@ -128,6 +128,18 @@
+@@ -128,6 +128,18 @@ public class SculkSensorBlock extends BaseEntityBlock implements SimpleWaterlogg
          }
      }
  
@@ -559,11 +551,10 @@ diff --git a/net/minecraft/world/level/block/SculkSensorBlock.java b/net/minecra
 diff --git a/net/minecraft/world/level/block/SculkShriekerBlock.java b/net/minecraft/world/level/block/SculkShriekerBlock.java
 --- a/net/minecraft/world/level/block/SculkShriekerBlock.java
 +++ b/net/minecraft/world/level/block/SculkShriekerBlock.java
-@@ -67,6 +67,16 @@
- 
+@@ -68,6 +68,16 @@ public class SculkShriekerBlock extends BaseEntityBlock implements SimpleWaterlo
          super.stepOn(level, pos, state, entity);
      }
-+
+ 
 +    // Leaves start - behaviour 1.21.1-
 +    @Override
 +    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
@@ -573,13 +564,14 @@ diff --git a/net/minecraft/world/level/block/SculkShriekerBlock.java b/net/minec
 +        super.onRemove(state, level, pos, newState, movedByPiston);
 +    }
 +    // Leaves end - behaviour 1.21.1-
- 
++
      @Override
      protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+         if (state.getValue(SHRIEKING)) {
 diff --git a/net/minecraft/world/level/block/ShulkerBoxBlock.java b/net/minecraft/world/level/block/ShulkerBoxBlock.java
 --- a/net/minecraft/world/level/block/ShulkerBoxBlock.java
 +++ b/net/minecraft/world/level/block/ShulkerBoxBlock.java
-@@ -150,6 +150,19 @@
+@@ -150,6 +150,19 @@ public class ShulkerBoxBlock extends BaseEntityBlock {
          // Paper end - re-set loot table if it was cleared
      }
  
@@ -602,7 +594,7 @@ diff --git a/net/minecraft/world/level/block/ShulkerBoxBlock.java b/net/minecraf
 diff --git a/net/minecraft/world/level/block/TripWireBlock.java b/net/minecraft/world/level/block/TripWireBlock.java
 --- a/net/minecraft/world/level/block/TripWireBlock.java
 +++ b/net/minecraft/world/level/block/TripWireBlock.java
-@@ -108,6 +108,16 @@
+@@ -108,6 +108,16 @@ public class TripWireBlock extends Block {
          }
      }
  
@@ -622,7 +614,7 @@ diff --git a/net/minecraft/world/level/block/TripWireBlock.java b/net/minecraft/
 diff --git a/net/minecraft/world/level/block/TripWireHookBlock.java b/net/minecraft/world/level/block/TripWireHookBlock.java
 --- a/net/minecraft/world/level/block/TripWireHookBlock.java
 +++ b/net/minecraft/world/level/block/TripWireHookBlock.java
-@@ -244,6 +244,25 @@
+@@ -244,6 +244,25 @@ public class TripWireHookBlock extends Block {
          level.updateNeighborsAt(pos.relative(opposite), block, orientation);
      }
  
@@ -651,7 +643,7 @@ diff --git a/net/minecraft/world/level/block/TripWireHookBlock.java b/net/minecr
 diff --git a/net/minecraft/world/level/block/entity/BlockEntityType.java b/net/minecraft/world/level/block/entity/BlockEntityType.java
 --- a/net/minecraft/world/level/block/entity/BlockEntityType.java
 +++ b/net/minecraft/world/level/block/entity/BlockEntityType.java
-@@ -302,7 +302,7 @@
+@@ -302,7 +302,7 @@ public class BlockEntityType<T extends BlockEntity> {
      }
  
      public boolean isValid(BlockState state) {
@@ -663,11 +655,10 @@ diff --git a/net/minecraft/world/level/block/entity/BlockEntityType.java b/net/m
 diff --git a/net/minecraft/world/level/block/piston/MovingPistonBlock.java b/net/minecraft/world/level/block/piston/MovingPistonBlock.java
 --- a/net/minecraft/world/level/block/piston/MovingPistonBlock.java
 +++ b/net/minecraft/world/level/block/piston/MovingPistonBlock.java
-@@ -64,6 +64,18 @@
-     public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
+@@ -65,6 +65,18 @@ public class MovingPistonBlock extends BaseEntityBlock {
          return createTickerHelper(blockEntityType, BlockEntityType.PISTON, PistonMovingBlockEntity::tick);
      }
-+
+ 
 +    // Leaves start - behaviour 1.21.1-
 +    @Override
 +    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
@@ -679,13 +670,14 @@ diff --git a/net/minecraft/world/level/block/piston/MovingPistonBlock.java b/net
 +        }
 +    }
 +    // Leaves end - behaviour 1.21.1-
- 
++
      @Override
      public void destroy(LevelAccessor level, BlockPos pos, BlockState state) {
+         BlockPos blockPos = pos.relative(state.getValue(FACING).getOpposite());
 diff --git a/net/minecraft/world/level/block/piston/PistonHeadBlock.java b/net/minecraft/world/level/block/piston/PistonHeadBlock.java
 --- a/net/minecraft/world/level/block/piston/PistonHeadBlock.java
 +++ b/net/minecraft/world/level/block/piston/PistonHeadBlock.java
-@@ -78,6 +78,19 @@
+@@ -78,6 +78,19 @@ public class PistonHeadBlock extends DirectionalBlock {
          return super.playerWillDestroy(level, pos, state, player);
      }
  
@@ -708,7 +700,7 @@ diff --git a/net/minecraft/world/level/block/piston/PistonHeadBlock.java b/net/m
 diff --git a/net/minecraft/world/level/block/state/BlockBehaviour.java b/net/minecraft/world/level/block/state/BlockBehaviour.java
 --- a/net/minecraft/world/level/block/state/BlockBehaviour.java
 +++ b/net/minecraft/world/level/block/state/BlockBehaviour.java
-@@ -170,6 +170,15 @@
+@@ -170,6 +170,15 @@ public abstract class BlockBehaviour implements FeatureElement {
          org.spigotmc.AsyncCatcher.catchOp("block onPlace"); // Spigot
      }
  
@@ -724,62 +716,59 @@ diff --git a/net/minecraft/world/level/block/state/BlockBehaviour.java b/net/min
      protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
      }
  
-@@ -864,6 +873,12 @@
-             this.getBlock().onPlace(this.asState(), level, pos, oldState, movedByPiston, context);
+@@ -865,6 +874,12 @@ public abstract class BlockBehaviour implements FeatureElement {
              // CraftBukkit end
          }
-+
+ 
 +        // Leaves start - behaviour 1.21.1-
 +        public void onRemove(Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
 +            this.getBlock().onRemove(this.asState(), level, pos, newState, movedByPiston);
 +        }
 +        // Leaves end - behaviour 1.21.1-
- 
++
          public void affectNeighborsAfterRemoval(ServerLevel level, BlockPos pos, boolean movedByPiston) {
              this.getBlock().affectNeighborsAfterRemoval(this.asState(), level, pos, movedByPiston);
+         }
 diff --git a/net/minecraft/world/level/chunk/LevelChunk.java b/net/minecraft/world/level/chunk/LevelChunk.java
 --- a/net/minecraft/world/level/chunk/LevelChunk.java
 +++ b/net/minecraft/world/level/chunk/LevelChunk.java
-@@ -399,24 +399,28 @@
-                 }
- 
+@@ -401,22 +401,28 @@ public class LevelChunk extends ChunkAccess implements DebugValueSource, ca.spot
                  boolean flag = !blockState.is(block);
--                boolean flag1 = (flags & Block.UPDATE_MOVE_BY_PISTON) != 0;
--                boolean flag2 = (flags & Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS) == 0;
+                 boolean flag1 = (flags & Block.UPDATE_MOVE_BY_PISTON) != 0;
+                 boolean flag2 = (flags & Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS) == 0;
 -                if (flag && blockState.hasBlockEntity() && !state.shouldChangedStateKeepBlockEntity(blockState)) {
 -                    if (!this.level.isClientSide() && flag2) {
 -                        BlockEntity blockEntity = this.level.getBlockEntity(pos);
 -                        if (blockEntity != null) {
 -                            blockEntity.preRemoveSideEffects(pos, blockState);
-+                boolean flag1 = (flags & 64) != 0;
-+                boolean flag2 = (flags & 256) == 0;
 +                // Leaves start - behaviour 1.21.1-
 +                if (!org.leavesmc.leaves.LeavesConfig.modify.oldMC.updater.oldBlockRemoveBehaviour) {
 +                    if (flag && blockState.hasBlockEntity()) {
-+                        if (!this.level.isClientSide && flag2) {
++                        if (!this.level.isClientSide() && flag2) {
 +                            BlockEntity blockEntity = this.level.getBlockEntity(pos);
 +                            if (blockEntity != null) {
 +                                blockEntity.preRemoveSideEffects(pos, blockState);
 +                            }
                          }
-+
-+                        this.removeBlockEntity(pos);
-                     }
+-                    }
  
 -                    this.removeBlockEntity(pos);
 -                }
--
++                        this.removeBlockEntity(pos);
++                    }
+ 
 -                if ((flag || block instanceof BaseRailBlock)
 -                    && this.level instanceof ServerLevel serverLevel
 -                    && ((flags & Block.UPDATE_NEIGHBORS) != 0 || flag1)) {
 -                    blockState.affectNeighborsAfterRemoval(serverLevel, pos, flag1);
--                }
-+                    if ((flag || block instanceof BaseRailBlock) && this.level instanceof ServerLevel serverLevel && ((flags & 1) != 0 || flag1)) {
++                    if ((flag || block instanceof BaseRailBlock)
++                        && this.level instanceof ServerLevel serverLevel
++                        && ((flags & Block.UPDATE_NEIGHBORS) != 0 || flag1)) {
 +                        blockState.affectNeighborsAfterRemoval(serverLevel, pos, flag1);
 +                    }
 +                } else {
 +                    blockState.onRemove(this.level, pos, state, flag1);
-+                }
+                 }
 +                // Leaves end - behaviour 1.21.1-
  
                  if (!section.getBlockState(i, i1, i2).is(block)) {

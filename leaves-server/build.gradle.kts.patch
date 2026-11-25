@@ -42,8 +42,10 @@
 +
      spigot {
 -        enabled = false
-         buildDataRef = "42d18d4c4653ffc549778dbe223f6994a031d69e"
-         packageVersion = "v1_21_R6" // also needs to be updated in MappingEnvironment
+-        buildDataRef = "42d18d4c4653ffc549778dbe223f6994a031d69e"
++        buildDataRef = "17f77cee7117ab9d6175f088ae8962bfd04e61a9" // Leaves - Spigot build data for 1.21.11
+-        packageVersion = "v1_21_R6" // also needs to be updated in MappingEnvironment
++        packageVersion = "v1_21_R7" // Leaves - Spigot package version for 1.21.11
      }
 @@ -40,15 +50,13 @@ paperweight {
          "org.spigotmc",

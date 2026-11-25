@@ -37,7 +37,7 @@ diff --git a/net/minecraft/world/entity/vehicle/ContainerEntity.java b/net/minec
 diff --git a/net/minecraft/world/inventory/AbstractContainerMenu.java b/net/minecraft/world/inventory/AbstractContainerMenu.java
 --- a/net/minecraft/world/inventory/AbstractContainerMenu.java
 +++ b/net/minecraft/world/inventory/AbstractContainerMenu.java
-@@ -603,7 +603,7 @@ public abstract class AbstractContainerMenu {
+@@ -604,7 +604,7 @@ public abstract class AbstractContainerMenu {
                  } else if (carried.isEmpty()) {
                      if (slot.mayPlace(item)) {
                          int maxStackSize = slot.getMaxStackSize(item);
@@ -46,7 +46,7 @@ diff --git a/net/minecraft/world/inventory/AbstractContainerMenu.java b/net/mine
                              slot.setByPlayer(item.split(maxStackSize));
                          } else {
                              inventory.setItem(button, ItemStack.EMPTY);
-@@ -612,7 +612,7 @@ public abstract class AbstractContainerMenu {
+@@ -613,7 +613,7 @@ public abstract class AbstractContainerMenu {
                      }
                  } else if (slot.mayPickup(player) && slot.mayPlace(item)) {
                      int maxStackSize = slot.getMaxStackSize(item);
@@ -55,7 +55,7 @@ diff --git a/net/minecraft/world/inventory/AbstractContainerMenu.java b/net/mine
                          slot.setByPlayer(item.split(maxStackSize));
                          slot.onTake(player, carried);
                          if (!inventory.add(carried)) {
-@@ -760,10 +760,15 @@ public abstract class AbstractContainerMenu {
+@@ -777,10 +777,15 @@ public abstract class AbstractContainerMenu {
      public abstract boolean stillValid(Player player);
  
      protected boolean moveItemStackTo(ItemStack stack, int startIndex, int endIndex, boolean reverseDirection) {
@@ -71,7 +71,7 @@ diff --git a/net/minecraft/world/inventory/AbstractContainerMenu.java b/net/mine
          if (isCheck) {
              stack = stack.copy();
          }
-@@ -828,6 +833,14 @@ public abstract class AbstractContainerMenu {
+@@ -845,6 +850,14 @@ public abstract class AbstractContainerMenu {
                  // Paper end - Add PlayerTradeEvent and PlayerPurchaseEvent
                  if (itemx.isEmpty() && slotx.mayPlace(stack)) {
                      int i1 = slotx.getMaxStackSize(stack);
@@ -159,3 +159,4 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
          stack.limitSize(this.getMaxStackLeaves(stack)); // Leaves - item over-stack util
      }
  
+

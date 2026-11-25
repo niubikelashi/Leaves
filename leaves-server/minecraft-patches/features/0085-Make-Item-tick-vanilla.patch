@@ -3,6 +3,7 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Mon, 30 Oct 2023 10:43:44 +0800
 Subject: [PATCH] Make Item tick vanilla
 
+
 diff --git a/net/minecraft/world/entity/item/ItemEntity.java b/net/minecraft/world/entity/item/ItemEntity.java
 --- a/net/minecraft/world/entity/item/ItemEntity.java
 +++ b/net/minecraft/world/entity/item/ItemEntity.java
@@ -25,3 +26,4 @@ diff --git a/net/minecraft/world/entity/item/ItemEntity.java b/net/minecraft/wor
      }
      // Paper end - EAR 2
  
+

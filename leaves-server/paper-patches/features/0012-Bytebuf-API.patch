@@ -47,7 +47,7 @@ diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/
 +    }
 +
 +    @Override
-+    public void sendPacket(org.leavesmc.leaves.bytebuf.Bytebuf bytebuf, org.leavesmc.leaves.bytebuf.packet.PacketType type) {
++    public void sendPacket(org.leavesmc.leaves.bytebuf.Bytebuf bytebuf, org.leavesmc.leaves.bytebuf.PacketType type) {
 +        this.server.getBytebufHandler().applyPacketToPlayer(this.getHandle(), new org.leavesmc.leaves.bytebuf.packet.Packet(type, bytebuf));
 +    }
 +    // Leaves end - Bytebuf API

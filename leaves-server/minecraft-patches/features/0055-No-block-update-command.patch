@@ -59,7 +59,7 @@ diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Le
 diff --git a/net/minecraft/world/level/block/piston/PistonBaseBlock.java b/net/minecraft/world/level/block/piston/PistonBaseBlock.java
 --- a/net/minecraft/world/level/block/piston/PistonBaseBlock.java
 +++ b/net/minecraft/world/level/block/piston/PistonBaseBlock.java
-@@ -101,6 +101,7 @@ public class PistonBaseBlock extends DirectionalBlock {
+@@ -106,6 +106,7 @@ public class PistonBaseBlock extends DirectionalBlock {
      }
  
      private void checkIfExtend(Level level, BlockPos pos, BlockState state) {
@@ -90,3 +90,4 @@ diff --git a/net/minecraft/world/level/redstone/NeighborUpdater.java b/net/minec
          try {
              // CraftBukkit start
              org.bukkit.event.block.BlockPhysicsEvent event = new org.bukkit.event.block.BlockPhysicsEvent(org.bukkit.craftbukkit.block.CraftBlock.at(level, pos), org.bukkit.craftbukkit.block.data.CraftBlockData.fromData(state), org.bukkit.craftbukkit.block.CraftBlock.at(level, sourcePos)); // Paper - Add source block to BlockPhysicsEvent
+

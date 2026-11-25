@@ -3,6 +3,8 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Wed, 17 Aug 2022 10:48:18 +0800
 Subject: [PATCH] Reduce entity allocations
 
+This patch is Powered by Pufferfish(https://github.com/pufferfish-gg/Pufferfish)
+
 diff --git a/net/minecraft/world/entity/ai/attributes/AttributeMap.java b/net/minecraft/world/entity/ai/attributes/AttributeMap.java
 --- a/net/minecraft/world/entity/ai/attributes/AttributeMap.java
 +++ b/net/minecraft/world/entity/ai/attributes/AttributeMap.java
@@ -33,8 +35,4 @@ diff --git a/net/minecraft/world/entity/ai/attributes/AttributeMap.java b/net/mi
      }
  
      public boolean hasAttribute(Holder<Attribute> attribute) {
-@@ -156,3 +164,4 @@ public class AttributeMap {
-     // Paper - end - living entity allow attribute registration
- 
- }
-+
+

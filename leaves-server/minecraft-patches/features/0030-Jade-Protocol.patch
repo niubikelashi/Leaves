@@ -3,6 +3,8 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Mon, 3 Feb 2025 13:33:19 +0800
 Subject: [PATCH] Jade Protocol
 
+This patch is Powered by Jade(https://github.com/Snownee/Jade)
+
 diff --git a/net/minecraft/world/entity/animal/armadillo/Armadillo.java b/net/minecraft/world/entity/animal/armadillo/Armadillo.java
 --- a/net/minecraft/world/entity/animal/armadillo/Armadillo.java
 +++ b/net/minecraft/world/entity/animal/armadillo/Armadillo.java
@@ -15,11 +17,6 @@ diff --git a/net/minecraft/world/entity/animal/armadillo/Armadillo.java b/net/mi
      private boolean peekReceivedClient = false;
  
      public Armadillo(EntityType<? extends Animal> type, Level level) {
-@@ -438,3 +438,4 @@ public class Armadillo extends Animal {
-         }
-     }
- }
-+
 diff --git a/net/minecraft/world/entity/animal/frog/Tadpole.java b/net/minecraft/world/entity/animal/frog/Tadpole.java
 --- a/net/minecraft/world/entity/animal/frog/Tadpole.java
 +++ b/net/minecraft/world/entity/animal/frog/Tadpole.java
@@ -56,11 +53,6 @@ diff --git a/net/minecraft/world/level/storage/loot/LootTable.java b/net/minecra
      private final List<LootItemFunction> functions;
      private final BiFunction<ItemStack, LootContext, ItemStack> compositeFunction;
      public org.bukkit.craftbukkit.CraftLootTable craftLootTable; // CraftBukkit
-@@ -270,3 +270,4 @@ public class LootTable {
-         }
-     }
- }
-+
 diff --git a/net/minecraft/world/level/storage/loot/entries/CompositeEntryBase.java b/net/minecraft/world/level/storage/loot/entries/CompositeEntryBase.java
 --- a/net/minecraft/world/level/storage/loot/entries/CompositeEntryBase.java
 +++ b/net/minecraft/world/level/storage/loot/entries/CompositeEntryBase.java
@@ -109,3 +101,4 @@ diff --git a/net/minecraft/world/level/storage/loot/predicates/CompositeLootItem
      private final Predicate<LootContext> composedPredicate;
  
      protected CompositeLootItemCondition(List<LootItemCondition> terms, Predicate<LootContext> composedPredicate) {
+

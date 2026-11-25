@@ -3,6 +3,7 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Mon, 1 Jul 2024 22:09:33 +0800
 Subject: [PATCH] Disable end gateway portal entity ticking
 
+
 diff --git a/net/minecraft/world/level/block/EndGatewayBlock.java b/net/minecraft/world/level/block/EndGatewayBlock.java
 --- a/net/minecraft/world/level/block/EndGatewayBlock.java
 +++ b/net/minecraft/world/level/block/EndGatewayBlock.java
@@ -23,3 +24,4 @@ diff --git a/net/minecraft/world/level/block/EndGatewayBlock.java b/net/minecraf
              }
          } else {
              return null;
+

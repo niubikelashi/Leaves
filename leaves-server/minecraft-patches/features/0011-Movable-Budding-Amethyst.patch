@@ -3,6 +3,7 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Sun, 3 Apr 2022 11:31:04 +0800
 Subject: [PATCH] Movable Budding Amethyst
 
+
 diff --git a/net/minecraft/world/level/block/BuddingAmethystBlock.java b/net/minecraft/world/level/block/BuddingAmethystBlock.java
 --- a/net/minecraft/world/level/block/BuddingAmethystBlock.java
 +++ b/net/minecraft/world/level/block/BuddingAmethystBlock.java
@@ -19,3 +20,4 @@ diff --git a/net/minecraft/world/level/block/BuddingAmethystBlock.java b/net/min
 +    }
 +    // Leaves end - budding amethyst can push by piston
  }
+

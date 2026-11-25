@@ -3,6 +3,7 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Wed, 30 Mar 2022 08:58:45 +0000
 Subject: [PATCH] Add isShrink to EntityResurrectEvent
 
+
 diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
@@ -23,3 +24,4 @@ diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/
                      itemInHand.shrink(1);
                  }
                  // Paper start - fix NPE when pre-cancelled EntityResurrectEvent is uncancelled
+

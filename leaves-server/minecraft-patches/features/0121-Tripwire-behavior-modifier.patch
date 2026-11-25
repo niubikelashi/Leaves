@@ -81,3 +81,4 @@ diff --git a/net/minecraft/world/level/levelgen/feature/EndPlatformFeature.java 
 +    }
 +    // Leaves end - tripwire behavior modifier
  }
+

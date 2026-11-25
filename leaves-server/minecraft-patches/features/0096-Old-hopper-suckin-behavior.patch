@@ -3,10 +3,11 @@ From: Lumine1909 <133463833+Lumine1909@users.noreply.github.com>
 Date: Thu, 6 Feb 2025 00:05:23 +0800
 Subject: [PATCH] Old hopper suckin behavior
 
+
 diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -608,7 +608,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -630,7 +630,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
  
              return false;
          } else {
@@ -15,3 +16,4 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
              if (!flag) {
                  for (ItemEntity itemEntity : getItemsAtAndAbove(level, hopper)) {
                      if (addItem(hopper, itemEntity)) {
+

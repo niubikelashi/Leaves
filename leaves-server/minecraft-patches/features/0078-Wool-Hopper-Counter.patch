@@ -3,6 +3,8 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Tue, 4 Feb 2025 20:18:35 +0800
 Subject: [PATCH] Wool Hopper Counter
 
+This patch is Powered by fabric-carpet(https://github.com/gnembon/fabric-carpet)
+
 diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
@@ -86,3 +88,4 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
          boolean flag = false;
          // CraftBukkit start
          if (org.bukkit.event.inventory.InventoryPickupItemEvent.getHandlerList().getRegisteredListeners().length > 0) { // Paper - optimize hoppers
+

@@ -3,6 +3,7 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Wed, 14 Jun 2023 12:07:07 +0800
 Subject: [PATCH] Redstone ignore upwards update
 
+
 diff --git a/net/minecraft/world/level/block/ComparatorBlock.java b/net/minecraft/world/level/block/ComparatorBlock.java
 --- a/net/minecraft/world/level/block/ComparatorBlock.java
 +++ b/net/minecraft/world/level/block/ComparatorBlock.java
@@ -46,3 +47,4 @@ diff --git a/net/minecraft/world/level/block/RepeaterBlock.java b/net/minecraft/
          if (direction == Direction.DOWN && !this.canSurviveOn(level, neighborPos, neighborState)) {
              return Blocks.AIR.defaultBlockState();
          } else {
+

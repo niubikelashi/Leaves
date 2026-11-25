@@ -3,6 +3,8 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Sun, 11 Dec 2022 18:43:35 +0800
 Subject: [PATCH] Player operation limiter
 
+This patch is Powered by plusls-carpet-addition(https://github.com/plusls/plusls-carpet-addition)
+
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
@@ -25,13 +27,13 @@ diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server
          this.gameMode.tick();
          this.wardenSpawnTracker.tick();
          if (this.invulnerableTime > 0) {
-@@ -3128,4 +3133,32 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -3133,4 +3138,31 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
          return (org.bukkit.craftbukkit.entity.CraftPlayer) super.getBukkitEntity();
      }
      // CraftBukkit end
 +
 +    // Leaves start - player operation limiter
-+    private void resetOperationCountPerTick() {
++    protected void resetOperationCountPerTick() {
 +        instaBreakCountPerTick = 0;
 +        placeBlockCountPerTick = 0;
 +    }
@@ -57,7 +59,6 @@ diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server
 +    }
 +    // Leaves end - player operation limiter
  }
-+
 diff --git a/net/minecraft/server/level/ServerPlayerGameMode.java b/net/minecraft/server/level/ServerPlayerGameMode.java
 --- a/net/minecraft/server/level/ServerPlayerGameMode.java
 +++ b/net/minecraft/server/level/ServerPlayerGameMode.java
@@ -106,3 +107,4 @@ diff --git a/net/minecraft/world/item/BlockItem.java b/net/minecraft/world/item/
                  if (placementState == null) {
                      return InteractionResult.FAIL;
                  } else if (!this.placeBlock(blockPlaceContext, placementState)) {
+

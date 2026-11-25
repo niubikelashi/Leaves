@@ -3,6 +3,7 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Tue, 12 Dec 2023 14:15:54 +0800
 Subject: [PATCH] Crafter 1 gt delay
 
+
 diff --git a/net/minecraft/world/level/block/CrafterBlock.java b/net/minecraft/world/level/block/CrafterBlock.java
 --- a/net/minecraft/world/level/block/CrafterBlock.java
 +++ b/net/minecraft/world/level/block/CrafterBlock.java
@@ -24,8 +25,4 @@ diff --git a/net/minecraft/world/level/block/CrafterBlock.java b/net/minecraft/w
          }
      }
  
-@@ -276,3 +276,4 @@ public class CrafterBlock extends BaseEntityBlock {
-         builder.add(ORIENTATION, TRIGGERED, CRAFTING);
-     }
- }
-+
+

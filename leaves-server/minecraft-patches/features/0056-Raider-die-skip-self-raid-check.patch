@@ -15,3 +15,4 @@ diff --git a/net/minecraft/world/entity/raid/Raider.java b/net/minecraft/world/e
      }
  
      public boolean hasActiveRaid() {
+

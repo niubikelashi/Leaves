@@ -3,7 +3,7 @@ package org.leavesmc.leaves.command;
 import com.google.common.base.Functions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.framework.qual.DefaultQualifier;
@@ -65,7 +65,7 @@ public class LeavesCommandUtil {
 
             if (results.isEmpty()) {
                 for (Object object : collection) {
-                    if (object instanceof ResourceLocation && matches(last, ((ResourceLocation) object).getPath())) {
+                    if (object instanceof Identifier && matches(last, ((Identifier) object).getPath())) {
                         results.add(String.valueOf(object));
                     }
                 }

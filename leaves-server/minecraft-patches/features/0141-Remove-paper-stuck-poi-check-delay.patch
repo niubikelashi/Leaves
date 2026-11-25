@@ -8,11 +8,11 @@ Fix https://github.com/LeavesMC/Leaves/issues/626
 diff --git a/net/minecraft/world/entity/ai/behavior/AcquirePoi.java b/net/minecraft/world/entity/ai/behavior/AcquirePoi.java
 --- a/net/minecraft/world/entity/ai/behavior/AcquirePoi.java
 +++ b/net/minecraft/world/entity/ai/behavior/AcquirePoi.java
-@@ -69,7 +69,7 @@
+@@ -69,7 +69,7 @@ public class AcquirePoi {
                              return false;
                          } else {
                              mutableLong.setValue(time + 20L + level.getRandom().nextInt(20));
--                            if (level.paperConfig().entities.behavior.stuckEntityPoiRetryDelay.enabled() && mob.getNavigation().isStuck()) mutableLong.add(level.paperConfig().entities.behavior.stuckEntityPoiRetryDelay.intValue()); // Paper - Next stuck check delay config
+-                            if (!org.leavesmc.leaves.LeavesConfig.modify.mcTechnicalMode && level.paperConfig().entities.behavior.stuckEntityPoiRetryDelay.enabled() && mob.getNavigation().isStuck()) mutableLong.add(level.paperConfig().entities.behavior.stuckEntityPoiRetryDelay.intValue()); // Paper - Next stuck check delay config // Leaves - mc technical survival mode
 +                            // if (mob.getNavigation().isStuck()) mutableLong.add(200); // Paper - Perf: Wait an additional 10s to check again if they're stuck // TODO Modifies Vanilla behavior, add config option // Leaves: tmp remove this(https://github.com/LeavesMC/Leaves/issues/626)
                              PoiManager poiManager = level.getPoiManager();
                              map.long2ObjectEntrySet().removeIf(entry -> !entry.getValue().isStillValid(time));

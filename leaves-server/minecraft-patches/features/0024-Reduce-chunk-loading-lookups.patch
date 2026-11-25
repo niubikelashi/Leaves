@@ -3,6 +3,8 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Sun, 21 Aug 2022 08:29:15 +0800
 Subject: [PATCH] Reduce chunk loading & lookups
 
+This patch is Powered by Pufferfish(https://github.com/pufferfish-gg/Pufferfish)
+
 diff --git a/net/minecraft/world/entity/monster/EnderMan.java b/net/minecraft/world/entity/monster/EnderMan.java
 --- a/net/minecraft/world/entity/monster/EnderMan.java
 +++ b/net/minecraft/world/entity/monster/EnderMan.java
@@ -38,3 +40,4 @@ diff --git a/net/minecraft/world/entity/monster/EnderMan.java b/net/minecraft/wo
          boolean flag = blockState.blocksMotion();
          boolean isWater = blockState.getFluidState().is(FluidTags.WATER);
          if (flag && !isWater) {
+

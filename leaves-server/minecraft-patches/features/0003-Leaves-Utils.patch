@@ -3,6 +3,7 @@ From: Lumine1909 <133463833+Lumine1909@users.noreply.github.com>
 Date: Tue, 22 Apr 2025 23:32:41 +0800
 Subject: [PATCH] Leaves Utils
 
+
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
@@ -27,7 +28,7 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
              }
              freezeLocked = input.getBooleanOr("Paper.FreezeLock", false);
              // Paper end
-+            leavesData = input.read("Leaves.Data", net.minecraft.nbt.CompoundTag.CODEC).orElse(new net.minecraft.nbt.CompoundTag()); // Leaves - leaves ex data
++            leavesData = input.read("Leaves.Data", net.minecraft.nbt.CompoundTag.CODEC).orElse(new net.minecraft.nbt.CompoundTag());
          } catch (Throwable var7) {
              CrashReport crashReport = CrashReport.forThrowable(var7, "Loading entity NBT");
              CrashReportCategory crashReportCategory = crashReport.addCategory("Entity being loaded");
@@ -44,15 +45,15 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
 diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Level.java
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
-@@ -916,7 +916,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -970,7 +970,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
      }
  
+     // Paper start - if loaded
+-    @Nullable
++    @org.jetbrains.annotations.NotNull // Leaves - notnull
      @Override
--    public @Nullable MinecraftServer getServer() {
-+    public @org.jetbrains.annotations.NotNull MinecraftServer getServer() { // Leaves - notnull
-         return null;
-     }
- 
+     public final ChunkAccess getChunkIfLoadedImmediately(int x, int z) {
+         return ((ServerLevel)this).chunkSource.getChunkAtIfLoadedImmediately(x, z);
 diff --git a/net/minecraft/world/level/LevelAccessor.java b/net/minecraft/world/level/LevelAccessor.java
 --- a/net/minecraft/world/level/LevelAccessor.java
 +++ b/net/minecraft/world/level/LevelAccessor.java
@@ -94,3 +95,4 @@ diff --git a/net/minecraft/world/level/block/state/BlockBehaviour.java b/net/min
          }
  
          public boolean isSolidRender() {
+

@@ -4,14 +4,16 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.NotNull;
 import org.leavesmc.leaves.bot.ServerBot;
+import org.leavesmc.leaves.entity.bot.actions.CraftBotAction;
 import org.leavesmc.leaves.entity.bot.actions.CraftUseItemOnAction;
 
-public class ServerUseItemOnAction extends ServerUseBotAction<ServerUseItemOnAction> {
+public class ServerUseItemOnAction extends AbstractUseBotAction<ServerUseItemOnAction> {
 
     public ServerUseItemOnAction() {
-        super("use_on", ServerUseItemOnAction::new);
+        super("use_on");
     }
 
     @Override
@@ -21,7 +23,7 @@ public class ServerUseItemOnAction extends ServerUseBotAction<ServerUseItemOnAct
     }
 
     public static InteractionResult useItemOn(ServerBot bot, BlockHitResult hitResult, InteractionHand hand) {
-        if (hitResult == null) {
+        if (hitResult == null || hitResult.getType() == HitResult.Type.MISS) {
             return InteractionResult.FAIL;
         }
 
@@ -30,6 +32,7 @@ public class ServerUseItemOnAction extends ServerUseBotAction<ServerUseItemOnAct
             return InteractionResult.FAIL;
         }
 
+        bot.updateItemInHand(hand);
         InteractionResult interactionResult = bot.gameMode.useItemOn(bot, bot.level(), bot.getItemInHand(hand), hand, hitResult);
         if (shouldSwing(interactionResult)) {
             bot.swing(hand);
@@ -39,7 +42,7 @@ public class ServerUseItemOnAction extends ServerUseBotAction<ServerUseItemOnAct
     }
 
     @Override
-    public Object asCraft() {
+    public CraftBotAction<?, ServerUseItemOnAction> asCraft() {
         return new CraftUseItemOnAction(this);
     }
 }

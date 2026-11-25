@@ -2,6 +2,7 @@ package org.leavesmc.leaves.protocol.servux;
 
 import com.mojang.serialization.DataResult;
 import io.netty.buffer.Unpooled;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -10,13 +11,13 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import org.jetbrains.annotations.NotNull;
 import org.leavesmc.leaves.LeavesConfig;
 import org.leavesmc.leaves.protocol.core.LeavesCustomPayload;
@@ -101,7 +102,7 @@ public class ServuxHudDataProtocol implements LeavesProtocol {
         sendPacket(player, new HudDataPayload(HudDataPayloadType.PACKET_S2C_METADATA, metadata));
     }
 
-    public static void refreshSpawnMetadata(ServerPlayer player) {
+    public static void refreshSpawnMetadata(ServerPlayer player) { // TODO: 1.21.9 removed spawn chunk, should we keep this?
         CompoundTag metadata = new CompoundTag();
         metadata.putString("id", HudDataPayload.CHANNEL.toString());
         metadata.putString("servux", ServuxProtocol.SERVUX_STRING);
@@ -121,7 +122,7 @@ public class ServuxHudDataProtocol implements LeavesProtocol {
             if (dr.result().isPresent()) {
                 CompoundTag entry = new CompoundTag();
                 entry.putString("id_reg", recipeEntry.id().registry().toString());
-                entry.putString("id_value", recipeEntry.id().location().toString());
+                entry.putString("id_value", recipeEntry.id().identifier().toString());
                 entry.put("recipe", dr.result().get());
                 list.add(entry);
             }
@@ -133,7 +134,7 @@ public class ServuxHudDataProtocol implements LeavesProtocol {
 
     public static void refreshWeatherData(ServerPlayer player) {
         ServerLevel level = MinecraftServer.getServer().overworld();
-        if (!level.getGameRules().getBoolean(GameRules.RULE_WEATHER_CYCLE)) {
+        if (!level.getGameRules().get(GameRules.ADVANCE_WEATHER)) {
             return;
         }
 
@@ -164,11 +165,11 @@ public class ServuxHudDataProtocol implements LeavesProtocol {
 
     private static void putWorldData(@NotNull CompoundTag metadata) {
         ServerLevel level = MinecraftServer.getServer().overworld();
-        BlockPos spawnPos = level.levelData.getSpawnPos();
+        BlockPos spawnPos = level.levelData.getRespawnData().pos();
         metadata.putInt("spawnPosX", spawnPos.getX());
         metadata.putInt("spawnPosY", spawnPos.getY());
         metadata.putInt("spawnPosZ", spawnPos.getZ());
-        metadata.putInt("spawnChunkRadius", level.getGameRules().getInt(GameRules.RULE_SPAWN_CHUNK_RADIUS));
+        // metadata.putInt("spawnChunkRadius", level.getGameRules().getInt(GameRules.RULE_SPAWN_CHUNK_RADIUS)); // TODO: 1.21.9 removed spawn chunk, should we keep this?
 
         if (LeavesConfig.protocol.servux.hudMetadataShareSeed) {
             metadata.putLong("worldSeed", level.getSeed());
@@ -177,7 +178,7 @@ public class ServuxHudDataProtocol implements LeavesProtocol {
 
     public static void refreshLoggers(ServerPlayer player, @Nonnull CompoundTag nbt) {
         if (!player.getBukkitEntity().hasPermission("servux.provider.hud_data.logger")) {
-            player.sendSystemMessage(Component.translatable("servux.hud_data.error.insufficient_for_loggers", "any"));
+            player.sendSystemMessage(Component.literal("Insufficient Permissions for Data Logger: 'any'.").withStyle(ChatFormatting.RED));
             return;
         }
 
@@ -234,20 +235,17 @@ public class ServuxHudDataProtocol implements LeavesProtocol {
             });
         }
 
-        for (ServerPlayer player : loggerPlayers.keySet()) {
-            List<DataLogger.Type> list = loggerPlayers.get(player);
-            if (list.isEmpty()) {
-                return;
-            }
-
+        loggerPlayers.forEach((player, list) -> {
             CompoundTag nbt = new CompoundTag();
             for (DataLogger.Type type : list) {
                 if (DATA.containsKey(type)) {
                     nbt.put(type.getSerializedName(), DATA.get(type));
                 }
             }
-            sendPacket(player, new HudDataPayload(HudDataPayloadType.PACKET_S2C_DATA_LOGGER_TICK, nbt));
-        }
+            if (!nbt.isEmpty()) {
+                sendPacket(player, new HudDataPayload(HudDataPayloadType.PACKET_S2C_DATA_LOGGER_TICK, nbt));
+            }
+        });
     }
 
     @Override
@@ -306,7 +304,7 @@ public class ServuxHudDataProtocol implements LeavesProtocol {
     public record HudDataPayload(HudDataPayloadType packetType, CompoundTag nbt, FriendlyByteBuf buffer) implements LeavesCustomPayload {
 
         @ID
-        public static final ResourceLocation CHANNEL = ServuxProtocol.id("hud_metadata");
+        public static final Identifier CHANNEL = ServuxProtocol.id("hud_metadata");
 
         @Codec
         public static final StreamCodec<FriendlyByteBuf, HudDataPayload> CODEC = StreamCodec.of(

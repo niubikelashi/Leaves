@@ -9,7 +9,7 @@ should remove when PaperMC/Paper#11831 merged
 diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
-@@ -4111,6 +4111,11 @@
+@@ -4113,6 +4113,11 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
              return null;
          } else {
              double d = this.getEyeY() - 0.3F;

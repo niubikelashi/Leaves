@@ -3,6 +3,7 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Wed, 5 Feb 2025 23:42:22 +0800
 Subject: [PATCH] Renewable coral
 
+
 diff --git a/net/minecraft/world/level/block/CoralFanBlock.java b/net/minecraft/world/level/block/CoralFanBlock.java
 --- a/net/minecraft/world/level/block/CoralFanBlock.java
 +++ b/net/minecraft/world/level/block/CoralFanBlock.java
@@ -124,3 +125,4 @@ diff --git a/net/minecraft/world/level/levelgen/feature/CoralTreeFeature.java b/
          BlockPos.MutableBlockPos mutableBlockPos = pos.mutable();
          int i = random.nextInt(3) + 1;
  
+

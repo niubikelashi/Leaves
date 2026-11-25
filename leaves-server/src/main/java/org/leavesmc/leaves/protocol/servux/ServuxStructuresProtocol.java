@@ -8,7 +8,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -34,6 +34,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static net.minecraft.server.MinecraftServer.getServer;
 
 // Powered by Servux(https://github.com/sakura-ryoko/servux)
 
@@ -69,7 +71,7 @@ public class ServuxStructuresProtocol implements LeavesProtocol {
 
     @ProtocolHandler.Ticker
     public static void tick() {
-        MinecraftServer server = MinecraftServer.getServer();
+        MinecraftServer server = getServer();
         int tickCounter = server.getTickCount();
         retainDistance = server.getPlayerList().getViewDistance() + 2;
         for (ServerPlayer player : players.values()) {
@@ -79,8 +81,8 @@ public class ServuxStructuresProtocol implements LeavesProtocol {
     }
 
     public static void onStartedWatchingChunk(ServerPlayer player, LevelChunk chunk) {
-        MinecraftServer server = player.level().getServer();
-        if (players.containsKey(player.getId()) && server != null) {
+        MinecraftServer server = getServer();
+        if (players.containsKey(player.getId())) {
             addChunkTimeoutIfHasReferences(player.getUUID(), chunk, server.getTickCount());
         }
     }
@@ -119,7 +121,7 @@ public class ServuxStructuresProtocol implements LeavesProtocol {
             LeavesLogger.LOGGER.warning(player.getScoreboardName() + " re-register servux:structures");
         }
 
-        MinecraftServer server = MinecraftServer.getServer();
+        MinecraftServer server = getServer();
         sendMetaData(player);
         initialSyncStructures(player, player.moonrise$getViewDistanceHolder().getViewDistances().sendViewDistance() + 2, server.getTickCount());
     }
@@ -352,7 +354,7 @@ public class ServuxStructuresProtocol implements LeavesProtocol {
     public record StructuresPayload(StructuresPayloadType packetType, CompoundTag nbt, FriendlyByteBuf buffer) implements LeavesCustomPayload {
 
         @ID
-        public static final ResourceLocation CHANNEL = ServuxProtocol.id("structures");
+        public static final Identifier CHANNEL = ServuxProtocol.id("structures");
 
         @Codec
         public static final StreamCodec<FriendlyByteBuf, StructuresPayload> CODEC = StreamCodec.of(

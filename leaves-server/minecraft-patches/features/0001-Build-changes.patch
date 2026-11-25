@@ -3,6 +3,7 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Sun, 26 Jan 2025 13:58:49 +0800
 Subject: [PATCH] Build changes
 
+
 diff --git a/ca/spottedleaf/moonrise/paper/PaperHooks.java b/ca/spottedleaf/moonrise/paper/PaperHooks.java
 --- a/ca/spottedleaf/moonrise/paper/PaperHooks.java
 +++ b/ca/spottedleaf/moonrise/paper/PaperHooks.java
@@ -63,3 +64,4 @@ diff --git a/net/minecraft/server/gui/MinecraftServerGui.java b/net/minecraft/se
          JPanel jPanel = new JPanel();
  
          javax.swing.JLabel jLabel = new javax.swing.JLabel("If you need help setting up your server you can visit:");
+

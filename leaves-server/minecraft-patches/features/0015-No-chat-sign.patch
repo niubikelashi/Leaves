@@ -3,6 +3,7 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Wed, 3 Aug 2022 11:20:51 +0800
 Subject: [PATCH] No chat sign
 
+
 diff --git a/net/minecraft/commands/arguments/ArgumentSignatures.java b/net/minecraft/commands/arguments/ArgumentSignatures.java
 --- a/net/minecraft/commands/arguments/ArgumentSignatures.java
 +++ b/net/minecraft/commands/arguments/ArgumentSignatures.java
@@ -103,7 +104,7 @@ diff --git a/net/minecraft/network/protocol/status/ServerStatus.java b/net/minec
 diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -770,7 +770,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -772,7 +772,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          // Paper start - Add setting for proxy online mode status
          return properties.enforceSecureProfile
              && io.papermc.paper.configuration.GlobalConfiguration.get().proxies.isProxyOnlineMode()
@@ -115,7 +116,7 @@ diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft
 diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 --- a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-@@ -308,6 +308,20 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
+@@ -323,10 +323,24 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
      }
  
      public void send(Packet<?> packet) {
@@ -126,25 +127,24 @@ diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/
 +            }
 +        }
 +        // Leaves end - rebuild ClientboundPlayerChatPacket
-+        // Leaves start - no ClientboundPlayerChatHeaderPacket and rebuild ClientboundPlayerChatPacket
-+        if (org.leavesmc.leaves.LeavesConfig.mics.noChatSign) {
-+            if (packet instanceof net.minecraft.network.protocol.game.ClientboundPlayerChatPacket && channelFutureListener != null) {
-+                channelFutureListener = null;
-+            }
-+        }
-+        // Leaves end - no ClientboundPlayerChatHeaderPacket and rebuild ClientboundPlayerChatPacket
          this.send(packet, null);
      }
  
-@@ -463,3 +477,4 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
-         return new CommonListenerCookie(this.playerProfile(), this.latency, clientInformation, this.transferred, this.playerBrand, this.pluginMessagerChannels, this.keepAlive); // Paper
-     }
- }
-+
+     public void send(Packet<?> packet, @Nullable ChannelFutureListener sendListener) {
++        // Leaves start - no ClientboundPlayerChatHeaderPacket and rebuild ClientboundPlayerChatPacket
++        if (org.leavesmc.leaves.LeavesConfig.mics.noChatSign) {
++            if (packet instanceof net.minecraft.network.protocol.game.ClientboundPlayerChatPacket && sendListener != null) {
++                sendListener = null;
++            }
++        }
++        // Leaves end - no ClientboundPlayerChatHeaderPacket and rebuild ClientboundPlayerChatPacket
+         // CraftBukkit start
+         if (packet == null || this.processedDisconnect) { // Spigot
+             return;
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -1153,7 +1153,7 @@ public abstract class PlayerList {
+@@ -1187,7 +1187,7 @@ public abstract class PlayerList {
      }
  
      public boolean verifyChatTrusted(PlayerChatMessage message) {
@@ -153,3 +153,4 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
      }
  
      // CraftBukkit start
+

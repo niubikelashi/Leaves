@@ -3,6 +3,7 @@ From: Lumine1909 <133463833+Lumine1909@users.noreply.github.com>
 Date: Sat, 10 May 2025 00:49:51 +0800
 Subject: [PATCH] Vanilla creative pickup behavior
 
+
 diff --git a/net/minecraft/world/entity/player/Inventory.java b/net/minecraft/world/entity/player/Inventory.java
 --- a/net/minecraft/world/entity/player/Inventory.java
 +++ b/net/minecraft/world/entity/player/Inventory.java
@@ -20,3 +21,4 @@ diff --git a/net/minecraft/world/entity/player/Inventory.java b/net/minecraft/wo
          for (int slot = 0; slot < this.items.size(); ++slot) {
              ItemStack itemInSlot = this.getItem(slot);
              if (itemInSlot.isEmpty()) {
+

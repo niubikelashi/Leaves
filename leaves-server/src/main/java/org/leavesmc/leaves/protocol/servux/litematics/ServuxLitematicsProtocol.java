@@ -10,7 +10,7 @@ import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -105,7 +105,6 @@ public class ServuxLitematicsProtocol implements LeavesProtocol {
 
             case PACKET_C2S_ENTITY_REQUEST -> onEntityRequest(player, payload.getEntityId());
 
-
             case PACKET_C2S_BULK_ENTITY_NBT_REQUEST -> onBulkEntityRequest(player, payload.getChunkPos(), payload.getCompound());
 
             case PACKET_C2S_NBT_RESPONSE_DATA -> {
@@ -154,7 +153,7 @@ public class ServuxLitematicsProtocol implements LeavesProtocol {
         ServuxLitematicaPayload payload = new ServuxLitematicaPayload(ServuxLitematicaPayloadType.PACKET_S2C_ENTITY_NBT_RESPONSE_SIMPLE);
         payload.entityId = entityId;
         if (entity instanceof net.minecraft.world.entity.player.Player) {
-            ResourceLocation loc = EntityType.getKey(entity.getType());
+            Identifier loc = EntityType.getKey(entity.getType());
             tag = TagUtil.saveEntity(entity);
             tag.putString("id", loc.toString());
             payload.nbt = tag;
@@ -297,7 +296,7 @@ public class ServuxLitematicsProtocol implements LeavesProtocol {
     public static class ServuxLitematicaPayload implements LeavesCustomPayload {
 
         @ID
-        public static final ResourceLocation CHANNEL = ServuxProtocol.id("litematics");
+        public static final Identifier CHANNEL = ServuxProtocol.id("litematics");
 
         @Codec
         public static final StreamCodec<FriendlyByteBuf, ServuxLitematicaPayload> CODEC = StreamCodec.of(

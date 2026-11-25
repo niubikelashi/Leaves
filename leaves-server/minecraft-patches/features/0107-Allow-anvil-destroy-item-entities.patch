@@ -3,6 +3,7 @@ From: huanli233 <392352840@qq.com>
 Date: Sat, 26 Oct 2024 19:53:17 +0800
 Subject: [PATCH] Allow anvil destroy item entities
 
+
 diff --git a/net/minecraft/world/entity/item/FallingBlockEntity.java b/net/minecraft/world/entity/item/FallingBlockEntity.java
 --- a/net/minecraft/world/entity/item/FallingBlockEntity.java
 +++ b/net/minecraft/world/entity/item/FallingBlockEntity.java
@@ -15,3 +16,4 @@ diff --git a/net/minecraft/world/entity/item/FallingBlockEntity.java b/net/minec
                  DamageSource damageSource1 = this.blockState.getBlock() instanceof Fallable fallable
                      ? fallable.getFallDamageSource(this)
                      : this.damageSources().fallingBlock(this);
+

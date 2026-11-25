@@ -3,6 +3,8 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Wed, 30 Nov 2022 07:32:05 +0800
 Subject: [PATCH] Random flatten triangular distribution
 
+This patch is Powered by Carpet-TIS-Addition(https://github.com/plusls/Carpet-TIS-Addition)
+
 diff --git a/net/minecraft/util/RandomSource.java b/net/minecraft/util/RandomSource.java
 --- a/net/minecraft/util/RandomSource.java
 +++ b/net/minecraft/util/RandomSource.java
@@ -34,3 +36,4 @@ diff --git a/net/minecraft/util/RandomSource.java b/net/minecraft/util/RandomSou
  
      default void consumeCount(int count) {
          for (int i = 0; i < count; i++) {
+

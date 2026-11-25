@@ -8,7 +8,7 @@ This patch is powered by NetherPortalFix(https://github.com/TwelveIterationMods/
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -1578,6 +1578,21 @@
+@@ -1574,6 +1574,21 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
                  org.bukkit.event.player.PlayerChangedWorldEvent changeEvent = new org.bukkit.event.player.PlayerChangedWorldEvent(this.getBukkitEntity(), serverLevel.getWorld());
                  this.level().getCraftServer().getPluginManager().callEvent(changeEvent);
                  // CraftBukkit end
@@ -33,13 +33,13 @@ diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -700,6 +700,20 @@
+@@ -706,6 +706,20 @@ public abstract class PlayerList {
          // It's possible for respawn to be in a diff dimension
          if (fromLevel != level) {
              new org.bukkit.event.player.PlayerChangedWorldEvent(serverPlayer.getBukkitEntity(), fromLevel.getWorld()).callEvent();
 +            // Leaves start - nether portal fix
 +            if (org.leavesmc.leaves.LeavesConfig.modify.netherPortalFix) {
-+                final ResourceKey<Level> fromDim = fromLevel.dimension();
++                final ResourceKey<Level> fromDim = player.level().dimension();
 +                final ResourceKey<Level> toDim = serverPlayer.level().dimension();
 +                final ResourceKey<Level> OVERWORLD = Level.OVERWORLD;
 +                final ResourceKey<Level> THE_NETHER = Level.NETHER;
@@ -57,7 +57,7 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
 diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
-@@ -262,7 +262,7 @@
+@@ -262,7 +262,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
      public int useItemRemaining;
      protected int fallFlyTicks;
      private long lastKineticHitFeedbackTime = -2147483648L;
@@ -69,7 +69,7 @@ diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/
 diff --git a/net/minecraft/world/level/block/NetherPortalBlock.java b/net/minecraft/world/level/block/NetherPortalBlock.java
 --- a/net/minecraft/world/level/block/NetherPortalBlock.java
 +++ b/net/minecraft/world/level/block/NetherPortalBlock.java
-@@ -176,7 +176,18 @@
+@@ -176,7 +176,18 @@ public class NetherPortalBlock extends Block implements Portal {
      private @Nullable TeleportTransition getExitPortal(
          ServerLevel level, Entity entity, BlockPos pos, BlockPos exitPos, WorldBorder worldBorder, org.bukkit.craftbukkit.event.PortalEventResult result // CraftBukkit
      ) {

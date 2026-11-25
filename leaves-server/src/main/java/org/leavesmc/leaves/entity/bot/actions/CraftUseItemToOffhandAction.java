@@ -1,7 +1,7 @@
 package org.leavesmc.leaves.entity.bot.actions;
 
-import org.leavesmc.leaves.bot.agent.actions.*;
-import org.leavesmc.leaves.entity.bot.action.*;
+import org.leavesmc.leaves.bot.agent.actions.ServerUseItemToOffhandAction;
+import org.leavesmc.leaves.entity.bot.action.UseItemToOffhandAction;
 
 public class CraftUseItemToOffhandAction extends CraftTimerBotAction<UseItemToOffhandAction, ServerUseItemToOffhandAction> implements UseItemToOffhandAction {
 
@@ -10,13 +10,13 @@ public class CraftUseItemToOffhandAction extends CraftTimerBotAction<UseItemToOf
     }
 
     @Override
-    public int getUseTick() {
-        return serverAction.getUseTick();
+    public int getUseTickTimeout() {
+        return serverAction.getUseTickTimeout();
     }
 
     @Override
-    public CraftUseItemToOffhandAction setUseTick(int useTick) {
-        serverAction.setUseTick(useTick);
+    public CraftUseItemToOffhandAction setUseTickTimeout(int timeout) {
+        serverAction.setUseTickTimeout(timeout);
         return this;
     }
 }

@@ -3,6 +3,8 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Tue, 18 Jul 2023 14:29:47 +0800
 Subject: [PATCH] Skip secondary POI sensor if absent
 
+This patch is Powered by Gale(https://github.com/GaleMC/Gale)
+
 diff --git a/net/minecraft/world/entity/ai/sensing/SecondaryPoiSensor.java b/net/minecraft/world/entity/ai/sensing/SecondaryPoiSensor.java
 --- a/net/minecraft/world/entity/ai/sensing/SecondaryPoiSensor.java
 +++ b/net/minecraft/world/entity/ai/sensing/SecondaryPoiSensor.java
@@ -22,3 +24,4 @@ diff --git a/net/minecraft/world/entity/ai/sensing/SecondaryPoiSensor.java b/net
          ResourceKey<Level> resourceKey = level.dimension();
          BlockPos blockPos = entity.blockPosition();
          List<GlobalPos> list = Lists.newArrayList();
+

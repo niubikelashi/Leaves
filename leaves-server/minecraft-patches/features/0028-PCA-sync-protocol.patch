@@ -3,6 +3,8 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Mon, 3 Feb 2025 13:17:03 +0800
 Subject: [PATCH] PCA sync protocol
 
+This patch is Powered by plusls-carpet-addition(https://github.com/plusls/plusls-carpet-addition)
+
 diff --git a/net/minecraft/world/entity/animal/equine/AbstractHorse.java b/net/minecraft/world/entity/animal/equine/AbstractHorse.java
 --- a/net/minecraft/world/entity/animal/equine/AbstractHorse.java
 +++ b/net/minecraft/world/entity/animal/equine/AbstractHorse.java
@@ -275,3 +277,4 @@ diff --git a/net/minecraft/world/level/block/entity/ShulkerBoxBlockEntity.java b
      @Override
      public int[] getSlotsForFace(Direction side) {
          return SLOTS;
+

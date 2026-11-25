@@ -7,124 +7,19 @@ Subject: [PATCH] Fix SculkCatalyst exp skip
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -1107,107 +1107,8 @@
-             }
+@@ -1211,7 +1211,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
          }
  
--        return false;
--    }
--    // Paper end - PlayerDeathEvent#getItemsToKeep
--    // Paper start - Expand PlayerDeathEvent API
--    private void sendClientboundPlayerCombatKillPacket(boolean displayMessage, Component deathMessage) {
--        if (displayMessage && deathMessage != CommonComponents.EMPTY) {
--            // Paper - moved from below die(DamageSource) method
--            this.connection
--                .send(
--                    new ClientboundPlayerCombatKillPacket(this.getId(), deathMessage),
--                    PacketSendListener.exceptionallySend(
--                        () -> {
--                            int i = 256;
--                            String string = deathMessage.getString(256);
--                            Component component = Component.translatable(
--                                "death.attack.message_too_long", Component.literal(string).withStyle(ChatFormatting.YELLOW)
--                            );
--                            Component component1 = Component.translatable("death.attack.even_more_magic", this.getDisplayName())
--                                .withStyle(style -> style.withHoverEvent(new HoverEvent.ShowText(component)));
--                            return new ClientboundPlayerCombatKillPacket(this.getId(), component1);
--                        }
--                    )
--                );
--        } else {
--            this.connection.send(new ClientboundPlayerCombatKillPacket(this.getId(), CommonComponents.EMPTY));
--        }
--    }
--    // Paper end - Expand PlayerDeathEvent API
--    @Override
--    public void die(DamageSource damageSource) {
--        // this.gameEvent(GameEvent.ENTITY_DIE); // Paper - move below event cancellation check
--        boolean flag = this.level().getGameRules().get(GameRules.SHOW_DEATH_MESSAGES); final boolean showDeathMessage = flag; // Paper - OBFHELPER
--        // CraftBukkit start - fire PlayerDeathEvent
--        if (this.isRemoved()) {
--            return;
--        }
--        List<DefaultDrop> loot = new java.util.ArrayList<>(this.getInventory().getContainerSize()); // Paper - Restore vanilla drops behavior
--        boolean keepInventory = this.level().getGameRules().get(GameRules.KEEP_INVENTORY) || this.isSpectator();
--        if (!keepInventory) {
--            for (ItemStack item : this.getInventory().getContents()) {
--                if (!item.isEmpty() && !EnchantmentHelper.has(item, net.minecraft.world.item.enchantment.EnchantmentEffectComponents.PREVENT_EQUIPMENT_DROP)) {
--                    loot.add(new DefaultDrop(item, stack -> this.drop(stack, true, false, false, null))); // Paper - Restore vanilla drops behavior; drop function taken from Inventory#dropAll (don't fire drop event)
--                }
--            }
--        }
--        if (!this.isSpectator() && this.shouldDropLoot(this.level())) { // Paper - fix player loottables running when mob loot gamerule is false
--            // SPIGOT-5071: manually add player loot tables (SPIGOT-5195 - ignores keepInventory rule)
--            this.dropFromLootTable(this.level(), damageSource, this.lastHurtByPlayerMemoryTime > 0);
--            // Paper - Restore vanilla drops behaviour; custom death loot is a noop on server player, remove.
--            loot.addAll(this.drops);
--            this.drops.clear(); // SPIGOT-5188: make sure to clear
--        } // Paper - fix player loottables running when mob loot gamerule is false
--
--        Component defaultMessage = this.getCombatTracker().getDeathMessage();
--
--        String deathmessage = defaultMessage.getString();
--        this.keepLevel = keepInventory; // SPIGOT-2222: pre-set keepLevel
--        org.bukkit.event.entity.PlayerDeathEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callPlayerDeathEvent(this, damageSource, loot, io.papermc.paper.adventure.PaperAdventure.asAdventure(defaultMessage), showDeathMessage, keepInventory); // Paper - Adventure; Expand PlayerDeathEvent API
--        // Paper start - cancellable death event
--        if (event.isCancelled()) {
--            // make compatible with plugins that might have already set the health in an event listener
--            if (this.getHealth() <= 0) {
--                this.setHealth((float) event.getReviveHealth());
--            }
--            return;
--        }
--        this.gameEvent(GameEvent.ENTITY_DIE); // moved from the top of this method
--        // Paper end
--
--        // SPIGOT-943 - only call if they have an inventory open
--        if (this.containerMenu != this.inventoryMenu) {
--            this.closeContainer(org.bukkit.event.inventory.InventoryCloseEvent.Reason.DEATH); // Paper - Inventory close reason
--        }
--
--        net.kyori.adventure.text.Component apiDeathMessage = event.deathMessage() != null ? event.deathMessage() : net.kyori.adventure.text.Component.empty(); // Paper - Adventure
--        Component deathScreenMessage = io.papermc.paper.adventure.PaperAdventure.asVanilla(event.deathScreenMessageOverride() != null ? event.deathScreenMessageOverride() : apiDeathMessage); // Paper - Expand PlayerDeathEvent API
--
--        if (apiDeathMessage != null && apiDeathMessage != net.kyori.adventure.text.Component.empty() && event.getShowDeathMessages()) { // Paper - Adventure; Expand PlayerDeathEvent API
--            Component deathMessage = io.papermc.paper.adventure.PaperAdventure.asVanilla(apiDeathMessage); // Paper - Adventure
--
--            // Paper - moved up to sendClientboundPlayerCombatKillPacket()
--            sendClientboundPlayerCombatKillPacket(event.getShowDeathMessages(), deathScreenMessage); // Paper - Expand PlayerDeathEvent
--            Team team = this.getTeam();
--            if (team == null || team.getDeathMessageVisibility() == Team.Visibility.ALWAYS) {
--                this.server.getPlayerList().broadcastSystemMessage(deathMessage, false);
--            } else if (team.getDeathMessageVisibility() == Team.Visibility.HIDE_FOR_OTHER_TEAMS) {
--                this.server.getPlayerList().broadcastSystemToTeam(this, deathMessage);
--            } else if (team.getDeathMessageVisibility() == Team.Visibility.HIDE_FOR_OWN_TEAM) {
--                this.server.getPlayerList().broadcastSystemToAllExceptTeam(this, deathMessage);
--            }
--        } else {
--            sendClientboundPlayerCombatKillPacket(event.getShowDeathMessages(), deathScreenMessage); // Paper - Expand PlayerDeathEvent
--        }
--
--        this.removeEntitiesOnShoulder();
--        if (this.level().getGameRules().get(GameRules.FORGIVE_DEAD_PLAYERS)) {
--            this.tellNeutralMobsThatIDied();
--        }
--
          // SPIGOT-5478 must be called manually now
 -        if (event.shouldDropExperience()) this.dropExperience(this.level(), damageSource.getEntity()); // Paper - tie to event
-+        if (shouldDropExperience(event.shouldDropExperience(), event.forceUseEventDropStatus())) this.dropExperience(this.level(), cause.getEntity()); // Paper - tie to event // Leaves - exp fix
++        if (shouldDropExperience(event.shouldDropExperience(), event.forceUseEventDropStatus())) this.dropExperience(this.level(), damageSource.getEntity()); // Paper - tie to event // Leaves - exp fix
          // we clean the player's inventory after the EntityDeathEvent is called so plugins can get the exact state of the inventory.
          if (!event.getKeepInventory()) {
              // Paper start - PlayerDeathEvent#getItemsToKeep
-@@ -1251,8 +1152,17 @@
-         this.setSharedFlagOnFire(false);
-         this.getCombatTracker().recheckStatus();
-         this.setLastDeathLocation(Optional.of(GlobalPos.of(this.level().dimension(), this.blockPosition())));
--        this.connection.markClientUnloadedAfterDeath();
--    }
-+        this.setClientLoaded(false);
-+    }
-+
+@@ -1258,6 +1258,15 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+         this.connection.markClientUnloadedAfterDeath();
+     }
+ 
 +    // Leaves start - exp fix
 +    private boolean shouldDropExperience(boolean eventResult, boolean forceUseEvent) {
 +        if (forceUseEvent) {
@@ -133,13 +28,14 @@ diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server
 +        return wasExperienceConsumed() ? false : eventResult;
 +    }
 +    // Leaves end - exp fix
- 
-     private void tellNeutralMobsThatIDied() {
++
+     protected void tellNeutralMobsThatIDied() { // Leaves private -> protected
          AABB aabb = new AABB(this.blockPosition()).inflate(32.0, 10.0, 32.0);
+         this.level()
 diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
-@@ -281,6 +281,7 @@
+@@ -281,6 +281,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
      private Waypoint.Icon locatorBarIcon = new Waypoint.Icon();
      // CraftBukkit start
      public int expToDrop;
@@ -147,19 +43,15 @@ diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/
      public List<DefaultDrop> drops = new java.util.ArrayList<>(); // Paper - Restore vanilla drops behavior
      public final org.bukkit.craftbukkit.attribute.CraftAttributeMap craftAttributes;
      public boolean collides = true;
-@@ -1868,9 +1869,10 @@
- 
-                     this.getCombatTracker().recheckStatus();
-                     if (entity != null) {
--                        entity.killedEntity((ServerLevel) this.level(), this, damageSource);
-+                        entity.killedEntity((ServerLevel) this.level(), this);
+@@ -1871,6 +1872,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+                         entity.killedEntity((ServerLevel) this.level(), this, damageSource);
                      }
                      this.gameEvent(GameEvent.ENTITY_DIE);
 +                    if (!this.wasExperienceConsumed()) this.dropExperience((ServerLevel) this.level(), damageSource.getEntity()); // Leaves - exp fix
                  } else {
                      this.dead = false;
                      this.setHealth((float) deathEvent.getReviveHealth());
-@@ -1947,7 +1949,7 @@
+@@ -1947,7 +1949,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
          this.drops = new java.util.ArrayList<>();
          // this.dropEquipment(level); // CraftBukkit - moved up
          // CraftBukkit end
@@ -171,7 +63,7 @@ diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/
 diff --git a/net/minecraft/world/level/block/entity/SculkCatalystBlockEntity.java b/net/minecraft/world/level/block/entity/SculkCatalystBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/SculkCatalystBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/SculkCatalystBlockEntity.java
-@@ -97,8 +97,7 @@
+@@ -97,8 +97,7 @@ public class SculkCatalystBlockEntity extends BlockEntity implements GameEventLi
          public boolean handleGameEvent(ServerLevel level, Holder<GameEvent> gameEvent, GameEvent.Context context, Vec3 pos) {
              if (gameEvent.is(GameEvent.ENTITY_DIE) && context.sourceEntity() instanceof LivingEntity livingEntity) {
                  if (!livingEntity.wasExperienceConsumed()) {

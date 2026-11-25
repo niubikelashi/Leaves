@@ -3,6 +3,7 @@ From: Helvetica Volubi <suisuroru@blue-millennium.fun>
 Date: Mon, 19 May 2025 00:06:03 +0800
 Subject: [PATCH] Spawn invulnerable time
 
+
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
@@ -22,7 +23,7 @@ diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server
          if (this.invulnerableTime > 0) {
              this.invulnerableTime--;
          }
-@@ -1295,6 +1297,13 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -1310,6 +1312,13 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
          if (this.isInvulnerableTo(level, damageSource)) {
              return false;
          } else {
@@ -36,3 +37,4 @@ diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server
              Entity entity = damageSource.getEntity();
              if (!( // Paper - split the if statement. If below statement is false, hurtServer would not have been evaluated. Return false.
               !(entity instanceof Player player && !this.canHarmPlayer(player))
+

@@ -3,6 +3,7 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Sun, 30 Jul 2023 12:20:16 +0800
 Subject: [PATCH] Zero tick plants
 
+
 diff --git a/net/minecraft/world/level/block/BambooStalkBlock.java b/net/minecraft/world/level/block/BambooStalkBlock.java
 --- a/net/minecraft/world/level/block/BambooStalkBlock.java
 +++ b/net/minecraft/world/level/block/BambooStalkBlock.java
@@ -77,3 +78,4 @@ diff --git a/net/minecraft/world/level/block/SugarCaneBlock.java b/net/minecraft
          }
      }
  
+

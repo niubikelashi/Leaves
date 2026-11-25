@@ -3,6 +3,8 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Sun, 14 Aug 2022 08:25:24 +0800
 Subject: [PATCH] Optimize suffocation
 
+This patch is Powered by Pufferfish(https://github.com/pufferfish-gg/Pufferfish)
+
 diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
@@ -28,8 +30,4 @@ diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/
      @Override
      public boolean hurtServer(ServerLevel level, DamageSource damageSource, float amount) {
          if (this.isInvulnerableTo(level, damageSource)) {
-@@ -4821,3 +4827,4 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
-     public record Fallsounds(SoundEvent small, SoundEvent big) {
-     }
- }
-+
+

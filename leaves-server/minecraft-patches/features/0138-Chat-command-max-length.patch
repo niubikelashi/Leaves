@@ -7,7 +7,7 @@ Subject: [PATCH] Chat command max length
 diff --git a/net/minecraft/network/protocol/game/ServerboundChatCommandPacket.java b/net/minecraft/network/protocol/game/ServerboundChatCommandPacket.java
 --- a/net/minecraft/network/protocol/game/ServerboundChatCommandPacket.java
 +++ b/net/minecraft/network/protocol/game/ServerboundChatCommandPacket.java
-@@ -12,11 +12,11 @@
+@@ -12,11 +12,11 @@ public record ServerboundChatCommandPacket(String command) implements Packet<Ser
      );
  
      private ServerboundChatCommandPacket(FriendlyByteBuf buffer) {
@@ -24,7 +24,7 @@ diff --git a/net/minecraft/network/protocol/game/ServerboundChatCommandPacket.ja
 diff --git a/net/minecraft/network/protocol/game/ServerboundChatCommandSignedPacket.java b/net/minecraft/network/protocol/game/ServerboundChatCommandSignedPacket.java
 --- a/net/minecraft/network/protocol/game/ServerboundChatCommandSignedPacket.java
 +++ b/net/minecraft/network/protocol/game/ServerboundChatCommandSignedPacket.java
-@@ -16,11 +16,11 @@
+@@ -16,11 +16,11 @@ public record ServerboundChatCommandSignedPacket(
      );
  
      private ServerboundChatCommandSignedPacket(FriendlyByteBuf buffer) {

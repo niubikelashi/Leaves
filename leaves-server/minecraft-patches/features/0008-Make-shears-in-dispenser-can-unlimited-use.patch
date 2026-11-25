@@ -3,6 +3,7 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Sun, 27 Feb 2022 14:07:57 +0800
 Subject: [PATCH] Make shears in dispenser can unlimited use
 
+
 diff --git a/net/minecraft/core/dispenser/ShearsDispenseItemBehavior.java b/net/minecraft/core/dispenser/ShearsDispenseItemBehavior.java
 --- a/net/minecraft/core/dispenser/ShearsDispenseItemBehavior.java
 +++ b/net/minecraft/core/dispenser/ShearsDispenseItemBehavior.java
@@ -15,8 +16,4 @@ diff --git a/net/minecraft/core/dispenser/ShearsDispenseItemBehavior.java b/net/
              }
          }
  
-@@ -95,3 +95,4 @@ public class ShearsDispenseItemBehavior extends OptionalDispenseItemBehavior {
-         return false;
-     }
- }
-+
+

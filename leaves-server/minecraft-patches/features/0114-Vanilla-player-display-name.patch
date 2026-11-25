@@ -3,17 +3,11 @@ From: Lumine1909 <133463833+Lumine1909@users.noreply.github.com>
 Date: Sun, 30 Mar 2025 21:53:45 +0800
 Subject: [PATCH] Vanilla player display name
 
+
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -474,21 +474,21 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
-         this.textFilter = server.createTextFilterForPlayer(this);
-         this.gameMode = server.createGameModeForPlayer(this);
-         this.gameMode.setGameModeForPlayer(this.calculateGameModeForNewPlayer(null), null);
-         this.recipeBook = new ServerRecipeBook((recipe, output) -> server.getRecipeManager().listDisplaysForRecipe(recipe, output));
-         this.stats = server.getPlayerList().getPlayerStats(this);
-         this.advancements = server.getPlayerList().getPlayerAdvancements(this);
-         this.updateOptionsNoEvents(clientInformation); // Paper - don't call options events on login
+@@ -481,7 +481,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
          this.object = null;
          // CraftBukkit start
          this.displayName = this.getScoreboardName();
@@ -22,24 +16,10 @@ diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server
          this.bukkitPickUpLoot = true;
          this.maxHealthCache = this.getMaxHealth();
          // CraftBukkit end
-     }
- 
-     @Override
-     public BlockPos adjustSpawnLocation(ServerLevel level, BlockPos pos) {
-         CompletableFuture<Vec3> completableFuture = PlayerSpawnFinder.findSpawn(level, pos);
-         level.chunkSource.mainThreadProcessor.managedBlock(completableFuture::isDone); // Paper - rewrite chunk system
-         return BlockPos.containing(completableFuture.join());
 diff --git a/net/minecraft/world/scores/Scoreboard.java b/net/minecraft/world/scores/Scoreboard.java
 --- a/net/minecraft/world/scores/Scoreboard.java
 +++ b/net/minecraft/world/scores/Scoreboard.java
-@@ -270,39 +270,57 @@ public class Scoreboard {
- 
-         this.onTeamRemoved(team);
-     }
- 
-     public boolean addPlayerToTeam(String playerName, PlayerTeam team) {
-         if (this.getPlayersTeam(playerName) != null) {
-             this.removePlayerFromTeam(playerName);
+@@ -277,6 +277,16 @@ public class Scoreboard {
          }
  
          this.teamsByPlayer.put(playerName, team);
@@ -56,19 +36,7 @@ diff --git a/net/minecraft/world/scores/Scoreboard.java b/net/minecraft/world/sc
          return team.getPlayers().add(playerName);
      }
  
-     public boolean removePlayerFromTeam(String playerName) {
-         PlayerTeam playersTeam = this.getPlayersTeam(playerName);
-         if (playersTeam != null) {
-             this.removePlayerFromTeam(playerName, playersTeam);
-             return true;
-         } else {
-             return false;
-         }
-     }
- 
-     public void removePlayerFromTeam(String playerName, PlayerTeam team) {
-         if (this.getPlayersTeam(playerName) != team) {
-             throw new IllegalStateException("Player is either on another team or not on any team. Cannot remove from team '" + team.getName() + "'.");
+@@ -296,6 +306,14 @@ public class Scoreboard {
          } else {
              this.teamsByPlayer.remove(playerName);
              team.getPlayers().remove(playerName);
@@ -83,10 +51,4 @@ diff --git a/net/minecraft/world/scores/Scoreboard.java b/net/minecraft/world/sc
          }
      }
  
-     public Collection<String> getTeamNames() {
-         return this.teamsByName.keySet();
-     }
- 
-     public Collection<PlayerTeam> getPlayerTeams() {
-         return this.teamsByName.values();
-     }
+

@@ -3,20 +3,27 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Sun, 2 Feb 2025 13:08:32 +0800
 Subject: [PATCH] Leaves Protocol Core
 
+
 diff --git a/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java b/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
 --- a/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
 +++ b/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
-@@ -46,7 +46,16 @@ public interface CustomPacketPayload {
+@@ -40,13 +40,22 @@ public interface CustomPacketPayload {
+ 
              @Override
-             public CustomPacketPayload decode(B buffer) {
-                 Identifier identifier = buffer.readIdentifier();
--                return (CustomPacketPayload)this.findCodec(identifier).decode(buffer);
+             public void encode(B buffer, CustomPacketPayload value) {
 +                // Leaves start - protocol core
 +                if (value instanceof org.leavesmc.leaves.protocol.core.LeavesCustomPayload payload) {
 +                    org.leavesmc.leaves.protocol.core.LeavesProtocolManager.encode(buffer, payload);
 +                    return;
 +                }
 +                // Leaves end - protocol core
+                 this.writeCap(buffer, value.type(), value);
+             }
+ 
+             @Override
+             public CustomPacketPayload decode(B buffer) {
+                 Identifier identifier = buffer.readIdentifier();
+-                return (CustomPacketPayload)this.findCodec(identifier).decode(buffer);
 +                // Leaves start - protocol core
 +                var payload = org.leavesmc.leaves.protocol.core.LeavesProtocolManager.decode(identifier, buffer);
 +                return java.util.Objects.requireNonNullElseGet(payload, () -> this.findCodec(identifier).decode(buffer));
@@ -64,7 +71,7 @@ diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/
 +            org.leavesmc.leaves.protocol.core.LeavesProtocolManager.handlePayload(org.leavesmc.leaves.protocol.core.ProtocolUtils.createSelector(this), leavesPayload);
 +            return;
 +        }
-+        if (packet.payload() instanceof net.minecraft.network.protocol.common.custom.DiscardedPayload(net.minecraft.resources.ResourceLocation id, byte[] data)) {
++        if (packet.payload() instanceof net.minecraft.network.protocol.common.custom.DiscardedPayload(net.minecraft.resources.Identifier id, byte[] data)) {
 +            if (org.leavesmc.leaves.protocol.core.LeavesProtocolManager.handleBytebuf(org.leavesmc.leaves.protocol.core.ProtocolUtils.createSelector(this), id, io.netty.buffer.Unpooled.wrappedBuffer(data))) {
 +                return;
 +            }
@@ -122,7 +129,7 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
              return;
          }
  
-+            org.leavesmc.leaves.protocol.core.LeavesProtocolManager.handlePlayerJoin(player);
++        org.leavesmc.leaves.protocol.core.LeavesProtocolManager.handlePlayerJoin(player);
 +
          final net.kyori.adventure.text.Component jm = playerJoinEvent.joinMessage();
  
@@ -143,3 +150,4 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
      }
  
      public boolean isAllowCommandsForAllPlayers() {
+

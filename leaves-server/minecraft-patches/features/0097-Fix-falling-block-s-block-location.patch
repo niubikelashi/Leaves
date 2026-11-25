@@ -3,10 +3,11 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Fri, 16 Feb 2024 19:50:03 +0800
 Subject: [PATCH] Fix falling block's block location
 
+
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -5063,6 +5063,15 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
+@@ -5080,6 +5080,15 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
              int floor = Mth.floor(x);
              int floor1 = Mth.floor(y);
              int floor2 = Mth.floor(z);
@@ -22,3 +23,4 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
              if (floor != this.blockPosition.getX() || floor1 != this.blockPosition.getY() || floor2 != this.blockPosition.getZ()) {
                  this.blockPosition = new BlockPos(floor, floor1, floor2);
                  this.inBlockState = null;
+

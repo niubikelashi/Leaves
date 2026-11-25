@@ -7,12 +7,13 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.leavesmc.leaves.bot.ServerBot;
+import org.leavesmc.leaves.entity.bot.actions.CraftBotAction;
 import org.leavesmc.leaves.entity.bot.actions.CraftUseItemToAction;
 
-public class ServerUseItemToAction extends ServerUseBotAction<ServerUseItemToAction> {
+public class ServerUseItemToAction extends AbstractUseBotAction<ServerUseItemToAction> {
 
     public ServerUseItemToAction() {
-        super("use_to", ServerUseItemToAction::new);
+        super("use_to");
     }
 
     @Override
@@ -32,6 +33,7 @@ public class ServerUseItemToAction extends ServerUseBotAction<ServerUseItemToAct
         }
 
         Vec3 vec3 = hitResult.getLocation().subtract(entity.getX(), entity.getY(), entity.getZ());
+        bot.updateItemInHand(hand);
         InteractionResult interactionResult = entity.interactAt(bot, vec3, hand);
         if (!interactionResult.consumesAction()) {
             interactionResult = bot.interactOn(hitResult.getEntity(), hand);
@@ -45,7 +47,7 @@ public class ServerUseItemToAction extends ServerUseBotAction<ServerUseItemToAct
     }
 
     @Override
-    public Object asCraft() {
+    public CraftBotAction<?, ServerUseItemToAction> asCraft() {
         return new CraftUseItemToAction(this);
     }
 }

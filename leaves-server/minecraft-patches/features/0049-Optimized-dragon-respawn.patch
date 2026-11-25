@@ -3,53 +3,31 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Tue, 27 Jun 2023 13:22:34 +0800
 Subject: [PATCH] Optimized dragon respawn
 
+
 diff --git a/net/minecraft/world/level/block/state/pattern/BlockPattern.java b/net/minecraft/world/level/block/state/pattern/BlockPattern.java
 --- a/net/minecraft/world/level/block/state/pattern/BlockPattern.java
 +++ b/net/minecraft/world/level/block/state/pattern/BlockPattern.java
-@@ -49,22 +49,22 @@ public class BlockPattern {
-     @VisibleForTesting
-     public Predicate<BlockInWorld>[][][] getPattern() {
-         return this.pattern;
-     }
- 
-     @VisibleForTesting
-     public BlockPattern.@Nullable BlockPatternMatch matches(LevelReader level, BlockPos pos, Direction finger, Direction thumb) {
-         LoadingCache<BlockPos, BlockInWorld> loadingCache = createLevelCache(level, false);
+@@ -57,7 +57,7 @@ public class BlockPattern {
          return this.matches(pos, finger, thumb, loadingCache);
      }
-+    public BlockPattern.BlockPatternMatch matches(BlockPos pos, Direction finger, Direction thumb, LoadingCache<BlockPos, BlockInWorld> cache) { // Leaves - private -> public
  
 -    private BlockPattern.@Nullable BlockPatternMatch matches(BlockPos pos, Direction finger, Direction thumb, LoadingCache<BlockPos, BlockInWorld> cache) {
++    public BlockPattern.@Nullable BlockPatternMatch matches(BlockPos pos, Direction finger, Direction thumb, LoadingCache<BlockPos, BlockInWorld> cache) { // Leaves - private -> public
          for (int i = 0; i < this.width; i++) {
              for (int i1 = 0; i1 < this.height; i1++) {
                  for (int i2 = 0; i2 < this.depth; i2++) {
-                     if (!this.pattern[i2][i1][i].test(cache.getUnchecked(translateAndRotate(pos, finger, thumb, i, i1, i2)))) {
-                         return null;
-                     }
-                 }
-             }
-         }
- 
 diff --git a/net/minecraft/world/level/dimension/end/EndDragonFight.java b/net/minecraft/world/level/dimension/end/EndDragonFight.java
 --- a/net/minecraft/world/level/dimension/end/EndDragonFight.java
 +++ b/net/minecraft/world/level/dimension/end/EndDragonFight.java
-@@ -262,22 +262,82 @@ public class EndDragonFight {
-                 for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
-                     if (blockEntity instanceof TheEndPortalBlockEntity) {
-                         return true;
-                     }
-                 }
-             }
-         }
- 
+@@ -270,7 +270,67 @@ public class EndDragonFight {
          return false;
      }
+ 
 +    // Leaves start - optimizedDragonRespawn
 +    private int cachePortalChunkIteratorX = -8;
 +    private int cachePortalChunkIteratorZ = -8;
 +    private int cachePortalOriginIteratorY = -1;
 +
- 
      public BlockPattern.@Nullable BlockPatternMatch findExitPortal() {
 +        if (org.leavesmc.leaves.LeavesConfig.performance.optimizedDragonRespawn) {
 +            int i, j;
@@ -109,21 +87,7 @@ diff --git a/net/minecraft/world/level/dimension/end/EndDragonFight.java b/net/m
          ChunkPos chunkPos = new ChunkPos(this.origin);
  
          for (int i = -8 + chunkPos.x; i <= 8 + chunkPos.x; i++) {
-             for (int i1 = -8 + chunkPos.z; i1 <= 8 + chunkPos.z; i1++) {
-                 LevelChunk chunk = this.level.getChunk(i, i1);
- 
-                 for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
-                     if (blockEntity instanceof TheEndPortalBlockEntity) {
-                         BlockPattern.BlockPatternMatch blockPatternMatch = this.exitPortalPattern.find(this.level, blockEntity.getBlockPos());
-                         if (blockPatternMatch != null) {
-@@ -560,20 +620,25 @@ public class EndDragonFight {
-                 list.addAll(entitiesOfClass);
-             }
- 
-             LOGGER.debug("Found all crystals, respawning dragon.");
-             return this.respawnDragon(list); // CraftBukkit - return value
-         }
-         return false; // CraftBukkit - return value
+@@ -567,6 +627,11 @@ public class EndDragonFight {
      }
  
      public boolean respawnDragon(List<EndCrystal> crystals) { // CraftBukkit - return boolean
@@ -135,10 +99,4 @@ diff --git a/net/minecraft/world/level/dimension/end/EndDragonFight.java b/net/m
          if (this.dragonKilled && this.respawnStage == null) {
              for (BlockPattern.BlockPatternMatch blockPatternMatch = this.findExitPortal(); blockPatternMatch != null; blockPatternMatch = this.findExitPortal()) {
                  for (int i = 0; i < this.exitPortalPattern.getWidth(); i++) {
-                     for (int i1 = 0; i1 < this.exitPortalPattern.getHeight(); i1++) {
-                         for (int i2 = 0; i2 < this.exitPortalPattern.getDepth(); i2++) {
-                             BlockInWorld block = blockPatternMatch.getBlock(i, i1, i2);
-                             if (block.getState().is(Blocks.BEDROCK) || block.getState().is(Blocks.END_PORTAL)) {
-                                 this.level.setBlockAndUpdate(block.getPos(), Blocks.END_STONE.defaultBlockState());
-                             }
-                         }
+

@@ -3,10 +3,11 @@ From: MC_XiaoHei <xor7xiaohei@gmail.com>
 Date: Thu, 3 Jul 2025 21:33:29 +0800
 Subject: [PATCH] Old leash behavior when use firework
 
+
 diff --git a/net/minecraft/world/item/FireworkRocketItem.java b/net/minecraft/world/item/FireworkRocketItem.java
 --- a/net/minecraft/world/item/FireworkRocketItem.java
 +++ b/net/minecraft/world/item/FireworkRocketItem.java
-@@ -70,7 +70,7 @@ public class FireworkRocketItem extends Item implements ProjectileItem {
+@@ -88,7 +88,7 @@ public class FireworkRocketItem extends Item implements ProjectileItem {
                  com.destroystokyo.paper.event.player.PlayerElytraBoostEvent event = new com.destroystokyo.paper.event.player.PlayerElytraBoostEvent((org.bukkit.entity.Player) player.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(itemInHand), (org.bukkit.entity.Firework) delayed.projectile().getBukkitEntity(), org.bukkit.craftbukkit.CraftEquipmentSlot.getHand(hand));
                  if (event.callEvent() && delayed.attemptSpawn()) {
                      player.awardStat(Stats.ITEM_USED.get(this)); // Moved up from below
@@ -15,3 +16,4 @@ diff --git a/net/minecraft/world/item/FireworkRocketItem.java b/net/minecraft/wo
                          level.playSound(null, player, SoundEvents.LEAD_BREAK, SoundSource.NEUTRAL, 1.0F, 1.0F);
                      }
                      if (event.shouldConsume() && !player.hasInfiniteMaterials()) {
+

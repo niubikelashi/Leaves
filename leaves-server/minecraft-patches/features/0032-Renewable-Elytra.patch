@@ -3,6 +3,8 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Mon, 12 Dec 2022 16:41:52 +0800
 Subject: [PATCH] Renewable Elytra
 
+This patch is Powered by Carpet-TIS-Addition(https://github.com/plusls/Carpet-TIS-Addition)
+
 diff --git a/net/minecraft/world/entity/monster/Phantom.java b/net/minecraft/world/entity/monster/Phantom.java
 --- a/net/minecraft/world/entity/monster/Phantom.java
 +++ b/net/minecraft/world/entity/monster/Phantom.java
@@ -27,3 +29,4 @@ diff --git a/net/minecraft/world/entity/monster/Phantom.java b/net/minecraft/wor
      static enum AttackPhase {
          CIRCLE,
          SWOOP;
+

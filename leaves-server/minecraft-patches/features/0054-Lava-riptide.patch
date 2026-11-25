@@ -3,6 +3,7 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Fri, 7 Jul 2023 16:53:32 +0800
 Subject: [PATCH] Lava riptide
 
+
 diff --git a/net/minecraft/world/item/TridentItem.java b/net/minecraft/world/item/TridentItem.java
 --- a/net/minecraft/world/item/TridentItem.java
 +++ b/net/minecraft/world/item/TridentItem.java
@@ -24,3 +25,4 @@ diff --git a/net/minecraft/world/item/TridentItem.java b/net/minecraft/world/ite
              return InteractionResult.FAIL;
          } else {
              player.startUsingItem(hand);
+

@@ -3,6 +3,7 @@ From: huanli233 <392352840@qq.com>
 Date: Sun, 27 Oct 2024 15:57:37 +0800
 Subject: [PATCH] Disable vault blacklist
 
+
 diff --git a/net/minecraft/world/level/block/entity/vault/VaultServerData.java b/net/minecraft/world/level/block/entity/vault/VaultServerData.java
 --- a/net/minecraft/world/level/block/entity/vault/VaultServerData.java
 +++ b/net/minecraft/world/level/block/entity/vault/VaultServerData.java
@@ -37,3 +38,4 @@ diff --git a/net/minecraft/world/level/block/entity/vault/VaultSharedData.java b
          if (!this.connectedPlayers.equals(set)) {
              this.connectedPlayers = set;
              this.markDirty();
+

@@ -3,6 +3,7 @@ From: huanli233 <392352840@qq.com>
 Date: Wed, 23 Oct 2024 23:10:48 +0800
 Subject: [PATCH] Old raid behavior
 
+
 diff --git a/net/minecraft/world/effect/BadOmenMobEffect.java b/net/minecraft/world/effect/BadOmenMobEffect.java
 --- a/net/minecraft/world/effect/BadOmenMobEffect.java
 +++ b/net/minecraft/world/effect/BadOmenMobEffect.java
@@ -196,7 +197,7 @@ diff --git a/net/minecraft/world/entity/raid/Raider.java b/net/minecraft/world/e
 +                        i = net.minecraft.util.Mth.clamp(i, 0, 4);
 +                        net.minecraft.world.effect.MobEffectInstance mobeffect1 = new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.BAD_OMEN, 120000, i, false, false, true);
 +
-+                        if (!serverLevel.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DISABLE_RAIDS)) {
++                        if (serverLevel.getGameRules().get(net.minecraft.world.level.gamerules.GameRules.RAIDS)) {
 +                            entityhuman.addEffect(mobeffect1, org.bukkit.event.entity.EntityPotionEffectEvent.Cause.PATROL_CAPTAIN); // CraftBukkit
 +                        }
 +                        this.setPatrolLeader(false);
@@ -207,8 +208,4 @@ diff --git a/net/minecraft/world/entity/raid/Raider.java b/net/minecraft/world/e
          }
  
          super.die(damageSource);
-@@ -568,3 +605,4 @@ public abstract class Raider extends PatrollingMonster {
-         }
-     }
- }
-+
+

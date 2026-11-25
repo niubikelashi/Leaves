@@ -3,6 +3,7 @@ From: MC_XiaoHei <xiaohei.xor7@outlook.com>
 Date: Tue, 20 May 2025 12:08:40 +0000
 Subject: [PATCH] Sound update suppression
 
+
 diff --git a/net/minecraft/world/level/block/SculkSensorBlock.java b/net/minecraft/world/level/block/SculkSensorBlock.java
 --- a/net/minecraft/world/level/block/SculkSensorBlock.java
 +++ b/net/minecraft/world/level/block/SculkSensorBlock.java
@@ -15,13 +16,15 @@ diff --git a/net/minecraft/world/level/block/SculkSensorBlock.java b/net/minecra
              && entity.getType() != EntityType.WARDEN
              && level.getBlockEntity(pos) instanceof SculkSensorBlockEntity sculkSensorBlockEntity
              && level instanceof ServerLevel serverLevel
-@@ -199,6 +199,13 @@ public class SculkSensorBlock extends BaseEntityBlock implements SimpleWaterlogg
+@@ -211,6 +211,15 @@ public class SculkSensorBlock extends BaseEntityBlock implements SimpleWaterlogg
          return state.getValue(PHASE);
      }
  
 +    // Leaves start - Sound update suppression
 +    public static boolean canActivate(BlockState state, BlockPos pos) {
-+        if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.updater.soundUpdateSuppression && !(state.getBlock() instanceof SculkSensorBlock)) throw new org.leavesmc.leaves.util.UpdateSuppressionException(pos, state.getBlock());
++        if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.updater.soundUpdateSuppression && !(state.getBlock() instanceof SculkSensorBlock)) {
++            throw new org.leavesmc.leaves.util.UpdateSuppressionException(pos, null, state.getBlock(), null, new IllegalArgumentException());
++        }
 +        return canActivate(state);
 +    }
 +    // Leaves end - Sound update suppression
@@ -50,8 +53,4 @@ diff --git a/net/minecraft/world/level/block/entity/SculkSensorBlockEntity.java 
                  int gameEventFrequency = VibrationSystem.getGameEventFrequency(gameEvent);
                  SculkSensorBlockEntity.this.setLastVibrationFrequency(gameEventFrequency);
                  int redstoneStrengthForDistance = VibrationSystem.getRedstoneStrengthForDistance(distance, this.getListenerRadius());
-@@ -142,3 +142,4 @@ public class SculkSensorBlockEntity extends BlockEntity implements GameEventList
-         }
-     }
- }
-+
+

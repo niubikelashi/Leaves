@@ -6,7 +6,7 @@ Subject: [PATCH] Vanilla Fluid Pushing
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -4777,8 +4777,82 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
+@@ -4794,8 +4794,82 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
          return Mth.lerp(partialTick, this.yRotO, this.yRot);
      }
  
@@ -89,3 +89,4 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
          if (this.touchingUnloadedChunk()) {
              return false;
          }
+

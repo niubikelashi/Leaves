@@ -6,7 +6,7 @@ Subject: [PATCH] Prevent loss of item drops due to update suppression when
 diff --git a/net/minecraft/server/level/ServerPlayerGameMode.java b/net/minecraft/server/level/ServerPlayerGameMode.java
 --- a/net/minecraft/server/level/ServerPlayerGameMode.java
 +++ b/net/minecraft/server/level/ServerPlayerGameMode.java
-@@ -398,8 +398,15 @@
+@@ -398,8 +398,15 @@ public class ServerPlayerGameMode {
                  org.bukkit.block.BlockState state = bblock.getState();
                  this.level.captureDrops = new java.util.ArrayList<>();
                  // CraftBukkit end
@@ -24,7 +24,7 @@ diff --git a/net/minecraft/server/level/ServerPlayerGameMode.java b/net/minecraf
                  if (SharedConstants.DEBUG_BLOCK_BREAK) {
                      LOGGER.info("server broke {} {} -> {}", pos, blockState1, this.level.getBlockState(pos));
                  }
-@@ -431,6 +438,8 @@
+@@ -431,6 +438,8 @@ public class ServerPlayerGameMode {
                  if (event.isDropItems()) {
                      org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockDropItemEvent(bblock, state, this.player, itemsToDrop); // Paper - capture all item additions to the world
                  }
@@ -33,7 +33,7 @@ diff --git a/net/minecraft/server/level/ServerPlayerGameMode.java b/net/minecraf
  
                  // Drop event experience
                  if (flag) {
-@@ -584,3 +593,4 @@
+@@ -584,3 +593,4 @@ public class ServerPlayerGameMode {
          this.level = level;
      }
  }

@@ -3,6 +3,8 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Thu, 20 Jul 2023 21:30:17 +0800
 Subject: [PATCH] Skip cloning advancement criteria
 
+This patch is Powered by Gale(https://github.com/GaleMC/Gale)
+
 diff --git a/net/minecraft/advancements/Advancement.java b/net/minecraft/advancements/Advancement.java
 --- a/net/minecraft/advancements/Advancement.java
 +++ b/net/minecraft/advancements/Advancement.java
@@ -15,3 +17,4 @@ diff --git a/net/minecraft/advancements/Advancement.java b/net/minecraft/advance
      }
  
      private static DataResult<Advancement> validate(Advancement advancement) {
+

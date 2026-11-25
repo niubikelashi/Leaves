@@ -6,7 +6,7 @@ Subject: [PATCH] Xaero Map Protocol
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -998,6 +998,7 @@ public abstract class PlayerList {
+@@ -1209,6 +1209,7 @@ public abstract class PlayerList {
          player.connection.send(new ClientboundSetChunkCacheRadiusPacket(level.spigotConfig.viewDistance));
          player.connection.send(new ClientboundSetSimulationDistancePacket(level.spigotConfig.simulationDistance));
          // Paper end
@@ -14,8 +14,9 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
          if (level.isRaining()) {
              // CraftBukkit start - handle player weather
              // player.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.START_RAINING, 0.0F));
-@@ -1299,3 +1300,4 @@ public abstract class PlayerList {
+@@ -1517,3 +1518,4 @@ public abstract class PlayerList {
          return this.allowCommandsForAllPlayers;
      }
  }
 +
+

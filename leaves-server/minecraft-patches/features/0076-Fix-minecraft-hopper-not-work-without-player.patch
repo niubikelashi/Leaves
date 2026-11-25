@@ -3,6 +3,7 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Wed, 16 Aug 2023 13:10:58 +0800
 Subject: [PATCH] Fix minecraft hopper not work without player
 
+
 diff --git a/net/minecraft/world/entity/vehicle/minecart/MinecartHopper.java b/net/minecraft/world/entity/vehicle/minecart/MinecartHopper.java
 --- a/net/minecraft/world/entity/vehicle/minecart/MinecartHopper.java
 +++ b/net/minecraft/world/entity/vehicle/minecart/MinecartHopper.java
@@ -20,3 +21,4 @@ diff --git a/net/minecraft/world/entity/vehicle/minecart/MinecartHopper.java b/n
      public boolean suckInItems() {
          if (HopperBlockEntity.suckInItems(this.level(), this)) {
              this.immunize(); // Paper
+
