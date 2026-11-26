@@ -5,10 +5,11 @@ Subject: [PATCH] Prevent loss of item drops due to update suppression when
  breaking blocks
 
 
+
 diff --git a/net/minecraft/server/level/ServerPlayerGameMode.java b/net/minecraft/server/level/ServerPlayerGameMode.java
 --- a/net/minecraft/server/level/ServerPlayerGameMode.java
 +++ b/net/minecraft/server/level/ServerPlayerGameMode.java
-@@ -382,7 +382,14 @@ public class ServerPlayerGameMode {
+@@ -402,7 +_,13 @@
                  this.level.captureDrops = new java.util.ArrayList<>();
                  // CraftBukkit end
                  BlockState blockState1 = org.leavesmc.leaves.command.subcommands.BlockUpdateCommand.isNoBlockUpdate() ? blockState : block.playerWillDestroy(this.level, pos, blockState, this.player); // Leaves - no block update
@@ -20,11 +21,10 @@ diff --git a/net/minecraft/server/level/ServerPlayerGameMode.java b/net/minecraf
 +                } catch (org.leavesmc.leaves.util.UpdateSuppressionException e) {
 +                    ex = e;
 +                    flag = false;
-+                }
-                 if (flag) {
-                     block.destroy(this.level, pos, blockState1);
+                 if (SharedConstants.DEBUG_BLOCK_BREAK) {
+                     LOGGER.info("server broke {} {} -> {}", pos, blockState1, this.level.getBlockState(pos));
                  }
-@@ -410,6 +417,8 @@ public class ServerPlayerGameMode {
+@@ -434,6 +_,8 @@
                  if (event.isDropItems()) {
                      org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockDropItemEvent(bblock, state, this.player, itemsToDrop); // Paper - capture all item additions to the world
                  }

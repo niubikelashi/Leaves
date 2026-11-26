@@ -3,11 +3,10 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Sun, 6 Apr 2025 00:19:06 +0800
 Subject: [PATCH] Disable packet limit
 
-
 diff --git a/net/minecraft/network/Connection.java b/net/minecraft/network/Connection.java
 --- a/net/minecraft/network/Connection.java
 +++ b/net/minecraft/network/Connection.java
-@@ -245,8 +245,8 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -245,8 +_,8 @@
                  if (this.stopReadingPackets) {
                      return;
                  }
@@ -21,16 +20,16 @@ diff --git a/net/minecraft/network/Connection.java b/net/minecraft/network/Conne
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -821,7 +821,7 @@ public class ServerGamePacketListenerImpl
+@@ -827,7 +_,7 @@
      public void handleCustomCommandSuggestions(ServerboundCommandSuggestionPacket packet) {
          // PacketUtils.ensureRunningOnSameThread(packet, this, this.player.level()); // Paper - AsyncTabCompleteEvent; run this async
          // CraftBukkit start
--        if (!this.tabSpamThrottler.isIncrementAndUnderThreshold() && !this.server.getPlayerList().isOp(this.player.getGameProfile()) && !this.server.isSingleplayerOwner(this.player.getGameProfile())) { // Paper - configurable tab spam limits
-+        if (!org.leavesmc.leaves.LeavesConfig.modify.disablePacketLimit && !this.tabSpamThrottler.isIncrementAndUnderThreshold() && !this.server.getPlayerList().isOp(this.player.getGameProfile()) && !this.server.isSingleplayerOwner(this.player.getGameProfile())) { // Paper - configurable tab spam limits // Leaves - can disable
+-        if (!this.tabSpamThrottler.isIncrementAndUnderThreshold() && !this.server.getPlayerList().isOp(this.player.nameAndId()) && !this.server.isSingleplayerOwner(this.player.nameAndId())) { // Paper - configurable tab spam limits
++        if (!org.leavesmc.leaves.LeavesConfig.modify.disablePacketLimit && !this.tabSpamThrottler.isIncrementAndUnderThreshold() && !this.server.getPlayerList().isOp(this.player.nameAndId()) && !this.server.isSingleplayerOwner(this.player.nameAndId())) { // Paper - configurable tab spam limits // Leaves - can disable
              this.disconnectAsync(Component.translatable("disconnect.spam"), org.bukkit.event.player.PlayerKickEvent.Cause.SPAM); // Paper - Kick event cause // Paper - add proper async disconnect
              return;
          }
-@@ -2002,6 +2002,7 @@ public class ServerGamePacketListenerImpl
+@@ -2009,6 +_,7 @@
      private static int getSpamThreshold() { return io.papermc.paper.configuration.GlobalConfiguration.get().spamLimiter.incomingPacketThreshold; } // Paper - Configurable threshold
  
      private boolean checkLimit(long timestamp) {
@@ -38,7 +37,7 @@ diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/ne
          if (this.lastLimitedPacket != -1 && timestamp - this.lastLimitedPacket < getSpamThreshold() && this.limitedPackets++ >= 8) { // Paper - Configurable threshold; raise packet limit to 8
              return false;
          }
-@@ -2536,6 +2537,7 @@ public class ServerGamePacketListenerImpl
+@@ -2543,6 +_,7 @@
  
      // Spigot start - spam exclusions
      private void detectRateSpam(String message) {
@@ -46,7 +45,7 @@ diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/ne
          // CraftBukkit start - replaced with thread safe throttle
          if (org.spigotmc.SpigotConfig.enableSpamExclusions) {
              for (String exclude : org.spigotmc.SpigotConfig.spamExclusions) {
-@@ -3246,7 +3248,7 @@ public class ServerGamePacketListenerImpl
+@@ -3256,7 +_,7 @@
      @Override
      public void handlePlaceRecipe(ServerboundPlaceRecipePacket packet) {
          // Paper start - auto recipe limit

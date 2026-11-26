@@ -5,10 +5,11 @@ Subject: [PATCH] InstantBlockUpdater Reintroduced
 
 This patch is Powered by Carpet-TIS-Addition(https://github.com/plusls/Carpet-TIS-Addition)
 
+
 diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Level.java
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
-@@ -873,7 +873,13 @@ public abstract class Level implements LevelAccessor, UUIDLookup<Entity>, AutoCl
+@@ -862,7 +_,13 @@
          this.thread = Thread.currentThread();
          this.biomeManager = new BiomeManager(this, biomeZoomSeed);
          this.isDebug = isDebug;
@@ -21,5 +22,5 @@ diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Le
 +        }
 +        // Leaves end - instantBlockUpdaterReintroduced
          this.registryAccess = registryAccess;
+         this.palettedContainerFactory = PalettedContainerFactory.create(registryAccess);
          this.damageSources = new DamageSources(registryAccess);
- 

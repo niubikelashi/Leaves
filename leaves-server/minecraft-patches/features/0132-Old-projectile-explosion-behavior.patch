@@ -3,16 +3,15 @@ From: MC_XiaoHei <xor7xiaohei@gmail.com>
 Date: Fri, 4 Jul 2025 09:11:46 +0800
 Subject: [PATCH] Old projectile explosion behavior
 
-
 diff --git a/net/minecraft/world/level/ServerExplosion.java b/net/minecraft/world/level/ServerExplosion.java
 --- a/net/minecraft/world/level/ServerExplosion.java
 +++ b/net/minecraft/world/level/ServerExplosion.java
-@@ -551,7 +551,7 @@ public class ServerExplosion implements Explosion {
-                             // Paper end - knockback events
-                         }
-                         // CraftBukkit end
--                        entity.push(vec3);
-+                        if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.oldProjectileExplosionBehavior) entity.setDeltaMovement(entity.getDeltaMovement().add(vec3)); else entity.push(vec3); // Leaves - old projectile explosion behavior
-                         if (entity instanceof Player player && !player.isSpectator() && (!player.isCreative() || !player.getAbilities().flying) && !level.paperConfig().environment.disableExplosionKnockback) { // Paper - Option to disable explosion knockback
-                             this.hitPlayers.put(player, vec3);
-                         }
+@@ -545,7 +_,7 @@
+                         this.hitPlayers.put(player, vec32);
+                     }
+ 
+-                    entity.onExplosionHit(this.source);
++                    if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.oldProjectileExplosionBehavior) entity.setDeltaMovement(entity.getDeltaMovement().add(vec3)); else entity.onExplosionHit(this.source); // Leaves - old projectile explosion behavior
+                 }
+             }
+         }

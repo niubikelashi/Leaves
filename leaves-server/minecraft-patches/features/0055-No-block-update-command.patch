@@ -5,21 +5,23 @@ Subject: [PATCH] No block update command
 
 
 diff --git a/net/minecraft/server/level/ServerPlayerGameMode.java b/net/minecraft/server/level/ServerPlayerGameMode.java
+
+diff --git a/net/minecraft/server/level/ServerPlayerGameMode.java b/net/minecraft/server/level/ServerPlayerGameMode.java
 --- a/net/minecraft/server/level/ServerPlayerGameMode.java
 +++ b/net/minecraft/server/level/ServerPlayerGameMode.java
-@@ -381,7 +381,7 @@ public class ServerPlayerGameMode {
+@@ -401,7 +_,7 @@
                  org.bukkit.block.BlockState state = bblock.getState();
                  this.level.captureDrops = new java.util.ArrayList<>();
                  // CraftBukkit end
 -                BlockState blockState1 = block.playerWillDestroy(this.level, pos, blockState, this.player);
 +                BlockState blockState1 = org.leavesmc.leaves.command.subcommands.BlockUpdateCommand.isNoBlockUpdate() ? blockState : block.playerWillDestroy(this.level, pos, blockState, this.player); // Leaves - no block update
                  boolean flag = this.level.removeBlock(pos, false);
-                 if (flag) {
-                     block.destroy(this.level, pos, blockState1);
+                 if (SharedConstants.DEBUG_BLOCK_BREAK) {
+                     LOGGER.info("server broke {} {} -> {}", pos, blockState1, this.level.getBlockState(pos));
 diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Level.java
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
-@@ -1089,6 +1089,11 @@ public abstract class Level implements LevelAccessor, UUIDLookup<Entity>, AutoCl
+@@ -1036,6 +_,11 @@
  
      @Override
      public boolean setBlock(BlockPos pos, BlockState state, int flags, int recursionLeft) {
@@ -31,7 +33,7 @@ diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Le
          // CraftBukkit start - tree generation
          if (this.captureTreeGeneration) {
              // Paper start - Protect Bedrock and End Portal/Frames from being destroyed
-@@ -1190,6 +1195,11 @@ public abstract class Level implements LevelAccessor, UUIDLookup<Entity>, AutoCl
+@@ -1137,6 +_,11 @@
          BlockState state = newState;
          BlockState blockState = oldState;
          BlockState blockState1 = currentState;
@@ -43,7 +45,7 @@ diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Le
          if (blockState1 == state) {
              if (blockState != blockState1) {
                  this.setBlocksDirty(pos, blockState, blockState1);
-@@ -1208,7 +1218,12 @@ public abstract class Level implements LevelAccessor, UUIDLookup<Entity>, AutoCl
+@@ -1155,7 +_,12 @@
  
              if ((flags & 16) == 0 && recursionLeft > 0) {
                  int i = flags & -34;
@@ -60,7 +62,7 @@ diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Le
 diff --git a/net/minecraft/world/level/block/piston/PistonBaseBlock.java b/net/minecraft/world/level/block/piston/PistonBaseBlock.java
 --- a/net/minecraft/world/level/block/piston/PistonBaseBlock.java
 +++ b/net/minecraft/world/level/block/piston/PistonBaseBlock.java
-@@ -105,6 +105,7 @@ public class PistonBaseBlock extends DirectionalBlock {
+@@ -100,6 +_,7 @@
      }
  
      private void checkIfExtend(Level level, BlockPos pos, BlockState state) {
@@ -71,7 +73,7 @@ diff --git a/net/minecraft/world/level/block/piston/PistonBaseBlock.java b/net/m
 diff --git a/net/minecraft/world/level/redstone/NeighborUpdater.java b/net/minecraft/world/level/redstone/NeighborUpdater.java
 --- a/net/minecraft/world/level/redstone/NeighborUpdater.java
 +++ b/net/minecraft/world/level/redstone/NeighborUpdater.java
-@@ -34,6 +34,11 @@ public interface NeighborUpdater {
+@@ -34,6 +_,11 @@
      static void executeShapeUpdate(
          LevelAccessor level, Direction direction, BlockPos pos, BlockPos neighborPos, BlockState neighborState, int flags, int recursionLeft
      ) {
@@ -83,7 +85,7 @@ diff --git a/net/minecraft/world/level/redstone/NeighborUpdater.java b/net/minec
          BlockState blockState = level.getBlockState(pos);
          if ((flags & 128) == 0 || !blockState.is(Blocks.REDSTONE_WIRE)) {
              BlockState blockState1 = blockState.updateShape(level, level, pos, direction, neighborPos, neighborState, level.getRandom());
-@@ -48,6 +53,7 @@ public interface NeighborUpdater {
+@@ -48,6 +_,7 @@
  
      static void executeUpdate(Level level, BlockState state, BlockPos pos, Block neighborBlock, @Nullable Orientation orientation, boolean movedByPiston, BlockPos sourcePos) {
          // Paper end - Add source block to BlockPhysicsEvent

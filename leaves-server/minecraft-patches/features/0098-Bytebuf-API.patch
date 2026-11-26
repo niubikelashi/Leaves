@@ -5,12 +5,14 @@ Subject: [PATCH] Bytebuf API
 
 
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
+
+diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -384,6 +384,13 @@ public abstract class PlayerList {
-             boolean _boolean = gameRules.getBoolean(GameRules.RULE_DO_IMMEDIATE_RESPAWN);
-             boolean _boolean1 = gameRules.getBoolean(GameRules.RULE_REDUCEDDEBUGINFO);
-             boolean _boolean2 = gameRules.getBoolean(GameRules.RULE_LIMITED_CRAFTING);
+@@ -169,6 +_,13 @@
+         boolean _boolean = gameRules.getBoolean(GameRules.RULE_DO_IMMEDIATE_RESPAWN);
+         boolean _boolean1 = gameRules.getBoolean(GameRules.RULE_REDUCEDDEBUGINFO);
+         boolean _boolean2 = gameRules.getBoolean(GameRules.RULE_LIMITED_CRAFTING);
 +
 +            // Leaves start - Bytebuf API
 +            if (!(player instanceof org.leavesmc.leaves.bot.ServerBot) && !(player instanceof org.leavesmc.leaves.replay.ServerPhotographer)) {
@@ -18,6 +20,6 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
 +            }
 +            // Leaves end - Bytebuf API
 +
-             serverGamePacketListenerImpl.send(
-                 new ClientboundLoginPacket(
-                     player.getId(),
+         serverGamePacketListenerImpl.send(
+             new ClientboundLoginPacket(
+                 player.getId(),

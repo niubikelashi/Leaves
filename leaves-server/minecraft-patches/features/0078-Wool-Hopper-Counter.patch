@@ -5,10 +5,11 @@ Subject: [PATCH] Wool Hopper Counter
 
 This patch is Powered by fabric-carpet(https://github.com/gnembon/fabric-carpet)
 
+
 diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -205,8 +205,30 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -196,6 +_,28 @@
                      flag |= validator.getAsBoolean(); // Paper - note: this is not a validator, it's what adds/sucks in items
                  }
  
@@ -28,18 +29,16 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
 +                }
 +                // Leaves end - Wool hopper counter
 +
-                 if (flag) {
-                     blockEntity.setCooldown(level.spigotConfig.hopperTransfer); // Spigot
 +                    // Leaves start - Wool hopper counter
 +                    if (org.leavesmc.leaves.LeavesConfig.modify.hopperCounter.unlimitedSpeed && org.leavesmc.leaves.util.HopperCounter.isEnabled() && woolHopperCounter(level, pos, state, HopperBlockEntity.getContainerAt(level, pos))) {
 +                        blockEntity.setCooldown(0);
 +                        return true;
 +                    }
 +                    // Leaves end - Wool hopper counter
+                 if (flag) {
+                     blockEntity.setCooldown(level.spigotConfig.hopperTransfer); // Spigot
                      setChanged(level, pos, state);
-                     // Leaves start - pca
-                     if (org.leavesmc.leaves.LeavesConfig.protocol.pca.enable) {
-@@ -432,6 +454,13 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -418,6 +_,13 @@
      // Paper end - Perf: Optimize Hoppers
  
      private static boolean ejectItems(Level level, BlockPos pos, HopperBlockEntity blockEntity) {
@@ -53,7 +52,7 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
          Container attachedContainer = getAttachedContainer(level, pos, blockEntity);
          if (attachedContainer == null) {
              return false;
-@@ -498,6 +527,26 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -484,6 +_,26 @@
          }
      }
  
@@ -80,7 +79,7 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
      private static int[] getSlots(Container container, Direction direction) {
          if (container instanceof WorldlyContainer worldlyContainer) {
              return worldlyContainer.getSlotsForFace(direction);
-@@ -632,6 +681,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -618,6 +_,7 @@
      }
  
      public static boolean addItem(Container container, ItemEntity item) {

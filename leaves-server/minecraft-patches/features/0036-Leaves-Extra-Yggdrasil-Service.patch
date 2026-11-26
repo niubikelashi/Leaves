@@ -3,11 +3,10 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Mon, 3 Feb 2025 15:48:19 +0800
 Subject: [PATCH] Leaves Extra Yggdrasil Service
 
-
 diff --git a/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java b/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java
 --- a/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java
 +++ b/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java
-@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
+@@ -48,7 +_,7 @@
  
  public class YggdrasilMinecraftSessionService implements MinecraftSessionService {
      private static final Logger LOGGER = LoggerFactory.getLogger(YggdrasilMinecraftSessionService.class);
@@ -19,7 +18,7 @@ diff --git a/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java 
 diff --git a/net/minecraft/server/Main.java b/net/minecraft/server/Main.java
 --- a/net/minecraft/server/Main.java
 +++ b/net/minecraft/server/Main.java
-@@ -178,7 +178,7 @@ public class Main {
+@@ -176,7 +_,7 @@
                  file = new File(bukkitConfiguration.getString("settings.world-container", "."));
              }
              // Paper end - fix SPIGOT-5824
@@ -31,12 +30,12 @@ diff --git a/net/minecraft/server/Main.java b/net/minecraft/server/Main.java
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -245,7 +245,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -247,7 +_,7 @@
      private boolean isDemo;
      private volatile boolean isReady;
      private long lastOverloadWarningNanos;
 -    protected final Services services;
 +    public final Services services; // Leaves - protected -> public
+     private final NotificationManager notificationManager;
      private long lastServerStatus;
      public final Thread serverThread;
-     private long lastTickNanos = Util.getNanos();

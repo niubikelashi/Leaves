@@ -5,12 +5,14 @@ Subject: [PATCH] Fix villagers dont release memory
 
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
+
+diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -4032,7 +4032,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
-         return this;
+@@ -4076,7 +_,7 @@
      }
  
+     @Nullable
 -    private Entity teleportCrossDimension(ServerLevel oldLevel, ServerLevel newLevel, TeleportTransition teleportTransition) {
 +    protected Entity teleportCrossDimension(ServerLevel oldLevel, ServerLevel newLevel, TeleportTransition teleportTransition) { // Leaves - private -> protected
          List<Entity> passengers = this.getPassengers();
@@ -19,7 +21,7 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
 diff --git a/net/minecraft/world/entity/npc/Villager.java b/net/minecraft/world/entity/npc/Villager.java
 --- a/net/minecraft/world/entity/npc/Villager.java
 +++ b/net/minecraft/world/entity/npc/Villager.java
-@@ -1033,4 +1033,19 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -1030,4 +_,19 @@
              return super.applyImplicitComponent(component, value);
          }
      }

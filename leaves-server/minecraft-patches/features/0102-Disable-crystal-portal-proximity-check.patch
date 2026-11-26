@@ -5,9 +5,11 @@ Subject: [PATCH] Disable crystal-portal proximity check
 
 
 diff --git a/net/minecraft/world/item/EndCrystalItem.java b/net/minecraft/world/item/EndCrystalItem.java
+
+diff --git a/net/minecraft/world/item/EndCrystalItem.java b/net/minecraft/world/item/EndCrystalItem.java
 --- a/net/minecraft/world/item/EndCrystalItem.java
 +++ b/net/minecraft/world/item/EndCrystalItem.java
-@@ -27,7 +27,7 @@ public class EndCrystalItem extends Item {
+@@ -27,7 +_,7 @@
          if (!blockState.is(Blocks.OBSIDIAN) && !blockState.is(Blocks.BEDROCK)) {
              return InteractionResult.FAIL;
          } else {
@@ -16,7 +18,7 @@ diff --git a/net/minecraft/world/item/EndCrystalItem.java b/net/minecraft/world/
              if (!level.isEmptyBlock(blockPos)) {
                  return InteractionResult.FAIL;
              } else {
-@@ -51,7 +51,7 @@ public class EndCrystalItem extends Item {
+@@ -51,7 +_,7 @@
                          level.gameEvent(context.getPlayer(), GameEvent.ENTITY_PLACE, blockPos);
                          EndDragonFight dragonFight = ((ServerLevel)level).getDragonFight();
                          if (dragonFight != null) {
@@ -28,7 +30,7 @@ diff --git a/net/minecraft/world/item/EndCrystalItem.java b/net/minecraft/world/
 diff --git a/net/minecraft/world/level/dimension/end/EndDragonFight.java b/net/minecraft/world/level/dimension/end/EndDragonFight.java
 --- a/net/minecraft/world/level/dimension/end/EndDragonFight.java
 +++ b/net/minecraft/world/level/dimension/end/EndDragonFight.java
-@@ -576,12 +576,14 @@ public class EndDragonFight {
+@@ -576,12 +_,14 @@
      }
  
      public boolean tryRespawn() { // CraftBukkit - return boolean
@@ -43,15 +45,15 @@ diff --git a/net/minecraft/world/level/dimension/end/EndDragonFight.java b/net/m
          if (this.dragonKilled && this.respawnStage == null) {
              BlockPos blockPos = this.portalLocation;
              if (blockPos == null) {
-@@ -596,6 +598,7 @@ public class EndDragonFight {
+@@ -596,6 +_,7 @@
  
                  blockPos = this.portalLocation;
              }
 +            /* Leaves
              // Paper start - Perf: Do crystal-portal proximity check before entity lookup
-             if (placedEndCrystalPos != null) {
+             if (placedEndCrystalPos != null && !level.paperConfig().misc.allowRemoteEnderDragonRespawning) {
                  // The end crystal must be 0 or 1 higher than the portal origin
-@@ -611,7 +614,7 @@ public class EndDragonFight {
+@@ -611,7 +_,7 @@
                  }
              }
              // Paper end - Perf: Do crystal-portal proximity check before entity lookup

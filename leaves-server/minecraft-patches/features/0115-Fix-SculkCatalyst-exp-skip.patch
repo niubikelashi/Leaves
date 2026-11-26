@@ -5,9 +5,11 @@ Subject: [PATCH] Fix SculkCatalyst exp skip
 
 
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
+
+diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -1105,7 +1105,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -1207,7 +_,7 @@
          }
  
          // SPIGOT-5478 must be called manually now
@@ -16,7 +18,7 @@ diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server
          // we clean the player's inventory after the EntityDeathEvent is called so plugins can get the exact state of the inventory.
          if (!event.getKeepInventory()) {
              // Paper start - PlayerDeathEvent#getItemsToKeep
-@@ -1152,6 +1152,15 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -1254,6 +_,15 @@
          this.setClientLoaded(false);
      }
  
@@ -35,7 +37,7 @@ diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server
 diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
-@@ -277,6 +277,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+@@ -278,6 +_,7 @@
      private Waypoint.Icon locatorBarIcon = new Waypoint.Icon();
      // CraftBukkit start
      public int expToDrop;
@@ -43,15 +45,15 @@ diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/
      public List<DefaultDrop> drops = new java.util.ArrayList<>(); // Paper - Restore vanilla drops behavior
      public final org.bukkit.craftbukkit.attribute.CraftAttributeMap craftAttributes;
      public boolean collides = true;
-@@ -1861,6 +1862,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
-                         entity.killedEntity((ServerLevel) this.level(), this);
+@@ -1868,6 +_,7 @@
+                         entity.killedEntity((ServerLevel) this.level(), this, damageSource);
                      }
                      this.gameEvent(GameEvent.ENTITY_DIE);
 +                    if (!this.wasExperienceConsumed()) this.dropExperience((ServerLevel) this.level(), damageSource.getEntity()); // Leaves - exp fix
                  } else {
                      this.dead = false;
                      this.setHealth((float) deathEvent.getReviveHealth());
-@@ -1934,7 +1936,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+@@ -1941,7 +_,7 @@
          this.drops = new java.util.ArrayList<>();
          // this.dropEquipment(level); // CraftBukkit - moved up
          // CraftBukkit end
@@ -63,7 +65,7 @@ diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/
 diff --git a/net/minecraft/world/level/block/entity/SculkCatalystBlockEntity.java b/net/minecraft/world/level/block/entity/SculkCatalystBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/SculkCatalystBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/SculkCatalystBlockEntity.java
-@@ -96,8 +96,7 @@ public class SculkCatalystBlockEntity extends BlockEntity implements GameEventLi
+@@ -96,8 +_,7 @@
          public boolean handleGameEvent(ServerLevel level, Holder<GameEvent> gameEvent, GameEvent.Context context, Vec3 pos) {
              if (gameEvent.is(GameEvent.ENTITY_DIE) && context.sourceEntity() instanceof LivingEntity livingEntity) {
                  if (!livingEntity.wasExperienceConsumed()) {

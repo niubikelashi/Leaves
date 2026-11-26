@@ -5,9 +5,11 @@ Subject: [PATCH] Force Void Trade
 
 
 diff --git a/net/minecraft/world/entity/npc/AbstractVillager.java b/net/minecraft/world/entity/npc/AbstractVillager.java
+
+diff --git a/net/minecraft/world/entity/npc/AbstractVillager.java b/net/minecraft/world/entity/npc/AbstractVillager.java
 --- a/net/minecraft/world/entity/npc/AbstractVillager.java
 +++ b/net/minecraft/world/entity/npc/AbstractVillager.java
-@@ -43,6 +43,7 @@ public abstract class AbstractVillager extends AgeableMob implements InventoryCa
+@@ -43,6 +_,7 @@
      @Nullable
      protected MerchantOffers offers;
      private final SimpleContainer inventory = new SimpleContainer(8, (org.bukkit.craftbukkit.entity.CraftAbstractVillager) this.getBukkitEntity()); // CraftBukkit - add argument
@@ -15,7 +17,7 @@ diff --git a/net/minecraft/world/entity/npc/AbstractVillager.java b/net/minecraf
  
      public AbstractVillager(EntityType<? extends AbstractVillager> entityType, Level level) {
          super(entityType, level);
-@@ -144,7 +145,13 @@ public abstract class AbstractVillager extends AgeableMob implements InventoryCa
+@@ -144,7 +_,13 @@
      @Override
      public void processTrade(MerchantOffer offer, @Nullable io.papermc.paper.event.player.PlayerPurchaseEvent event) { // The MerchantRecipe passed in here is the one set by the PlayerPurchaseEvent
          if (event == null || event.willIncreaseTradeUses()) {
@@ -30,7 +32,7 @@ diff --git a/net/minecraft/world/entity/npc/AbstractVillager.java b/net/minecraf
          }
          if (event == null || event.isRewardingExp()) {
              this.rewardTradeXp(offer);
-@@ -156,7 +163,7 @@ public abstract class AbstractVillager extends AgeableMob implements InventoryCa
+@@ -156,7 +_,7 @@
      @Override
      public void notifyTrade(MerchantOffer offer) {
          // offer.increaseUses(); // Paper - Add PlayerTradeEvent and PlayerPurchaseEvent
@@ -39,16 +41,16 @@ diff --git a/net/minecraft/world/entity/npc/AbstractVillager.java b/net/minecraf
          // this.rewardTradeXp(offer); // Paper - Add PlayerTradeEvent and PlayerPurchaseEvent
          if (this.tradingPlayer instanceof ServerPlayer) {
              CriteriaTriggers.TRADE.trigger((ServerPlayer)this.tradingPlayer, this, offer.getResult());
-@@ -173,7 +180,7 @@ public abstract class AbstractVillager extends AgeableMob implements InventoryCa
+@@ -173,7 +_,7 @@
      @Override
      public void notifyTradeUpdated(ItemStack stack) {
-         if (!this.level().isClientSide && this.ambientSoundTime > -this.getAmbientSoundInterval() + 20) {
+         if (!this.level().isClientSide() && this.ambientSoundTime > -this.getAmbientSoundInterval() + 20) {
 -            this.ambientSoundTime = -this.getAmbientSoundInterval();
 +            if (!voidTrade) this.ambientSoundTime = -this.getAmbientSoundInterval(); // Leaves - force void trade
              this.makeSound(this.getTradeUpdatedSound(!stack.isEmpty()));
          }
      }
-@@ -219,6 +226,12 @@ public abstract class AbstractVillager extends AgeableMob implements InventoryCa
+@@ -219,6 +_,12 @@
      }
  
      protected void stopTrading() {
@@ -61,7 +63,7 @@ diff --git a/net/minecraft/world/entity/npc/AbstractVillager.java b/net/minecraf
          this.setTradingPlayer(null);
      }
  
-@@ -297,4 +310,10 @@ public abstract class AbstractVillager extends AgeableMob implements InventoryCa
+@@ -297,4 +_,10 @@
      public boolean stillValid(Player player) {
          return this.getTradingPlayer() == player && this.isAlive() && player.canInteractWithEntity(this, 4.0);
      }
@@ -75,7 +77,7 @@ diff --git a/net/minecraft/world/entity/npc/AbstractVillager.java b/net/minecraf
 diff --git a/net/minecraft/world/entity/npc/Villager.java b/net/minecraft/world/entity/npc/Villager.java
 --- a/net/minecraft/world/entity/npc/Villager.java
 +++ b/net/minecraft/world/entity/npc/Villager.java
-@@ -383,6 +383,7 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -383,6 +_,7 @@
      }
  
      private void startTrading(Player player) {
@@ -83,7 +85,7 @@ diff --git a/net/minecraft/world/entity/npc/Villager.java b/net/minecraft/world/
          this.updateSpecialPrices(player);
          this.setTradingPlayer(player);
          this.openTradingScreen(player, this.getDisplayName(), this.getVillagerData().level());
-@@ -622,8 +623,12 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -622,8 +_,12 @@
      @Override
      protected void rewardTradeXp(MerchantOffer offer) {
          int i = 3 + this.random.nextInt(4);
@@ -101,7 +103,7 @@ diff --git a/net/minecraft/world/entity/npc/Villager.java b/net/minecraft/world/
 diff --git a/net/minecraft/world/entity/npc/WanderingTrader.java b/net/minecraft/world/entity/npc/WanderingTrader.java
 --- a/net/minecraft/world/entity/npc/WanderingTrader.java
 +++ b/net/minecraft/world/entity/npc/WanderingTrader.java
-@@ -124,9 +124,10 @@ public class WanderingTrader extends net.minecraft.world.entity.npc.AbstractVill
+@@ -124,9 +_,10 @@
                      return InteractionResult.CONSUME;
                  }
  
@@ -118,7 +120,7 @@ diff --git a/net/minecraft/world/entity/npc/WanderingTrader.java b/net/minecraft
 diff --git a/net/minecraft/world/inventory/MerchantMenu.java b/net/minecraft/world/inventory/MerchantMenu.java
 --- a/net/minecraft/world/inventory/MerchantMenu.java
 +++ b/net/minecraft/world/inventory/MerchantMenu.java
-@@ -25,7 +25,7 @@ public class MerchantMenu extends AbstractContainerMenu {
+@@ -25,7 +_,7 @@
      private static final int SELLSLOT2_X = 162;
      private static final int BUYSLOT_X = 220;
      private static final int ROW_Y = 37;
@@ -130,15 +132,15 @@ diff --git a/net/minecraft/world/inventory/MerchantMenu.java b/net/minecraft/wor
 diff --git a/net/minecraft/world/item/trading/MerchantOffer.java b/net/minecraft/world/item/trading/MerchantOffer.java
 --- a/net/minecraft/world/item/trading/MerchantOffer.java
 +++ b/net/minecraft/world/item/trading/MerchantOffer.java
-@@ -39,6 +39,7 @@ public class MerchantOffer {
+@@ -39,6 +_,7 @@
      public float priceMultiplier;
      public int xp;
      public boolean ignoreDiscounts; // Paper - Add ignore discounts API
 +    public int voidTradeUses; // Leaves - force void trade
  
      // CraftBukkit start
-     private org.bukkit.craftbukkit.inventory.@org.jspecify.annotations.Nullable CraftMerchantRecipe bukkitHandle;
-@@ -78,6 +79,7 @@ public class MerchantOffer {
+     private @javax.annotation.Nullable org.bukkit.craftbukkit.inventory.CraftMerchantRecipe bukkitHandle;
+@@ -78,6 +_,7 @@
          this.priceMultiplier = priceMultiplier;
          this.xp = xp;
          this.ignoreDiscounts = ignoreDiscounts; // Paper
@@ -146,7 +148,7 @@ diff --git a/net/minecraft/world/item/trading/MerchantOffer.java b/net/minecraft
      }
  
      public MerchantOffer(ItemCost baseCostA, ItemStack result, int maxUses, int xp, float priceMultiplier) {
-@@ -167,6 +169,16 @@ public class MerchantOffer {
+@@ -167,6 +_,16 @@
          this.uses++;
      }
  
@@ -163,7 +165,7 @@ diff --git a/net/minecraft/world/item/trading/MerchantOffer.java b/net/minecraft
      public int getDemand() {
          return this.demand;
      }
-@@ -196,7 +208,7 @@ public class MerchantOffer {
+@@ -196,7 +_,7 @@
      }
  
      public boolean isOutOfStock() {
@@ -175,7 +177,7 @@ diff --git a/net/minecraft/world/item/trading/MerchantOffer.java b/net/minecraft
 diff --git a/net/minecraft/world/level/block/EndGatewayBlock.java b/net/minecraft/world/level/block/EndGatewayBlock.java
 --- a/net/minecraft/world/level/block/EndGatewayBlock.java
 +++ b/net/minecraft/world/level/block/EndGatewayBlock.java
-@@ -109,6 +109,17 @@ public class EndGatewayBlock extends BaseEntityBlock implements Portal {
+@@ -109,6 +_,17 @@
      public TeleportTransition getPortalDestination(ServerLevel level, Entity entity, BlockPos pos) {
          if (level.getBlockEntity(pos) instanceof TheEndGatewayBlockEntity theEndGatewayBlockEntity) {
              Vec3 portalPosition = theEndGatewayBlockEntity.getPortalPosition(level, pos);

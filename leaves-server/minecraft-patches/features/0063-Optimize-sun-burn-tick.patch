@@ -5,10 +5,11 @@ Subject: [PATCH] Optimize sun burn tick
 
 This patch is Powered by Gale(https://github.com/GaleMC/Gale)
 
+
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -2112,9 +2112,20 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -2154,9 +_,20 @@
  
      @Deprecated
      public float getLightLevelDependentMagicValue() {
@@ -32,7 +33,7 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
      }
  
      public void absSnapTo(double x, double y, double z, float yRot, float xRot) {
-@@ -2129,6 +2140,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -2171,6 +_,7 @@
          this.xRotO = this.getXRot();
          this.setYHeadRot(yRot); // Paper - Update head rotation
      }
@@ -43,17 +44,10 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
 diff --git a/net/minecraft/world/entity/Mob.java b/net/minecraft/world/entity/Mob.java
 --- a/net/minecraft/world/entity/Mob.java
 +++ b/net/minecraft/world/entity/Mob.java
-@@ -1546,17 +1546,39 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
-     protected void playAttackSound() {
-     }
+@@ -1567,13 +_,32 @@
  
-+    // Leaves start - optimize sun burn tick
-+    @Nullable private BlockPos cached_eye_blockpos;
-+    @Nullable private net.minecraft.world.phys.Vec3 cached_position;
-+    // Leaves end - optimize sun burn tick
-+
      public boolean isSunBurnTick() {
-         if (this.level().isBrightOutside() && !this.level().isClientSide) {
+         if (this.level().isBrightOutside() && !this.level().isClientSide()) {
 -            float lightLevelDependentMagicValue = this.getLightLevelDependentMagicValue();
 -            BlockPos blockPos = BlockPos.containing(this.getX(), this.getEyeY(), this.getZ());
 -            boolean flag = this.isInWaterOrRain() || this.isInPowderSnow || this.wasInPowderSnow;
@@ -62,6 +56,10 @@ diff --git a/net/minecraft/world/entity/Mob.java b/net/minecraft/world/entity/Mo
 -                && !flag
 -                && this.level().canSeeSky(blockPos)) {
 -                return true;
++    // Leaves start - optimize sun burn tick
++    @Nullable private BlockPos cached_eye_blockpos;
++    @Nullable private net.minecraft.world.phys.Vec3 cached_position;
++    // Leaves end - optimize sun burn tick
 +            // Leaves start - optimize sun burn tick
 +            if (!org.leavesmc.leaves.LeavesConfig.performance.optimizeSunBurnTick) {
 +                float lightLevelDependentMagicValue = this.getLightLevelDependentMagicValue();
@@ -78,16 +76,12 @@ diff --git a/net/minecraft/world/entity/Mob.java b/net/minecraft/world/entity/Mo
 +                    this.cached_eye_blockpos = BlockPos.containing(this.getX(), this.getEyeY(), this.getZ());
 +                    this.cached_position = this.position();
 +                }
-+
 +                float f = this.getLightLevelDependentMagicValue(cached_eye_blockpos); // Pass BlockPos to getBrightness
-+
 +                // Check brightness first
 +                if (f <= 0.5F) return false;
 +                if (this.random.nextFloat() * 30.0F >= (f - 0.4F) * 2.0F) return false;
 +                boolean flag = this.isInWaterOrRain() || this.isInPowderSnow || this.wasInPowderSnow;
 +                return !flag && this.level().canSeeSky(this.cached_eye_blockpos);
-             }
 +            // Leaves end - optimize sun burn tick
+             }
          }
- 
-         return false;

@@ -5,12 +5,14 @@ Subject: [PATCH] Xaero Map Protocol
 
 
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
+
+diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -1318,6 +1318,7 @@ public abstract class PlayerList {
+@@ -1046,6 +_,7 @@
          player.connection.send(new ClientboundInitializeBorderPacket(worldBorder));
          player.connection.send(new ClientboundSetTimePacket(level.getGameTime(), level.getDayTime(), level.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT)));
-         player.connection.send(new ClientboundSetDefaultSpawnPositionPacket(level.getSharedSpawnPos(), level.getSharedSpawnAngle()));
+         player.connection.send(new ClientboundSetDefaultSpawnPositionPacket(level.getRespawnData()));
 +        org.leavesmc.leaves.protocol.XaeroMapProtocol.onSendWorldInfo(player); // Leaves - xaero map protocol
          if (level.isRaining()) {
              // CraftBukkit start - handle player weather
