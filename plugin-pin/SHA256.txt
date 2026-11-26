@@ -1,0 +1,6 @@
+# plugin-pin vendored 工件的 sha256 清单（构建前由 verify_plugin_pin.py 校验；条目不含本文件）
+c9b0afad2355c8718f974e5539610f24c7282f8cfe5b0465f9fec7afb1a91386  plugin-pin/org/leavesmc/leavesweight/leavesweight-core/2.1.0-SNAPSHOT/leavesweight-core-2.1.0-20260523.044214-4.jar
+54c71509b01dffdaaf0f370d97d907369e9ba12d05a52aae39aafa8a42adcadd  plugin-pin/org/leavesmc/leavesweight/leavesweight-core/2.1.0-SNAPSHOT/leavesweight-core-2.1.0-20260523.044214-4.pom
+d29586d4265fdb23bf91861745f57ad0f4cfd21a8ddfd8a35be5d95cef37bd8d  plugin-pin/org/leavesmc/leavesweight/leavesweight-core/2.1.0-SNAPSHOT/maven-metadata.xml
+a57673ae9c936a87ee16c090926640f2f59939bbe7b27f7384efdc81ec2aabbe  plugin-pin/org/leavesmc/leavesweight/patcher/org.leavesmc.leavesweight.patcher.gradle.plugin/2.1.0-SNAPSHOT/maven-metadata.xml
+2e3be319b10da7969e1a715e184ceda7c211ccfb2574048ea2c3cfc7ef87aebd  plugin-pin/org/leavesmc/leavesweight/patcher/org.leavesmc.leavesweight.patcher.gradle.plugin/2.1.0-SNAPSHOT/org.leavesmc.leavesweight.patcher.gradle.plugin-2.1.0-20260523.044214-4.pom
