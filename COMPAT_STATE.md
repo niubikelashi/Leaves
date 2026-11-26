@@ -622,3 +622,47 @@ compat/26.1.2 第 1 轮证据（分支 `compat/26.1.2`，从 `8ba0135` 切出并
 本轮记错本实际新增 **E122–E128**（不止上面写的 E122–E125）：E122（`gradle_task.ps1` 给 `gradle.properties` 写进 BOM+CRLF，提交前必须用 python 去 BOM/CRLF）、E123（github.com 大 pack push/pull 反复 `curl 28/56` → `-c http.postBuffer=524288000 -c http.version=HTTP/1.1`；fetch 侧先手动带 `GIT_SSL_CAINFO` fetch，或本地 mirror 只作对象供给、不改 origin）、E124（复现判据按 basename 排除 + 两侧同一套现算）、E125（上游 `leaves-server/src/main/java` / `leaves-api/src` 是 tracked 源码，移植必须整体采纳）、E126（GitHub `POST /git/tags` 必须带 `"type": "tag"`；Release 会把 tag ref 直接指向 commit）、E127（PS 5.1 里 `& $script <参数>` 报 BadExpression，不要写链式 wrapper，逐次直接调 `gradle_task.ps1`）。E120 出现次数升到 3（本轮复现 + 真实根因 `curl 56 Recv failure`）。另补 E128：`-c` 是 git 顶层选项，写在 `push` 子命令后面报 `error: unknown switch 'c'`（本文件 §21 的文档提交第一次就踩了，rc=129，改顺序后 rc=0）。记错本现 1601 行，索引行 128 与正文条目 128 对齐（模板行 `### Exxx` 不计入），证据 `round26-notebook-update.txt`、`round26-notebook-e128.txt`。
 
 **文档提交的真实推送结果**：`master` 从 `4cfe97f` 推到 **`7d74523241b61dc0f7bfe08157f2681675b71343`**（`git -c http.postBuffer=524288000 -c http.version=HTTP/1.1 push origin master`，`ls-remote` 与本地 HEAD 一致）。本轮未把 1.21.10 源码树并入 master，理由见 §21「未合并 master 的理由」。
+
+
+## §19 补充（第 27 轮）：tag 与提交的关系、tag 不迁移的理由、版本状态与两套插件坐标
+
+**tag / 提交对应关系（compat/1.21.11）**：tag `leaves-1.21.11-compat` 的 tag object 是 `47f0ebad9a4d837d3f4939f509d3f2f96f67c4d5`，其目标 commit 是发布提交 `34c9920cb3b9c040a1ea035eb362b4e9e7b4a271`；vendored 加固（`plugin-pin/** binary` + 本地仓库手法）落在提交 `0abd6f35be6bb24ae7d05dd810fbebaaede45741`；第 27 轮的 plugin-pin sha256 清单与构建前校验落在 `1ceb95c6d1a77574498961611780ecbc7c11f326`（分支 HEAD，`ls-remote` 一致）。这三者互相独立：tag 描述的是**发布构建**，加固与清单是**构建输入的防误改措施**。
+
+**为什么 tag 不迁移（判据先行）**：第 27 轮在 HEAD `1ceb95c` 上删 build 目录 + `--no-build-cache` 全量重建四个产物，用与第 23/24 轮同一套逐条目 CRC32 判据（嵌套 jar 递归展开、按 basename 排除 `MANIFEST.MF`/`versions.list`/`patches.list`/`*.jar.patch`）与交付快照比对 —— api 条目 2,495、server 18,568、bundler 55,676、clip 13,835，**仅交付 0 / 仅重建 0 / CRC 差异 0**（`round24-repro-vs-delivered.txt` 第 27 轮复核段）。这说明 `34c9920` 那次发布构建的产物字节集合与加固后的重建结果在判据上等价：加固没有改变产物内容，只是让插件字节来源变得可钉、可校验。因此 tag 继续指向 `34c9920`：把它迁到 `0abd6f3`/`1ceb95c` 会声明一次从未发布过的构建，并且要重新上传 asset，违反「不删除、不覆盖已有 Release 与 asset」的底线；可复现性由 §19/§20/§22 的证据链承担，不靠改 tag 表达。
+
+**版本状态（本轮定案）**：
+- `compat/1.21.11` = **success**（构建全绿 + 产物可复现 + 已发 Release），**连续非 success 计数重置为 0**，每版本 ≤10 轮 / 连续 2 个非 success 的 gate 对该版本**解除**；后续只做防误改维护。
+- `compat/1.21.10` = success（§21，提交 `6a63f73…`，release id 458635670）。
+- 26.x（`compat/26.1.2`、`compat/26.2` 及 blocked 的 26.1 / 26.1.1 / 26.3）继续按「只在 diag 分支验证、不合 master、不产 Release」执行，直到 Delete Timings 的重锚/语义结论有定案（见 §22 的前置条件）。
+
+**两套插件坐标（各自独立 vendored，不共用同一份 `plugin-pin/`）**：
+| 分支 | 插件声明 | vendored 时间戳坐标 | core jar sha256 |
+| --- | --- | --- | --- |
+| `compat/1.21.11` | `org.leavesmc.leavesweight.patcher` 2.0.0-SNAPSHOT | `2.0.0-20250422.125601-5`（buildNumber 5） | `8be5d5311e76943f86a6d7fd347dbcefde4e3ddafe8a75964c386629f6318e34`（12,137,119 B） |
+| `compat/1.21.10` | `org.leavesmc.leavesweight.patcher` 2.1.0-SNAPSHOT | `2.1.0-20260523.044214-4`（buildNumber 4） | `c9b0afad2355c8718f974e5539610f24c7282f8cfe5b0465f9fec7afb1a91386`（12,129,279 B） |
+
+坐标不同 → 两个分支各自 vendored 一份：1.21.11 的 core pom `88773d79…`、marker pom `87003402…`；1.21.10 的 core pom `54c71509…`（无 `<dependencies>`，shadowed）、core metadata 原件 1,396 B → 瘦身 1,124 B `d29586d4…`、marker pom 改写依赖为时间戳坐标后 1,965 B `2e3be319…`、marker metadata 657 B → 633 B `a57673ae…`。leavesclip 用 releases 的不可变正式版（1.21.11 = 3.0.10、1.21.10 = 3.0.8），不需要 vendored。每分支另有 `plugin-pin/SHA256.txt`（jar/pom/metadata 逐条 sha256）与仓库根 `verify_plugin_pin.py`（构建前校验，不一致 exit 1），`.gitattributes` 的 binary 覆盖整个 `plugin-pin/**`（含 `.pom`/`.xml`，不做换行转换，记错本 E121）。
+
+## §22 第 27 轮：收口动作、只读诊断与下一个目标（2026-11-26，Asia/Shanghai）
+
+**当前 ref（与实际一致）**：`compat/1.21.11` HEAD `1ceb95c6d1a77574498961611780ecbc7c11f326`（推送 `8aa4d28..1ceb95c`，`ls-remote` 同 sha，工作树脏条数 0）；`compat/1.21.10` HEAD `0155e2dd522d065db39fc39e2da9a396a5a3901c`（推送 `6a63f73..0155e2d`，`ls-remote` 同 sha，脏条数 0）；tag `leaves-1.21.11-compat` → `34c9920…`（未迁移，理由见 §19 补充），tag `leaves-1.21.10-compat` → `6a63f73…`（本轮清单提交不改 tag，同样理由）。
+
+**收口动作（全部入库并推送）**：两个 compat 分支各自新增 `plugin-pin/SHA256.txt`（清单不含自身）与仓库根 `verify_plugin_pin.py`，提交信息 `build(compat): plugin-pin sha256 清单入库 + 构建前字节校验（binary 属性已覆盖 plugin-pin/**）`；构建前校验各自 rc=0（清单条目 5、不一致 0，结论「可进入构建」）；证据 `round27-plugin-pin-manifest.txt` 逐条列出「磁盘 sha256 = `git show HEAD:` blob sha256 一致=True」。
+
+**产物复核**：`compat/1.21.11` 删 build 目录后以 `--no-build-cache` 重跑 api jar / server jar / bundler / clip（四次分次调用，日志 `1.21.11-round27-rebuild-*.log`，四次均 BUILD SUCCESSFUL：49s / 4m54s / 47s / 1m36s），逐条目 CRC 与交付快照差异 0（见 §19 补充）；`Leaves-1.21.11/gradle.properties` 在构建后按记错本 E122 用 `git checkout -- gradle.properties` 还原成入库版本（无 BOM/CRLF 残留），工作树脏条数 0。
+
+**1.21.10 的逐补丁只读三分类（不做全量构建）**：`patch_diag_12110_round27.py` 在权威基线上按文件名顺序模拟逐个应用（内存累积状态），判据是 hunk 的 old-side 行序列能否精确命中。结果（`round27-patch-diagnosis-12110.txt`）：minecraft 层 143、paper-server 层 17、paper-api 层 9 —— **可直接应用=169（含 offset）、需重锚=0、需语义改写=0**；另两个 `build.gradle.kts.patch`（10 + 4 hunk）的基线是已打补丁的生成物，标「需重锚」属预期（补丁体已在生成文件里落地，重放对象是未打补丁的上游生成物，见 §21 的 hunk #10 手工落地证据）。踩坑两处记进记错本：E129（补丁体空行导致解析 IndexError）、E130（嵌套 minecraft 仓库的 `ROOT` 是空树，不能当补丁基线，正确基线是 `a05bfc5 leaves File Patches`）。
+
+**1.21.11 的 A/B 类改动与 1.21.10 落点比对**：`round27-cross-version-landing.txt` 逐项核对 —— `CommandUtils.java` 两侧都在；`org.leavesmc.leaves.bytebuf.PacketType.java` 只在 1.21.11（1.21.10 上游落点不同）；旧 `LeavesCommandUtil.java` 两侧都无；legacy `SimpleBytebufManager.java` 1.21.10 仍有（上游 1.21.10 收录它，编译全绿，不需删）；我方 paper-server `0013-Leaves-Plugin.patch` 与 api `0009-Leaves-Plugin.patch` 两侧都在；1.21.11 删掉的 7 个上游已删 feature 补丁（0018/0056/0070/0083/0099/0127/0138）在 1.21.10 全部存在且能干净应用；`maxArrowDespawnInvulnerability` 只在 1.21.11 的 `paper-server/0007`。裁决：**不做 cherry-pick** —— 1.21.10 的补丁体与主源码来自上游 `dev/1.21.10` 权威落点且已全绿可复现，没有需要搬运的语义缺口；若将来重生成补丁后出现同落点差异，再按「同落点优先 cherry-pick → `applyAllPatches` 验证 → 落点不同单独重锚」的顺序处理。
+
+**1.21.9 的 `Entity.getServer()` 单独盘点（不假设与 1.21.11 相同）**：`round27-entity-getserver-1219.txt` 分类计数 —— 静态 `MinecraftServer.getServer()` 51 处、`Bukkit.getServer()` 3 处、entity 实例调用（`this.getServer()` / `player.getServer()`）19 处、我方自己声明的 `getServer()` 4 处（含 `MinecraftInternalPlugin`）；补丁里出现 getServer 的有 11 个（`0003-Leaves-Utils` 4、`0074-Replay-Mod-API` 9、`0001-Build-changes` 8 等）。核实姿势记进 E131：Paper 仓库不含 `net/minecraft` 源（API tree 查 `1.21.9` commit `0ff899dae…` blobs=4,508，唯一的 `Entity.java` 是 `paper-api/src/main/java/org/bukkit/entity/Entity.java`），raw 抓 404 不是路径错 → 存在性必须在 `applyAllPatches` 生成嵌套 minecraft 基线后用 `javap` 定案，再按「不恢复被上游删除的 API、改调用点」的既定裁决执行（原意图 + 新落点 + 等价性理由写进本文件）。本轮不动代码。
+
+**26.x 的前置条件（维持既定姿势）**：`compat/26.1.2` 的 Delete Timings 手工重锚结论必须先落成实际补丁并通过 `:leaves-api` 层，才谈主流水线；`compat/26.2` 的 timings 语义重写本轮不动（维持 blocked）；26.x 继续只在 diag 分支验证、不合 master、不产 Release。
+
+**底线复核**：`Leaves-base-1218` 仍是 detached `d93e9766d3797d130f66179e70a1b374c546fef7`、工作树干净，四个 1.21.8 jar 字节未动（api `cedb0e03…` / server `c4c90220…` / bundler `de50f798…` / clip `0064faf7…`）；本轮未创建/修改任何 Release 或 asset（GitHub 仍 releases=22、assets=39，与第 26 轮一致）；分支名与 commit 均按 `ls-remote` 复核过。
+
+**语义改写清单**：本轮新增 0（只读诊断与防误改改动）；流水线改造 0；§17 的历史语义清单保持不变。
+
+**记错本同步**：改写 E121（明确 `plugin-pin/` 下所有文件含 `.pom`/`.xml` 一律按 binary、不做换行转换，并补入 sha256 清单入库 + 构建前字节校验，出现次数升到 2）、新增 E129/E130/E131；记错本现 1,634 行，索引行 131 与正文条目 131 编号集合一致（模板行不计入），证据 `round27-notebook.txt`。
+
+**下一个目标**：`compat/1.21.9`（先跑 `applyAllPatches` 生成嵌套 minecraft 基线 → `javap` 定案 `Entity.getServer()` → 按「改调用点」裁决修编译 → compileJava 绿 → jar/bundler/clip → 与交付逐条目 CRC 复核 → 才宣布 success 并发 Release）；并行推进 26.1.2 的 Delete Timings 重锚补丁过 `:leaves-api` 层。
