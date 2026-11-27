@@ -5,7 +5,6 @@ Subject: [PATCH] No chat sign
 
 
 diff --git a/src/main/java/io/papermc/paper/adventure/ChatProcessor.java b/src/main/java/io/papermc/paper/adventure/ChatProcessor.java
-index 965ddeb8f57565d68415fb6f549e6d00feed3c33..84ae6df6932d50a41147da2570cce3bef90d10a4 100644
 --- a/src/main/java/io/papermc/paper/adventure/ChatProcessor.java
 +++ b/src/main/java/io/papermc/paper/adventure/ChatProcessor.java
 @@ -317,7 +317,7 @@ public final class ChatProcessor {

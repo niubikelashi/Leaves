@@ -1,0 +1,111 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Lumine1909 <133463833+Lumine1909@users.noreply.github.com>
+Date: Sun, 18 May 2025 19:58:42 +0800
+Subject: [PATCH] Leaves Config API
+
+
+diff --git a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
+--- a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
++++ b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
+@@ -320,7 +320,11 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+         try {
+             return super.createWorldConfig(contextMap);
+         } catch (IOException exception) {
+-            throw new RuntimeException("Could not create world config for " + levelKey, exception);
++            // Leaves start - technical mode
++            WorldConfiguration config = super.createWorldConfig(contextMap);
++            org.leavesmc.leaves.util.McTechnicalModeHelper.onWorldConfigCreate(config);
++            return config;
++            // Leaves end - technical mode
+         }
+     }
+ 
+@@ -336,6 +340,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+             for (ServerLevel level : server.getAllLevels()) {
+                 this.createWorldConfig(createWorldContextMap(level), reloader(this.worldConfigClass, level.paperConfig()));
+             }
++            org.leavesmc.leaves.util.McTechnicalModeHelper.doMcTechnicalModeIf(); // Leaves - mc technical survival mode
+         } catch (Exception ex) {
+             throw new RuntimeException("Could not reload paper configuration files", ex);
+         }
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+--- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+@@ -415,6 +415,8 @@ public final class CraftServer implements Server {
+ 
+         CraftRegistry.setMinecraftRegistry(console.registryAccess());
+ 
++        org.leavesmc.leaves.bytebuf.internal.InternalBytebufHandler.init(); // Leaves - Bytebuf API
++
+         if (!Main.useConsole) {
+             this.getLogger().info("Console input is disabled due to --noconsole command argument");
+         }
+@@ -2981,3 +2983,18 @@ public final class CraftServer implements Server {
+     }
+     // Leaves end - Bot API
+ }
++
++    // Leaves start - Bytebuf API
++    @Override
++    public org.leavesmc.leaves.bytebuf.BytebufAllocator getBytebufAllocator() {
++        return org.leavesmc.leaves.bytebuf.internal.InternalBytebufHandler.allocator();
++    }
++    // Leaves end - Bytebuf API
++
++    // Leaves start - Config API
++    @Override
++    public org.leavesmc.leaves.config.LeavesConfigProvider getLeavesConfig() {
++        return org.leavesmc.leaves.config.InternalConfigProvider.INSTANCE;
++    }
++    // Leaves end - Config API
++}
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftComplexPart.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftComplexPart.java
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftComplexPart.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftComplexPart.java
+@@ -12,14 +12,19 @@ public class CraftComplexPart extends CraftEntity implements ComplexEntityPart {
+         super(server, entity);
+     }
+ 
+-    @Override
+-    public EnderDragonPart getHandle() {
+-        return (EnderDragonPart) this.entity;
+-    }
++    // @Override // Leaves start - endDragonPartCanUseEndPortal
++    // public EnderDragonPart getHandle() {
++    //     return (EnderDragonPart) this.entity;
++    // }
+ 
+     @Override
+     public ComplexLivingEntity getParent() {
+-        return (ComplexLivingEntity) this.getHandle().parentMob.getBukkitEntity();
++        net.minecraft.world.entity.Entity entity = this.getHandle();
++        if (entity instanceof EnderDragonPart part) return (ComplexLivingEntity) part.parentMob.getBukkitEntity();
++        CraftEnderDragon dragon = new org.bukkit.craftbukkit.entity.CraftEnderDragon((org.bukkit.craftbukkit.CraftServer) org.bukkit.Bukkit.getServer(), (net.minecraft.world.entity.boss.enderdragon.EnderDragon) entity);
++        entity.bukkitEntity = dragon;
++        return dragon;
++        // Leaves end - endDragonPartCanUseEndPortal
+     }
+ 
+     @Override
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -3310,6 +3310,18 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
+             }
+         }
+ 
++
++    // Leaves start - Bytebuf API
++    @Override
++    public void send(org.leavesmc.leaves.bytebuf.PacketType packetType, org.leavesmc.leaves.bytebuf.Bytebuf bytebuf) {
++        org.leavesmc.leaves.bytebuf.internal.InternalBytebufHandler.sendPacket(this, packetType, bytebuf);
++    }
++
++    @Override
++    public @org.jetbrains.annotations.NotNull Object getChannel() {
++        return getHandle().connection.connection.channel;
++    }
++    // Leaves end - Bytebuf API
+         return null;
+     }
+ 

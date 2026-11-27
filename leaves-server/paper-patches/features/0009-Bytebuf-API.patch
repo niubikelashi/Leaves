@@ -1,12 +1,10 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: MC_XiaoHei <xiaohei.xor7@outlook.com>
-Date: Mon, 22 Jul 2024 09:05:56 +0000
-Subject: [PATCH] Leaves Plugin
+From: Lumine1909 <133463833+Lumine1909@users.noreply.github.com>
+Date: Thu, 6 Feb 2025 00:14:23 +0800
+Subject: [PATCH] Bytebuf API
 
-This patch is licensed under the MIT license.
 
 diff --git a/src/main/java/io/papermc/paper/command/PaperPluginsCommand.java b/src/main/java/io/papermc/paper/command/PaperPluginsCommand.java
-index 9c49bb7fb8c3ca4b62e73dcfca2669971defb181..b5fc7668d03cf314a8421e72e782da0cb7e6446a 100644
 --- a/src/main/java/io/papermc/paper/command/PaperPluginsCommand.java
 +++ b/src/main/java/io/papermc/paper/command/PaperPluginsCommand.java
 @@ -174,28 +174,41 @@ public class PaperPluginsCommand {
@@ -65,11 +63,34 @@ index 9c49bb7fb8c3ca4b62e73dcfca2669971defb181..b5fc7668d03cf314a8421e72e782da0c
  
          for (final Component component : formatProviders(spigotPlugins)) {
              sender.sendMessage(component);
+diff --git a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
+--- a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
++++ b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
+@@ -320,7 +320,11 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+         try {
+             return super.createWorldConfig(contextMap);
+         } catch (IOException exception) {
+-            throw new RuntimeException("Could not create world config for " + levelKey, exception);
++            // Leaves start - technical mode
++            WorldConfiguration config = super.createWorldConfig(contextMap);
++            org.leavesmc.leaves.util.McTechnicalModeHelper.onWorldConfigCreate(config);
++            return config;
++            // Leaves end - technical mode
+         }
+     }
+ 
+@@ -336,6 +340,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+             for (ServerLevel level : server.getAllLevels()) {
+                 this.createWorldConfig(createWorldContextMap(level), reloader(this.worldConfigClass, level.paperConfig()));
+             }
++            org.leavesmc.leaves.util.McTechnicalModeHelper.doMcTechnicalModeIf(); // Leaves - mc technical survival mode
+         } catch (Exception ex) {
+             throw new RuntimeException("Could not reload paper configuration files", ex);
+         }
 diff --git a/src/main/java/io/papermc/paper/plugin/PluginInitializerManager.java b/src/main/java/io/papermc/paper/plugin/PluginInitializerManager.java
-index 3200aef1ba5d079fc3790841c826b4cf3951f2cf..440104ac53a8445ee6f729028209ae1366c3fa38 100644
 --- a/src/main/java/io/papermc/paper/plugin/PluginInitializerManager.java
 +++ b/src/main/java/io/papermc/paper/plugin/PluginInitializerManager.java
-@@ -121,19 +121,30 @@ public class PluginInitializerManager {
+@@ -112,19 +112,30 @@ public class PluginInitializerManager {
          java.util.List<Path> dirs = ((java.util.List<File>) optionSet.valuesOf("add-plugin-dir")).stream().map(File::toPath).toList();
          dirs.forEach(pluginDir -> io.papermc.paper.plugin.util.EntrypointUtil.registerProvidersFromSource(io.papermc.paper.plugin.provider.source.DirectoryProviderSource.INSTANCE_NO_CREATE, pluginDir));
  
@@ -102,7 +123,6 @@ index 3200aef1ba5d079fc3790841c826b4cf3951f2cf..440104ac53a8445ee6f729028209ae13
              if (LOGGER.isDebugEnabled()) {
                  LOGGER.info("Paper plugins ({}):\n - {}", paperPluginNames.size(), String.join("\n - ", paperPluginNames));
 diff --git a/src/main/java/io/papermc/paper/plugin/provider/configuration/LegacyPaperMeta.java b/src/main/java/io/papermc/paper/plugin/provider/configuration/LegacyPaperMeta.java
-index 8cd649c977172f6b757d68565fcbb9eb8ae100a3..c18a94af99c827d73c31279e324e15ec8217a31d 100644
 --- a/src/main/java/io/papermc/paper/plugin/provider/configuration/LegacyPaperMeta.java
 +++ b/src/main/java/io/papermc/paper/plugin/provider/configuration/LegacyPaperMeta.java
 @@ -18,7 +18,7 @@ import java.util.List;
@@ -128,7 +148,6 @@ index 8cd649c977172f6b757d68565fcbb9eb8ae100a3..c18a94af99c827d73c31279e324e15ec
          return ConfigurationTransformation.builder()
              .addAction(NodePath.path(), (path, value) -> {
 diff --git a/src/main/java/io/papermc/paper/plugin/provider/configuration/PaperPluginMeta.java b/src/main/java/io/papermc/paper/plugin/provider/configuration/PaperPluginMeta.java
-index d3b3a8baca013909fa9c6204d964d7d7efeb2719..753fdb9782ee6b4cb8e232ebfdd52dea5d9e2a66 100644
 --- a/src/main/java/io/papermc/paper/plugin/provider/configuration/PaperPluginMeta.java
 +++ b/src/main/java/io/papermc/paper/plugin/provider/configuration/PaperPluginMeta.java
 @@ -55,7 +55,7 @@ public class PaperPluginMeta implements PluginMeta {
@@ -141,7 +160,6 @@ index d3b3a8baca013909fa9c6204d964d7d7efeb2719..753fdb9782ee6b4cb8e232ebfdd52dea
      private String website;
      private String prefix;
 diff --git a/src/main/java/io/papermc/paper/plugin/provider/type/PluginFileType.java b/src/main/java/io/papermc/paper/plugin/provider/type/PluginFileType.java
-index e5a5fcaccfe85298f6fe4b47ba97aa633a8cb855..62c70d1fb20c3dbfad13a4027669d295ac9a39a8 100644
 --- a/src/main/java/io/papermc/paper/plugin/provider/type/PluginFileType.java
 +++ b/src/main/java/io/papermc/paper/plugin/provider/type/PluginFileType.java
 @@ -23,6 +23,7 @@ import java.util.jar.JarFile;
@@ -176,7 +194,6 @@ index e5a5fcaccfe85298f6fe4b47ba97aa633a8cb855..62c70d1fb20c3dbfad13a4027669d295
      private final String config;
      private final PluginTypeFactory<T, C> factory;
 diff --git a/src/main/java/io/papermc/paper/plugin/provider/type/paper/PaperPluginParent.java b/src/main/java/io/papermc/paper/plugin/provider/type/paper/PaperPluginParent.java
-index 55a6898e95704cddafda1ca5dc0951c7102fe10b..283f046c6f34c83f01e1ca1d80cbd7cc35a2b7d2 100644
 --- a/src/main/java/io/papermc/paper/plugin/provider/type/paper/PaperPluginParent.java
 +++ b/src/main/java/io/papermc/paper/plugin/provider/type/paper/PaperPluginParent.java
 @@ -27,6 +27,7 @@ import java.util.jar.JarFile;
@@ -221,7 +238,6 @@ index 55a6898e95704cddafda1ca5dc0951c7102fe10b..283f046c6f34c83f01e1ca1d80cbd7cc
          return new PaperServerPluginProvider(provider);
      }
 diff --git a/src/main/java/io/papermc/paper/plugin/storage/SimpleProviderStorage.java b/src/main/java/io/papermc/paper/plugin/storage/SimpleProviderStorage.java
-index 26422904751647a061397ce978bba752149003cd..884ed63dab16acca83fe8f421762f2561400b1fb 100644
 --- a/src/main/java/io/papermc/paper/plugin/storage/SimpleProviderStorage.java
 +++ b/src/main/java/io/papermc/paper/plugin/storage/SimpleProviderStorage.java
 @@ -26,6 +26,16 @@ public abstract class SimpleProviderStorage<T> implements ProviderStorage<T> {
@@ -241,30 +257,19 @@ index 26422904751647a061397ce978bba752149003cd..884ed63dab16acca83fe8f421762f256
          this.providers.add(provider);
      }
  
-diff --git a/src/main/java/io/papermc/paper/pluginremap/PluginRemapper.java b/src/main/java/io/papermc/paper/pluginremap/PluginRemapper.java
-index fbad4a2242aa1ab910b2e2ae4cce973ff63fda84..89d4fa952d072dd6e071dc9eef51f4050f7e750e 100644
---- a/src/main/java/io/papermc/paper/pluginremap/PluginRemapper.java
-+++ b/src/main/java/io/papermc/paper/pluginremap/PluginRemapper.java
-@@ -337,7 +337,13 @@ public final class PluginRemapper {
-                     }
-                     index.skip(inputFile);
-                     return CompletableFuture.completedFuture(inputFile);
--                }
-+                } else if (ns == null && Files.exists(fs.getPath(PluginFileType.LEAVES_PLUGIN_JSON))) { // Leaves start - leaves plugin
-+                    if (DEBUG_LOGGING) {
-+                        LOGGER.info("Plugin '{}' is a Leaves plugin with no namespace specified.", inputFile);
-+                    }
-+                    index.skip(inputFile);
-+                    return CompletableFuture.completedFuture(inputFile);
-+                } // Leaves end - leaves plugin
-             }
-         } catch (final IOException ex) {
-             return CompletableFuture.failedFuture(new RuntimeException("Failed to open plugin jar " + inputFile, ex));
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 7d74bedf91d6448dc2bf2920a84d8e93edf2a279..b22f9cf5da95435527aaae99e23f6f834727072f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -2973,6 +2973,13 @@ public final class CraftServer implements Server {
+@@ -415,6 +415,8 @@ public final class CraftServer implements Server {
+ 
+         CraftRegistry.setMinecraftRegistry(console.registryAccess());
+ 
++        org.leavesmc.leaves.bytebuf.internal.InternalBytebufHandler.init(); // Leaves - Bytebuf API
++
+         if (!Main.useConsole) {
+             this.getLogger().info("Console input is disabled due to --noconsole command argument");
+         }
+@@ -2967,6 +2969,13 @@ public final class CraftServer implements Server {
          this.console.addPluginAllowingSleep(plugin.getName(), value);
      }
  
@@ -278,3 +283,65 @@ index 7d74bedf91d6448dc2bf2920a84d8e93edf2a279..b22f9cf5da95435527aaae99e23f6f83
      // Leaves start - Bot API
      @Override
      public org.leavesmc.leaves.entity.bot.CraftBotManager getBotManager() {
+@@ -2974,3 +2983,11 @@ public final class CraftServer implements Server {
+     }
+     // Leaves end - Bot API
+ }
++
++    // Leaves start - Bytebuf API
++    @Override
++    public org.leavesmc.leaves.bytebuf.BytebufAllocator getBytebufAllocator() {
++        return org.leavesmc.leaves.bytebuf.internal.InternalBytebufHandler.allocator();
++    }
++    // Leaves end - Bytebuf API
++}
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftComplexPart.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftComplexPart.java
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftComplexPart.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftComplexPart.java
+@@ -12,14 +12,19 @@ public class CraftComplexPart extends CraftEntity implements ComplexEntityPart {
+         super(server, entity);
+     }
+ 
+-    @Override
+-    public EnderDragonPart getHandle() {
+-        return (EnderDragonPart) this.entity;
+-    }
++    // @Override // Leaves start - endDragonPartCanUseEndPortal
++    // public EnderDragonPart getHandle() {
++    //     return (EnderDragonPart) this.entity;
++    // }
+ 
+     @Override
+     public ComplexLivingEntity getParent() {
+-        return (ComplexLivingEntity) this.getHandle().parentMob.getBukkitEntity();
++        net.minecraft.world.entity.Entity entity = this.getHandle();
++        if (entity instanceof EnderDragonPart part) return (ComplexLivingEntity) part.parentMob.getBukkitEntity();
++        CraftEnderDragon dragon = new org.bukkit.craftbukkit.entity.CraftEnderDragon((org.bukkit.craftbukkit.CraftServer) org.bukkit.Bukkit.getServer(), (net.minecraft.world.entity.boss.enderdragon.EnderDragon) entity);
++        entity.bukkitEntity = dragon;
++        return dragon;
++        // Leaves end - endDragonPartCanUseEndPortal
+     }
+ 
+     @Override
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -3310,6 +3310,18 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
+             }
+         }
+ 
++
++    // Leaves start - Bytebuf API
++    @Override
++    public void send(org.leavesmc.leaves.bytebuf.PacketType packetType, org.leavesmc.leaves.bytebuf.Bytebuf bytebuf) {
++        org.leavesmc.leaves.bytebuf.internal.InternalBytebufHandler.sendPacket(this, packetType, bytebuf);
++    }
++
++    @Override
++    public @org.jetbrains.annotations.NotNull Object getChannel() {
++        return getHandle().connection.connection.channel;
++    }
++    // Leaves end - Bytebuf API
+         return null;
+     }
+ 
