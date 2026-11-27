@@ -11,7 +11,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.leavesmc.leaves.LeavesLogger;
-import org.leavesmc.leaves.bot.ServerBot;
 import org.leavesmc.leaves.event.player.UpdateSuppressionEvent;
 
 import java.util.ArrayList;
@@ -101,11 +100,8 @@ public class UpdateSuppressionException extends RuntimeException {
             messages.add("in %s".formatted(level.dimension().identifier()));
         }
         if (player != null) {
-            if (player instanceof ServerBot) {
-                messages.add("by %s[bot]".formatted(player.displayName));
-            } else {
-                messages.add("by %s".formatted(player.displayName));
-            }
+            // Leaves - 26.2 compat: bot 标注随 bot 特性延期（docs/deferred-26.2/REMOVED-FEATURES.md）
+            messages.add("by %s".formatted(player.displayName));
         }
         return String.join(" ", messages);
     }

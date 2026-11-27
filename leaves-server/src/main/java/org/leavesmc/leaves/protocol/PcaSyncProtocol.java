@@ -25,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.leavesmc.leaves.LeavesConfig;
 import org.leavesmc.leaves.LeavesLogger;
-import org.leavesmc.leaves.bot.ServerBot;
 import org.leavesmc.leaves.plugin.MinecraftInternalPlugin;
 import org.leavesmc.leaves.protocol.core.LeavesCustomPayload;
 import org.leavesmc.leaves.protocol.core.LeavesProtocol;
@@ -136,18 +135,17 @@ public class PcaSyncProtocol implements LeavesProtocol {
                         case NOBODY -> {
                             return;
                         }
+                        // Leaves - 26.2 compat: BOT 目标随 bot 特性延期，直接拒绝（docs/deferred-26.2/REMOVED-FEATURES.md）
                         case BOT -> {
-                            if (!(entity instanceof ServerBot)) {
-                                return;
-                            }
+                            return;
                         }
                         case OPS -> {
-                            if (!(entity instanceof ServerBot) && !server.getPlayerList().isOp(player.nameAndId())) {
+                            if (!server.getPlayerList().isOp(player.nameAndId())) {
                                 return;
                             }
                         }
                         case OPS_AND_SELF -> {
-                            if (!(entity instanceof ServerBot) && !server.getPlayerList().isOp(player.nameAndId()) && entity != player) {
+                            if (!server.getPlayerList().isOp(player.nameAndId()) && entity != player) {
                                 return;
                             }
                         }

@@ -17,7 +17,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.NameAndId;
 import org.jetbrains.annotations.Nullable;
 import org.leavesmc.leaves.LeavesConfig;
-import org.leavesmc.leaves.bot.ServerBot;
 
 import java.net.InetAddress;
 import java.net.Proxy;
@@ -52,7 +51,7 @@ public class LeavesMinecraftSessionService extends PaperMinecraftSessionService 
         ProfileResult result = super.hasJoinedServer(profileName, serverId, address); // mojang
 
         ServerPlayer player = MinecraftServer.getServer().getPlayerList().getPlayerByName(profileName);
-        if (player != null && !(player instanceof ServerBot)) {
+        if (player != null) {
             return null; // if it has same name, return null
         }
 

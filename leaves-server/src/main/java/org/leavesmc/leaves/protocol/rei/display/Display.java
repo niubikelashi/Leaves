@@ -24,11 +24,9 @@ import net.minecraft.world.item.component.Fireworks;
 import net.minecraft.world.item.component.ProvidesTrimMaterial;
 import net.minecraft.world.item.crafting.FireworkRocketRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.MapCloningRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SmithingTransformRecipe;
 import net.minecraft.world.item.crafting.SmithingTrimRecipe;
-import net.minecraft.world.item.crafting.TippedArrowRecipe;
 import net.minecraft.world.item.crafting.TransmuteRecipe;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay;
@@ -102,38 +100,7 @@ public abstract class Display {
         return displayList;
     }
 
-    /**
-     * see me.shedaniel.rei.plugin.client.categories.crafting.filler.TippedArrowRecipeFiller#apply
-     */
-    @NotNull
-    public static Collection<Display> ofTippedArrowRecipe(@NotNull RecipeHolder<TippedArrowRecipe> recipeHolder) {
-        EntryIngredient arrowIngredient = EntryIngredient.of(Items.ARROW);
-        Set<Identifier> registeredPotions = new HashSet<>();
-        List<Display> displays = new ArrayList<>();
-        MinecraftServer.getServer().registryAccess().lookup(Registries.POTION).stream()
-            .flatMap(Registry::listElements)
-            .map(reference -> PotionContents.createItemStack(Items.LINGERING_POTION, reference))
-            .forEach(itemStack -> {
-                PotionContents potion = itemStack.get(DataComponents.POTION_CONTENTS);
-                if (potion == null || potion.potion().isEmpty()) {
-                    return;
-                }
-                if (potion.potion().get().unwrapKey().isPresent() && registeredPotions.add(potion.potion().get().unwrapKey().get().identifier())) {
-                    List<EntryIngredient> input = new ArrayList<>();
-                    for (int i = 0; i < 4; i++) {
-                        input.add(arrowIngredient);
-                    }
-                    input.add(EntryIngredient.of(itemStack));
-                    for (int i = 0; i < 4; i++) {
-                        input.add(arrowIngredient);
-                    }
-                    ItemStack outputStack = new ItemStack(Items.TIPPED_ARROW, 8);
-                    outputStack.set(DataComponents.POTION_CONTENTS, potion);
-                    displays.add(new CustomDisplay(input, List.of(EntryIngredient.of(outputStack)), recipeHolder.id().identifier()));
-                }
-            });
-        return displays;
-    }
+    // Leaves - 26.2 compat: ofTippedArrowRecipe 依赖 26.2 已删除的 TippedArrowRecipe，随 REI 协议记债（docs/deferred-26.2/REMOVED-FEATURES.md）
 
     /**
      * see me.shedaniel.rei.plugin.client.categories.crafting.filler.TippedArrowRecipeFiller#apply
@@ -153,18 +120,7 @@ public abstract class Display {
         return Collections.singleton(new ShapelessDisplay(List.of(inputs), List.of(EntryIngredient.of(outputs)), recipeHolder.id().identifier()));
     }
 
-    /**
-     * see me.shedaniel.rei.plugin.client.categories.crafting.filler.MapCloningRecipeFiller#apply
-     */
-    @NotNull
-    public static Collection<Display> ofMapCloningRecipe(@NotNull RecipeHolder<MapCloningRecipe> recipeHolder) {
-        return Collections.singleton(
-            new ShapelessDisplay(
-                List.of(EntryIngredient.of(Items.FILLED_MAP), EntryIngredient.of(Items.MAP)),
-                List.of(EntryIngredient.of(new ItemStack(Items.FILLED_MAP, 2))),
-                recipeHolder.id().identifier())
-        );
-    }
+    // Leaves - 26.2 compat: ofMapCloningRecipe 依赖 26.2 已删除的 MapCloningRecipe，随 REI 协议记债（docs/deferred-26.2/REMOVED-FEATURES.md）
 
     /**
      * see me.shedaniel.rei.plugin.common.displays.DefaultSmithingDisplay#ofTransforming

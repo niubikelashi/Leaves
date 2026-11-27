@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import org.leavesmc.leaves.command.RootNode;
 import org.leavesmc.leaves.command.leaves.subcommands.BlockUpdateCommand;
 import org.leavesmc.leaves.command.leaves.subcommands.ConfigCommand;
-import org.leavesmc.leaves.command.leaves.subcommands.CounterCommand;
 import org.leavesmc.leaves.command.leaves.subcommands.ReloadCommand;
 import org.leavesmc.leaves.command.leaves.subcommands.ReportCommand;
 import org.leavesmc.leaves.command.leaves.subcommands.UpdateCommand;
@@ -20,7 +19,6 @@ public class LeavesCommand extends RootNode {
         children(
             BlockUpdateCommand::new,
             ConfigCommand::new,
-            CounterCommand::new,
             ReloadCommand::new,
             ReportCommand::new,
             UpdateCommand::new

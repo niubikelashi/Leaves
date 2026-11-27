@@ -13,9 +13,6 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
-import org.leavesmc.leaves.bot.BotList;
-import org.leavesmc.leaves.bot.ServerBot;
-import org.leavesmc.leaves.command.bot.BotCommand;
 import org.leavesmc.leaves.command.leaves.LeavesCommand;
 import org.leavesmc.leaves.config.GlobalConfigManager;
 import org.leavesmc.leaves.config.annotations.GlobalConfig;
@@ -130,22 +127,9 @@ public final class LeavesConfig {
         public static class FakeplayerConfig {
 
             @TransferConfig("fakeplayer.enable")
-            @GlobalConfig(value = "enable", validator = FakeplayerValidator.class)
+            // Leaves - 26.2 compat: fakeplayer enable 校验器依赖被延期的 bot 子系统（docs/deferred-26.2/REMOVED-FEATURES.md）
+            @GlobalConfig(value = "enable")
             public boolean enable = true;
-
-            private static class FakeplayerValidator extends BooleanConfigValidator {
-                @Override
-                public void verify(Boolean old, Boolean value) throws IllegalArgumentException {
-                    if (!value.equals(old)) {
-                        if (value) {
-                            BotCommand.INSTANCE.register();
-                        } else {
-                            BotCommand.INSTANCE.unregister();
-                            BotList.INSTANCE.removeAll();
-                        }
-                    }
-                }
-            }
 
             @TransferConfig("fakeplayer.unable-fakeplayer-names")
             @GlobalConfig(value = "unable-fakeplayer-names")
@@ -178,49 +162,15 @@ public final class LeavesConfig {
             @GlobalConfig("open-fakeplayer-inventory")
             public boolean canOpenInventory = false;
 
-            @GlobalConfig(value = "use-action", validator = CanUseConfigValidator.class)
+            // Leaves - 26.2 compat: bot 子命令权限校验器随 bot 特性一起延期（docs/deferred-26.2/REMOVED-FEATURES.md）
+            @GlobalConfig("use-action")
             public boolean canUseAction = true;
 
-            private static class CanUseConfigValidator extends BotSubcommandValidator {
-                private CanUseConfigValidator() {
-                    super("use");
-                }
-            }
-
-            @GlobalConfig(value = "modify-config", validator = CanModifyConfigValidator.class)
+            @GlobalConfig("modify-config")
             public boolean canModifyConfig = false;
 
-            private static class CanModifyConfigValidator extends BotSubcommandValidator {
-                private CanModifyConfigValidator() {
-                    super("config");
-                }
-            }
-
-            @GlobalConfig(value = "manual-save-and-load", validator = CanManualSaveAndLoadValidator.class)
+            @GlobalConfig("manual-save-and-load")
             public boolean canManualSaveAndLoad = false;
-
-            private static class CanManualSaveAndLoadValidator extends BotSubcommandValidator {
-                private CanManualSaveAndLoadValidator() {
-                    super("save", "load");
-                }
-            }
-
-            private static class BotSubcommandValidator extends BooleanConfigValidator {
-                private final List<String> subcommands;
-
-                private BotSubcommandValidator(String... subcommand) {
-                    this.subcommands = List.of(subcommand);
-                }
-
-                @Override
-                public void verify(Boolean old, Boolean value) throws IllegalArgumentException {
-                    if (old != null && !old.equals(value)) {
-                        Bukkit.getOnlinePlayers().stream()
-                            .filter(sender -> subcommands.stream().allMatch(subcommand -> BotCommand.hasPermission(sender, subcommand)))
-                            .forEach(org.bukkit.entity.Player::updateCommands);
-                    }
-                }
-            }
 
             @GlobalConfig(value = "cache-skin", lock = true)
             public boolean useSkinCache = false;
@@ -242,26 +192,7 @@ public final class LeavesConfig {
                 @GlobalConfig("spawn-phantom")
                 public boolean canSpawnPhantom = false;
 
-                @TransferConfig("modify.fakeplayer.tick-type")
-                @GlobalConfig("tick-type")
-                public ServerBot.TickType tickType = ServerBot.TickType.NETWORK;
-
-                @GlobalConfig(value = "simulation-distance", validator = BotSimulationDistanceValidator.class)
-                private int simulationDistance = -1;
-
-                public int getSimulationDistance(ServerBot bot) {
-                    return this.simulationDistance == -1 ? bot.getBukkitEntity().getSimulationDistance() : this.simulationDistance;
-                }
-
-                public static class BotSimulationDistanceValidator extends IntConfigValidator {
-                    @Override
-                    public void verify(Integer old, Integer value) throws IllegalArgumentException {
-                        if ((value < 2 && value != -1) || value > 32) {
-                            throw new IllegalArgumentException("simulation-distance must be a number between 2 and 32, got: " + value);
-                        }
-                    }
-                }
-
+                // Leaves - 26.2 compat: tick-type 与 bot simulation-distance 依赖 ServerBot，随 bot 特性延期（docs/deferred-26.2/REMOVED-FEATURES.md）
                 @GlobalConfig("enable-locator-bar")
                 public boolean enableLocatorBar = false;
             }
