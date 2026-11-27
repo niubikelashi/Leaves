@@ -17,3 +17,20 @@
   `BotManager` / `PhotographerManager` 接口仍存在，插件读取时会得到 null，属已知债务。
 - `CraftPlayer.getChannel()` 返回 `getHandle().connection.connection.channel`（netty Channel），
   与 `InternalBytebufHandler` 的 `(Channel) audience.getChannel()` 用法一致。
+
+
+## Lithium / Moonrise 优化子系统（26.2 整特性延期）
+- 外层 `leaves-server/src/main/java/org/leavesmc/leaves/lithium/**` 已删除并记债。
+- 理由：Lithium 依赖 mc 层注入的 `lithium$…`/`moonrise$getRawPalette` 等访问器，来自本轮延期的 mc 补丁（`00xx Lithium-*`、`PalettedContainer`）；
+  仓库内没有 mixin 资源（`mixins.json` 命中 0），且已应用补丁层对 lithium/moonrise 的引用为 0，因此无法在 26.2 上机械重建。
+- 连带删除的错误文件：`common/hopper/{HopperHelper,LithiumStackList}.java`、`common/block/entity/{SleepingBlockEntity,SleepUntilTimeBlockEntityTickInvoker}.java`、
+  `common/block/tracking/ComparatorTracking.java`、`common/world/chunk/{LithiumHashPalette,LithiumStackList 等}.java`。
+- Moonrise 本体仍在 Paper 26.2 中（`ca.spottedleaf.moonrise.*`），外层 `util/ElytraAeronauticsHelper.java`、`region/*` 的 moonrise 调用编译通过，未删除。
+- 回填计划：按 `docs/deferred-26.2/minecraft-features/` 内的 Lithium 补丁逐特性重建注入方法（或改为 mixin 框架）后再恢复本目录。
+
+## Async Keepalive（26.2 整特性延期）
+- 外层 `org/leavesmc/leaves/network/AsyncKeepaliveManager.java` 已删除并记债。
+- 理由：该类调用 `ServerCommonPacketListenerImpl.keepConnectionAliveAsync(long, long)` 与 `processedDisconnect`，
+  这两个成员在 26.2 全仓命中 0（只有 `protected void keepConnectionAlive()`），依赖延期的 mc 补丁。
+- paper-server 层没有任何对 `AsyncKeepaliveManager` 的引用，删除不破坏补丁层。
+- 回填计划：实现 mc 层异步 keepalive 方法（含 `Connection` 锁语义）后恢复。

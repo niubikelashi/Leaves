@@ -167,14 +167,14 @@ public abstract class Display {
 
     private static Optional<Holder<TrimMaterial>> getMaterialFromIngredient(HolderLookup.Provider provider, Holder<Item> item) {
         ProvidesTrimMaterial providesTrimMaterial = new ItemStack(item).get(DataComponents.PROVIDES_TRIM_MATERIAL);
-        return providesTrimMaterial != null ? providesTrimMaterial.unwrap(provider) : Optional.empty();
+        return providesTrimMaterial != null ? Optional.of(providesTrimMaterial.material()) : Optional.empty();
     }
 
     public static EntryIngredient ofSlotDisplay(SlotDisplay slot) {
         return switch (slot) {
             case SlotDisplay.Empty ignored -> EntryIngredient.empty();
             case SlotDisplay.ItemSlotDisplay s -> EntryIngredient.of(s.item().value());
-            case SlotDisplay.ItemStackSlotDisplay s -> EntryIngredient.of(s.stack());
+            case SlotDisplay.ItemStackSlotDisplay s -> EntryIngredient.of(s.stack().create());
             case SlotDisplay.TagSlotDisplay s -> ofItemTag(s.tag());
             case SlotDisplay.Composite s -> {
                 ArrayList<ItemStack> list = new ArrayList<>();

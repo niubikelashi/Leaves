@@ -139,9 +139,9 @@ public class REIServerProtocol implements LeavesProtocol {
                 case ShapedRecipe ignored -> builder.add(new ShapedDisplay((RecipeHolder) holder));
                 case ShapelessRecipe ignored -> builder.add(new ShapelessDisplay((RecipeHolder) holder));
                 case TransmuteRecipe ignored -> builder.addAll(Display.ofTransmuteRecipe((RecipeHolder) holder));
-                case TippedArrowRecipe ignored -> builder.addAll(Display.ofTippedArrowRecipe((RecipeHolder) holder));
+                // Leaves - 26.2 compat: TippedArrowRecipe 已在 26.2 删除，REI display 随协议记债（docs/deferred-26.2/REMOVED-FEATURES.md）
                 case FireworkRocketRecipe ignored -> builder.addAll(Display.ofFireworkRocketRecipe((RecipeHolder) holder));
-                case MapCloningRecipe ignored -> builder.addAll(Display.ofMapCloningRecipe((RecipeHolder) holder));
+                // Leaves - 26.2 compat: MapCloningRecipe 已在 26.2 删除，REI display 随协议记债（docs/deferred-26.2/REMOVED-FEATURES.md）
                 // ignore ArmorDyeRecipe, BannerDuplicateRecipe, BookCloningRecipe, ShieldDecorationRecipe
                 default -> {
                 }

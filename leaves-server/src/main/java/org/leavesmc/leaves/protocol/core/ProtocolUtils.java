@@ -70,7 +70,7 @@ public class ProtocolUtils {
             return selector;
         }
         ServerPlayer player = common instanceof ServerGamePacketListenerImpl game ? game.getPlayer() : null;
-        selector = new IdentifierSelector(new Context(common.profile, common.connection), player);
+        selector = new IdentifierSelector(new Context(common.getOwner(), common.connection), player);
         if (player != null) {
             SELECTOR_CACHE.put(common, selector);
         }
