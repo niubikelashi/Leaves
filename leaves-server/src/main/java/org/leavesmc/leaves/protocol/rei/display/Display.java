@@ -166,8 +166,8 @@ public abstract class Display {
     }
 
     private static Optional<Holder<TrimMaterial>> getMaterialFromIngredient(HolderLookup.Provider provider, Holder<Item> item) {
-        ProvidesTrimMaterial providesTrimMaterial = new ItemStack(item).get(DataComponents.PROVIDES_TRIM_MATERIAL);
-        return providesTrimMaterial != null ? Optional.of(providesTrimMaterial.material()) : Optional.empty();
+        Holder<TrimMaterial> trimMaterial = new ItemStack(item).get(DataComponents.PROVIDES_TRIM_MATERIAL);
+        return trimMaterial != null ? Optional.of(trimMaterial) : Optional.empty();
     }
 
     public static EntryIngredient ofSlotDisplay(SlotDisplay slot) {

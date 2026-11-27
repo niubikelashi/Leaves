@@ -34,3 +34,25 @@
   这两个成员在 26.2 全仓命中 0（只有 `protected void keepConnectionAlive()`），依赖延期的 mc 补丁。
 - paper-server 层没有任何对 `AsyncKeepaliveManager` 的引用，删除不破坏补丁层。
 - 回填计划：实现 mc 层异步 keepalive 方法（含 `Connection` 锁语义）后恢复。
+
+
+## 26.2 round50：可见性放宽与字段重注入（compat commit，待并入原 feature 补丁）
+- `Entity.bukkitEntity` private -> public：paper-server 的 `CraftComplexPart.getParent()` 跨包写入（对应 deferred `Old-ender-dragon-part-can-use-end-portal` 语义）。
+- `FireworkRocketEntity.getExplosions()`、`Creeper.droppedSkulls`、`Language.parseTranslations`、
+  `CoralFeature/CoralClaw/CoralTree/CoralMushroom.placeFeature`、`BlockPattern.matches(BlockPos,Direction,Direction,LoadingCache)`：放宽为 public，
+  与 1.21.8 基线的 `// Leaves - private -> public` 一致；对应补丁仍在 `docs/deferred-26.2/minecraft-features/`。
+- `RegionFile` 改为 `implements org.leavesmc.leaves.region.IRegionFile`（并放宽 `recalculateHeader/write/isOversized/setOversized/getOversizedData`）：
+  26.2 的 vanilla `RegionFile` 已具备全部方法，只是可见性不足；region 的其余补丁（RegionFileStorage/格式切换）仍 deferred，
+  `IRegionFileFactory` 里 `REGION_SHIFT` 内联为常量 5（26.2 不再暴露 `RegionFileStorage.REGION_SHIFT`）。
+- `Player.elytraAeronauticsNoChunk` 字段重注入：Elytra Aeronautics 的行为钩子（`ChunkMap` 距离地图、`Entity.tickRiding`、
+  `FireworkRocketItem`、`ServerGamePacketListenerImpl` 移动校验）对应的 mc 补丁仍在 deferred，本轮只恢复数据槽位；
+  `ElytraAeronauticsHelper` 改用 `level().getChunkSource().chunkMap.getDistanceManager()`（26.2 `ServerLevel.chunkSource` 已 private）。
+- `ServerGamePacketListenerImpl.exchangeTarget` 重注入：26.2 已彻底删除 vanilla `ExchangeTarget`（全仓命中 0），
+  syncmatica 继续使用 Leaves 自有的 `protocol/syncmatica/exchange/ExchangeTarget`；其余 syncmatica mc/server 补丁仍 deferred。
+
+## 26.2 round50：整特性延期（删除外层文件）
+- `org/leavesmc/leaves/util/WoolUtils.java` 删除：26.2 `Blocks` 已不再有 `WHITE_WOOL` 等羊毛常量（羊毛改为 `Blocks.WOOL` + `ItemStack` 组件路线，
+  `*_WOOL` 常量全仓命中 0），羊毛漏斗计数没有数据源；依赖它的 `common/hopper` 计数补丁本身也在 deferred。
+- `org/leavesmc/leaves/util/ReturnPortalManager.java` 删除：它调用 `Player.getLeavesData()`（玩家持久数据注入），该 mc 补丁仍在 deferred；
+  全仓（mc fork / paper-server fork）对该类的引用为 0，删除不破坏补丁层。
+- 回填计划：两条都在 `docs/deferred-26.2/minecraft-features/` 的对应补丁落地后恢复。
