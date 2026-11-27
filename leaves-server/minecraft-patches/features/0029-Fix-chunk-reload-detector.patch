@@ -1,0 +1,444 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Fortern <blueten.ki@gmail.com>
+Date: Sat, 17 May 2025 03:01:48 +0000
+Subject: [PATCH] Fix chunk reload detector
+
+
+diff --git a/ca/spottedleaf/moonrise/paper/PaperHooks.java b/ca/spottedleaf/moonrise/paper/PaperHooks.java
+--- a/ca/spottedleaf/moonrise/paper/PaperHooks.java
++++ b/ca/spottedleaf/moonrise/paper/PaperHooks.java
+@@ -29,7 +29,7 @@ import net.minecraft.world.phys.AABB;
+ import java.util.List;
+ import java.util.function.Predicate;
+ 
+-public final class PaperHooks extends BaseChunkSystemHooks implements PlatformHooks {
++public class PaperHooks extends BaseChunkSystemHooks implements PlatformHooks { // Leaves - not final
+ 
+     private static final org.slf4j.Logger LOGGER = com.mojang.logging.LogUtils.getLogger();
+ 
+diff --git a/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java b/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java
+--- a/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java
++++ b/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java
+@@ -2022,7 +2022,7 @@ public final class CollisionUtil {
+                                                 continue;
+                                             }
+                                         } else {
+-                                            if (!voxelShapeIntersect(aabb, singleAABB)) {
++                                            if (shouldSkip(aabb, singleAABB)) { // Leaves - Configurable collision behavior
+                                                 continue;
+                                             }
+                                         }
+@@ -2077,6 +2077,16 @@ public final class CollisionUtil {
+         return ret;
+     }
+ 
++    // Leaves start - Configurable collision behavior
++    private static boolean shouldSkip(net.minecraft.world.phys.AABB aabb, net.minecraft.world.phys.AABB singleAABB) {
++        return switch (org.leavesmc.leaves.LeavesConfig.fix.collisionBehavior) {
++            // Paper has changed to block shape vanilla, so we only check fully vanilla here
++            case PAPER -> !voxelShapeIntersect(aabb, singleAABB);
++            case VANILLA -> !aabb.intersects(singleAABB);
++        };
++    }
++    // Leaves end - Configurable collision behavior
++
+     public static boolean getEntityHardCollisions(final Level world, final Entity entity, AABB aabb,
+                                                   final List<AABB> into, final int collisionFlags, final Predicate<Entity> predicate) {
+         final boolean checkOnly = (collisionFlags & COLLISION_FLAG_CHECK_ONLY) != 0;
+diff --git a/net/minecraft/advancements/Advancement.java b/net/minecraft/advancements/Advancement.java
+--- a/net/minecraft/advancements/Advancement.java
++++ b/net/minecraft/advancements/Advancement.java
+@@ -64,7 +64,7 @@ public record Advancement(
+     ) {
+         this(parent, display, rewards, Map.copyOf(criteria), requirements, sendsTelemetryEvent, display.map(Advancement::decorateName));
+     }
+-
++        this(parent, display, rewards, !org.leavesmc.leaves.LeavesConfig.performance.skipCloningAdvancementCriteria ? Map.copyOf(criteria) : criteria, requirements, sendsTelemetryEvent, display.map(Advancement::decorateName)); // Leaves - skip cloning advancement criteria
+     private static DataResult<Advancement> validate(final Advancement advancement) {
+         return advancement.requirements().validate(advancement.criteria().keySet()).map(r -> advancement);
+     }
+diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
+--- a/net/minecraft/server/MinecraftServer.java
++++ b/net/minecraft/server/MinecraftServer.java
+@@ -1292,7 +1292,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+                 LOGGER.info("*************************************************************************************");
+                 LOGGER.info("This is the first time you're starting this server.");
+                 LOGGER.info("It's recommended you read our 'Getting Started' documentation for guidance.");
+-                LOGGER.info("View this and more helpful information here: https://docs.papermc.io/paper/next-steps");
++                LOGGER.info("View this and more helpful information here: https://docs.leavesmc.org/leaves/guides/next-steps"); // Leaves - change
+                 LOGGER.info("*************************************************************************************");
+             }
+             // Paper end - Add onboarding message for initial server start
+@@ -1950,7 +1950,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+     public String getServerModName() {
+         return io.papermc.paper.ServerBuildInfo.buildInfo().brandName(); // Paper
+     }
+-
++        return org.leavesmc.leaves.LeavesConfig.mics.serverModName; // Leaves - Custom // Paper
+     public ServerClockManager clockManager() {
+         return this.clockManager;
+     }
+diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
+--- a/net/minecraft/server/dedicated/DedicatedServer.java
++++ b/net/minecraft/server/dedicated/DedicatedServer.java
+@@ -250,9 +250,10 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+         io.papermc.paper.command.PaperCommands.registerCommands(this); // Paper - setup /paper command
+         this.server.spark.registerCommandBeforePlugins(this.server); // Paper - spark
+         com.destroystokyo.paper.Metrics.PaperMetrics.startMetrics(); // Paper - start metrics
+-        com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
+ 
+         // this.worldData.setGameType(properties.gameMode.get()); // CraftBukkit - moved to world loading
++        com.destroystokyo.paper.Metrics.PaperMetrics.startMetrics(); // Paper - start metrics // Leaves - down
++
+         LOGGER.info("Default game type: {}", properties.gameMode.get());
+         // Paper start - Unix domain socket support
+         java.net.SocketAddress bindAddress;
+diff --git a/net/minecraft/server/gui/MinecraftServerGui.java b/net/minecraft/server/gui/MinecraftServerGui.java
+--- a/net/minecraft/server/gui/MinecraftServerGui.java
++++ b/net/minecraft/server/gui/MinecraftServerGui.java
+@@ -185,7 +185,7 @@ public class MinecraftServerGui extends JComponent {
+ 
+     // Paper start - Add onboarding message for initial server start
+     private JComponent buildOnboardingPanel() {
+-        String onboardingLink = "https://docs.papermc.io/paper/next-steps";
++        String onboardingLink = "https://docs.leavesmc.org/leaves/guides/next-steps"; // Leaves - change
+         JPanel jPanel = new JPanel();
+ 
+         javax.swing.JLabel jLabel = new javax.swing.JLabel("If you need help setting up your server you can visit:");
+diff --git a/net/minecraft/server/level/ServerEntity.java b/net/minecraft/server/level/ServerEntity.java
+--- a/net/minecraft/server/level/ServerEntity.java
++++ b/net/minecraft/server/level/ServerEntity.java
+@@ -359,7 +359,7 @@ public class ServerEntity {
+             }
+             ((LivingEntity) this.entity).detectEquipmentUpdates(); // CraftBukkit - SPIGOT-3789: sync again immediately after sending
+         }
+-
++            if (this.entity.totalEntityAge == 0) ((LivingEntity) this.entity).detectEquipmentUpdates(); // CraftBukkit - SPIGOT-3789: sync again immediately after sending // Leaves - fix chunk reload detector (#492)
+         if (!this.entity.getPassengers().isEmpty()) {
+             broadcast.accept(new ClientboundSetPassengersPacket(this.entity));
+         }
+diff --git a/net/minecraft/world/entity/ai/gossip/GossipType.java b/net/minecraft/world/entity/ai/gossip/GossipType.java
+--- a/net/minecraft/world/entity/ai/gossip/GossipType.java
++++ b/net/minecraft/world/entity/ai/gossip/GossipType.java
+@@ -16,9 +16,9 @@ public enum GossipType implements StringRepresentable {
+     public final String id;
+     public final int weight;
+     public final int max;
+-    public final int decayPerDay;
++    public int max; // Leaves - not final
+     public final int decayPerTransfer;
+-    public static final Codec<GossipType> CODEC = StringRepresentable.fromEnum(GossipType::values);
++    public int decayPerTransfer; // Leaves - not final
+ 
+     GossipType(final String id, final int weight, final int max, final int decayPerDay, final int decayPerTransfer) {
+         this.id = id;
+diff --git a/net/minecraft/world/entity/monster/EnderMan.java b/net/minecraft/world/entity/monster/EnderMan.java
+--- a/net/minecraft/world/entity/monster/EnderMan.java
++++ b/net/minecraft/world/entity/monster/EnderMan.java
+@@ -431,7 +431,7 @@ public class EnderMan extends Monster implements NeutralMob {
+     @Override
+     public boolean requiresCustomPersistence() {
+         return super.requiresCustomPersistence() || this.getCarriedBlock() != null;
+-    }
++        return super.requiresCustomPersistence() || (!org.leavesmc.leaves.LeavesConfig.modify.despawnEndermanWithBlock && this.getCarriedBlock() != null); // Leaves - despawn enderman with block
+ 
+     private static class EndermanFreezeWhenLookedAt extends Goal {
+         private final EnderMan enderman;
+diff --git a/net/minecraft/world/entity/monster/skeleton/Skeleton.java b/net/minecraft/world/entity/monster/skeleton/Skeleton.java
+--- a/net/minecraft/world/entity/monster/skeleton/Skeleton.java
++++ b/net/minecraft/world/entity/monster/skeleton/Skeleton.java
+@@ -132,3 +132,25 @@ public class Skeleton extends AbstractSkeleton {
+         return SoundEvents.SKELETON_STEP;
+     }
+ }
++
++    // Leaves start - spider jockeys drop gapples
++    @Override
++    protected void dropCustomDeathLoot(net.minecraft.server.level.ServerLevel level, DamageSource damageSource, boolean recentlyHit) {
++        super.dropCustomDeathLoot(level, damageSource, recentlyHit);
++        if (damageSource.getEntity() instanceof net.minecraft.world.entity.monster.Creeper creeper && creeper.isPowered() && !creeper.droppedSkulls) {
++            creeper.droppedSkulls = true;
++            this.spawnAtLocation(level, net.minecraft.world.item.Items.SKELETON_SKULL);
++        }
++    }
++
++    @Override
++    protected void dropFromLootTable(net.minecraft.server.level.ServerLevel level, DamageSource damageSource, boolean causedByPlayer) {
++        super.dropFromLootTable(level, damageSource, causedByPlayer);
++        if (org.leavesmc.leaves.LeavesConfig.modify.spiderJockeysDropGapples > 0.0D) {
++            if (this.getRootVehicle().getType() == EntityType.SPIDER && this.random.nextDouble() < org.leavesmc.leaves.LeavesConfig.modify.spiderJockeysDropGapples) {
++                this.spawnAtLocation(level, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ENCHANTED_GOLDEN_APPLE));
++            }
++        }
++    }
++    // Leaves end - spider jockeys drop gapples
++}
+diff --git a/net/minecraft/world/entity/monster/spider/Spider.java b/net/minecraft/world/entity/monster/spider/Spider.java
+--- a/net/minecraft/world/entity/monster/spider/Spider.java
++++ b/net/minecraft/world/entity/monster/spider/Spider.java
+@@ -143,6 +143,18 @@ public class Spider extends Monster {
+     }
+ 
+     @Override
++    // Leaves start - spider jockeys drop gapples
++    @Override
++    protected void dropFromLootTable(net.minecraft.server.level.ServerLevel level, DamageSource damageSource, boolean causedByPlayer) {
++        super.dropFromLootTable(level, damageSource, causedByPlayer);
++        if (org.leavesmc.leaves.LeavesConfig.modify.spiderJockeysDropGapples > 0.0D) {
++            if (this.hasPassenger(entity -> entity.getType() == EntityType.SKELETON) && this.random.nextDouble() < org.leavesmc.leaves.LeavesConfig.modify.spiderJockeysDropGapples) {
++                this.spawnAtLocation(level, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ENCHANTED_GOLDEN_APPLE));
++            }
++        }
++    }
++    // Leaves end - spider jockeys drop gapples
++
+     public @Nullable SpawnGroupData finalizeSpawn(
+         final ServerLevelAccessor level, final DifficultyInstance difficulty, final EntitySpawnReason spawnReason, @Nullable SpawnGroupData groupData
+     ) {
+diff --git a/net/minecraft/world/entity/monster/zombie/ZombifiedPiglin.java b/net/minecraft/world/entity/monster/zombie/ZombifiedPiglin.java
+--- a/net/minecraft/world/entity/monster/zombie/ZombifiedPiglin.java
++++ b/net/minecraft/world/entity/monster/zombie/ZombifiedPiglin.java
+@@ -113,6 +113,9 @@ public class ZombifiedPiglin extends Zombie implements NeutralMob {
+             this.maybeAlertOthers();
+         }
+ 
++
++        if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.oldZombiePiglinDrop && this.isAngry()) this.lastHurtByPlayerMemoryTime = this.tickCount; // Leaves - old zombie piglin drop
++
+         super.customServerAiStep(level);
+     }
+ 
+diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
+--- a/net/minecraft/world/entity/player/Player.java
++++ b/net/minecraft/world/entity/player/Player.java
+@@ -2078,8 +2078,10 @@ public abstract class Player extends Avatar implements ContainerUser {
+ 
+         if (anyEventCancelled.booleanValue() && !this.abilities.instabuild && this instanceof final ServerPlayer player) this.resyncUsingItem(player); // Paper - resync if no item matched the Predicate
+         return this.hasInfiniteMaterials() ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
+-    }
+-
++                // Leaves start - bow infinity fix
++                if ((org.leavesmc.leaves.LeavesConfig.modify.bowInfinityFix || anyEventCancelled.booleanValue()) && !this.abilities.instabuild && this instanceof final ServerPlayer player) this.resyncUsingItem(player); // Paper - resync if no item matched the Predicate
++                return this.hasInfiniteMaterials() || (org.leavesmc.leaves.LeavesConfig.modify.bowInfinityFix && net.minecraft.world.item.enchantment.EnchantmentHelper.processAmmoUse((ServerLevel) this.level(), shootable, new ItemStack(Items.ARROW), 1) <= 0) ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
++                // Leaves end - bow infinity fix
+     @Override
+     public Vec3 getRopeHoldPosition(final float partialTickTime) {
+         double xOff = 0.22 * (this.getMainArm() == HumanoidArm.RIGHT ? -1.0 : 1.0);
+diff --git a/net/minecraft/world/item/crafting/SmithingTransformRecipe.java b/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
+--- a/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
++++ b/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
+@@ -115,6 +115,12 @@ public class SmithingTransformRecipe extends SimpleSmithingRecipe {
+         );
+     }
+ 
++    // Leaves start - REI
++    public SlotDisplay getResult() {
++        return this.result.display();
++    }
++    // Leaves end - REI
++
+     // CraftBukkit start
+     @Override
+     public org.bukkit.inventory.Recipe toBukkitRecipe(org.bukkit.NamespacedKey id) {
+diff --git a/net/minecraft/world/item/crafting/SmithingTrimRecipe.java b/net/minecraft/world/item/crafting/SmithingTrimRecipe.java
+--- a/net/minecraft/world/item/crafting/SmithingTrimRecipe.java
++++ b/net/minecraft/world/item/crafting/SmithingTrimRecipe.java
+@@ -110,6 +110,12 @@ public class SmithingTrimRecipe extends SimpleSmithingRecipe {
+     }
+ 
+     @Override
++    // Leaves start
++    public Holder<TrimPattern> pattern() {
++        return pattern;
++    }
++    // Leaves end
++
+     public RecipeSerializer<SmithingTrimRecipe> getSerializer() {
+         return SERIALIZER;
+     }
+diff --git a/net/minecraft/world/level/block/BambooStalkBlock.java b/net/minecraft/world/level/block/BambooStalkBlock.java
+--- a/net/minecraft/world/level/block/BambooStalkBlock.java
++++ b/net/minecraft/world/level/block/BambooStalkBlock.java
+@@ -109,6 +109,10 @@ public class BambooStalkBlock extends Block implements BonemealableBlock {
+         if (!state.canSurvive(level, pos)) {
+             level.destroyBlock(pos, true);
+         }
++            // Leaves start - zero tick plants
++        } else if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.zeroTickPlants) {
++            this.randomTick(state, level, pos, random);
++            // Leaves end - zero tick plants
+     }
+ 
+     @Override
+diff --git a/net/minecraft/world/level/block/CactusBlock.java b/net/minecraft/world/level/block/CactusBlock.java
+--- a/net/minecraft/world/level/block/CactusBlock.java
++++ b/net/minecraft/world/level/block/CactusBlock.java
+@@ -48,6 +48,10 @@ public class CactusBlock extends Block {
+         if (!state.canSurvive(level, pos)) {
+             level.destroyBlock(pos, true);
+         }
++            // Leaves start - zero tick plants
++        } else if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.zeroTickPlants) {
++            this.randomTick(state, level, pos, random);
++            // Leaves end - zero tick plants
+     }
+ 
+     @Override
+diff --git a/net/minecraft/world/level/block/ChorusFlowerBlock.java b/net/minecraft/world/level/block/ChorusFlowerBlock.java
+--- a/net/minecraft/world/level/block/ChorusFlowerBlock.java
++++ b/net/minecraft/world/level/block/ChorusFlowerBlock.java
+@@ -48,6 +48,9 @@ public class ChorusFlowerBlock extends Block {
+         if (!state.canSurvive(level, pos)) {
+             level.destroyBlock(pos, true);
+         }
++        } else if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.zeroTickPlants) {
++            this.randomTick(state, level, pos, random);
++            // Leaves end - zero tick plants
+     }
+ 
+     @Override
+diff --git a/net/minecraft/world/level/block/GrowingPlantHeadBlock.java b/net/minecraft/world/level/block/GrowingPlantHeadBlock.java
+--- a/net/minecraft/world/level/block/GrowingPlantHeadBlock.java
++++ b/net/minecraft/world/level/block/GrowingPlantHeadBlock.java
+@@ -160,4 +160,15 @@ public abstract class GrowingPlantHeadBlock extends GrowingPlantBlock implements
+     protected GrowingPlantHeadBlock getHeadBlock() {
+         return this;
+     }
++
++    // Leaves start - zero tick plants
++    @Override
++    public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
++        if (!state.canSurvive(world, pos)) {
++            world.destroyBlock(pos, true);
++        } else if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.zeroTickPlants) {
++            this.randomTick(state, world, pos, random);
++        }
++    }
++    // Leaves end - zero tick plants
+ }
+diff --git a/net/minecraft/world/level/block/SugarCaneBlock.java b/net/minecraft/world/level/block/SugarCaneBlock.java
+--- a/net/minecraft/world/level/block/SugarCaneBlock.java
++++ b/net/minecraft/world/level/block/SugarCaneBlock.java
+@@ -44,6 +44,10 @@ public class SugarCaneBlock extends Block {
+         if (!state.canSurvive(level, pos)) {
+             level.destroyBlock(pos, true);
+         }
++            // Leaves start - zero tick plants
++        } else if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.zeroTickPlants) {
++            this.randomTick(state, level, pos, random);
++            // Leaves end - zero tick plants
+     }
+ 
+     @Override
+diff --git a/net/minecraft/world/level/block/TntBlock.java b/net/minecraft/world/level/block/TntBlock.java
+--- a/net/minecraft/world/level/block/TntBlock.java
++++ b/net/minecraft/world/level/block/TntBlock.java
+@@ -49,7 +49,7 @@ public class TntBlock extends Block {
+         if (!oldState.is(state.getBlock())) {
+             if (level.hasNeighborSignal(pos) && prime(level, pos, () -> org.bukkit.craftbukkit.event.CraftEventFactory.callTNTPrimeEvent(level, pos, org.bukkit.event.block.TNTPrimeEvent.PrimeCause.REDSTONE, null, null))) { // CraftBukkit - TNTPrimeEvent
+                 level.removeBlock(pos, false);
+-            }
++            if (level.hasNeighborSignal(pos) && !org.leavesmc.leaves.LeavesConfig.modify.noTNTPlaceUpdate && prime(level, pos, () -> org.bukkit.craftbukkit.event.CraftEventFactory.callTNTPrimeEvent(level, pos, org.bukkit.event.block.TNTPrimeEvent.PrimeCause.REDSTONE, null, null))) { // CraftBukkit - TNTPrimeEvent // Leaves - prevent update
+         }
+     }
+ 
+diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+--- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
++++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+@@ -273,36 +273,58 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+         final int movedItemCount = Math.min(level.spigotConfig.hopperAmount, originalItemCount);
+         container.setChanged(); // original logic always marks source inv as changed even if no move happens.
+         movedItem.setCount(movedItemCount);
+-
+-        if (!skipPullModeEventFire) {
+-            movedItem = callPullMoveEvent(hopper, container, movedItem);
+-            if (movedItem == null) { // cancelled
+-                origItemStack.setCount(originalItemCount);
+-                // Drastically improve performance by returning true.
+-                // No plugin could have relied on the behavior of false as the other call
+-                // site for IMIE did not exhibit the same behavior
+-                return true;
++        // Leaves start - fix vanilla
++        if (org.leavesmc.leaves.LeavesConfig.fix.vanillaHopper && movedItem.getCount() <= movedItemCount) {
++            if (!skipPullModeEventFire) {
++                movedItem = callPullMoveEvent(hopper, container, movedItem);
++                if (movedItem == null) { // cancelled
++                    origItemStack.setCount(originalItemCount);
++                    // Drastically improve performance by returning true.
++                    // No plugin could have relied on the behavior of false as the other call
++                    // site for IMIE did not exhibit the same behavior
++                    return true;
++                }
+             }
++            movedItem = origItemStack.copy();
++            final ItemStack remainingItem = addItem(container, hopper,  container.removeItem(i, movedItemCount), null);
++            if (remainingItem.isEmpty()) {
++                container.setChanged();
+         }
+ 
+-        final ItemStack remainingItem = addItem(container, hopper, movedItem, null);
++            container.setItem(i, movedItem);
++        } else {
++            container.setChanged(); // original logic always marks source inv as changed even if no move happens.
++            movedItem.setCount(movedItemCount);
+         final int remainingItemCount = remainingItem.getCount();
+-        if (remainingItemCount != movedItemCount) {
+-            origItemStack = origItemStack.copy(true);
+-            origItemStack.setCount(originalItemCount);
+-            if (!origItemStack.isEmpty()) {
+-                origItemStack.setCount(originalItemCount - movedItemCount + remainingItemCount);
+-            }
+-
++            if (!skipPullModeEventFire) {
++                movedItem = callPullMoveEvent(hopper, container, movedItem);
++                if (movedItem == null) { // cancelled
++                    origItemStack.setCount(originalItemCount);
++                    // Drastically improve performance by returning true.
++                    // No plugin could have relied on the behavior of false as the other call
++                    // site for IMIE did not exhibit the same behavior
++                    return true;
++                }
+             ignoreBlockEntityUpdates = true;
+             container.setItem(i, origItemStack);
+-            ignoreBlockEntityUpdates = false;
+-            container.setChanged();
+-            return true;
+-        }
+-        origItemStack.setCount(originalItemCount);
++            final ItemStack remainingItem = addItem(container, hopper, movedItem, null);
++            final int remainingItemCount = remainingItem.getCount();
++            if (remainingItemCount != movedItemCount) {
++                origItemStack = origItemStack.copy(true);
++                origItemStack.setCount(originalItemCount);
++                if (!origItemStack.isEmpty()) {
++                    origItemStack.setCount(originalItemCount - movedItemCount + remainingItemCount);
++                }
++
++                ignoreBlockEntityUpdates = true;
++                container.setItem(i, origItemStack);
++                ignoreBlockEntityUpdates = false;
++                container.setChanged();
++                return true;
++            }
++            origItemStack.setCount(originalItemCount);
+ 
+-        if (level.paperConfig().hopper.cooldownWhenFull) {
++        // Leaves end - fix vanilla
+             applyCooldown(hopper);
+         }
+ 
+diff --git a/net/minecraft/world/level/chunk/LevelChunk.java b/net/minecraft/world/level/chunk/LevelChunk.java
+--- a/net/minecraft/world/level/chunk/LevelChunk.java
++++ b/net/minecraft/world/level/chunk/LevelChunk.java
+@@ -751,6 +751,11 @@ public class LevelChunk extends ChunkAccess implements DebugValueSource, ca.spot
+         this.loaded = loaded;
+     }
+ 
++        // Leaves start - bbor
++        if (loaded) {
++            org.leavesmc.leaves.protocol.BBORProtocol.onChunkLoaded(this);
++        }
++        // Leaves end - bbor
+     public Level getLevel() {
+         return this.level;
+     }
