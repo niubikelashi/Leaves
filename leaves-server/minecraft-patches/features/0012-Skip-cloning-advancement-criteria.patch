@@ -1,8 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: violetc <58360096+s-yh-china@users.noreply.github.com>
-Date: Thu, 20 Jul 2023 21:30:17 +0800
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
 Subject: [PATCH] Skip cloning advancement criteria
-This patch is Powered by Gale(https://github.com/GaleMC/Gale)
 
 
 diff --git a/net/minecraft/commands/Commands.java b/net/minecraft/commands/Commands.java
@@ -572,3 +571,4 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
              applyCooldown(hopper);
          }
  
+

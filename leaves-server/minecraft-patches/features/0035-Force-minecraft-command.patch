@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Lumine1909 <133463833+Lumine1909@users.noreply.github.com>
-Date: Sat, 29 Nov 2025 23:32:57 +0800
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
 Subject: [PATCH] Force minecraft command
 
 
@@ -310,3 +310,4 @@ diff --git a/net/minecraft/world/level/ServerExplosion.java b/net/minecraft/worl
          boolean mobGriefingEnabled = this.level.getGameRules().get(GameRules.MOB_GRIEFING);
          boolean isNotWindCharge = this.source == null || !this.source.is(EntityTypes.BREEZE_WIND_CHARGE) && !this.source.is(EntityTypes.WIND_CHARGE);
          return mobGriefingEnabled ? isNotWindCharge : this.blockInteraction.shouldAffectBlocklikeEntities() && isNotWindCharge;
+

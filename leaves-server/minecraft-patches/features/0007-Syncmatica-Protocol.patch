@@ -1,8 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: violetc <58360096+s-yh-china@users.noreply.github.com>
-Date: Mon, 3 Feb 2025 16:51:01 +0800
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
 Subject: [PATCH] Syncmatica Protocol
-This patch is Powered by Syncmatica(https://github.com/End-Tech/syncmatica)
 
 
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
@@ -18,3 +17,4 @@ diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/ne
          this.chatMessageChain = new FutureChain(server.chatExecutor); // CraftBukkit - async chat
          this.tickEndEvent = new io.papermc.paper.event.packet.ClientTickEndEvent(player.getBukkitEntity()); // Paper - add client tick end event
          this.playerGameConnection = new io.papermc.paper.connection.PaperPlayerGameConnection(this); // Paper
+

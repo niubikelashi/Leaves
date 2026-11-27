@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: MC_XiaoHei <xor7xiaohei@gmail.com>
-Date: Fri, 4 Jul 2025 08:55:31 +0800
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
 Subject: [PATCH] Old wet tnt explode behavior
 
 
@@ -741,3 +741,4 @@ diff --git a/net/minecraft/world/level/chunk/LevelChunk.java b/net/minecraft/wor
      public Level getLevel() {
          return this.level;
      }
+

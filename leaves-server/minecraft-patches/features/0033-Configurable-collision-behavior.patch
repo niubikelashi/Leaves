@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Fortern <blueten.ki@gmail.com>
-Date: Thu, 24 Oct 2024 23:10:34 +0800
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
 Subject: [PATCH] Configurable collision behavior
 
 
@@ -712,3 +712,4 @@ diff --git a/net/minecraft/world/level/chunk/LevelChunk.java b/net/minecraft/wor
      public Level getLevel() {
          return this.level;
      }
+

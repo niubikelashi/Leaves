@@ -1,8 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: violetc <58360096+s-yh-china@users.noreply.github.com>
-Date: Sun, 11 Dec 2022 18:43:35 +0800
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
 Subject: [PATCH] Player operation limiter
-This patch is Powered by plusls-carpet-addition(https://github.com/plusls/plusls-carpet-addition)
 
 
 diff --git a/net/minecraft/advancements/Advancement.java b/net/minecraft/advancements/Advancement.java
@@ -496,3 +495,4 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
              applyCooldown(hopper);
          }
  
+

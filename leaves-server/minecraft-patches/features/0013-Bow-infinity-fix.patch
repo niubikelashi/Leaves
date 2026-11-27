@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: violetc <58360096+s-yh-china@users.noreply.github.com>
-Date: Mon, 24 Jul 2023 15:54:18 +0800
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
 Subject: [PATCH] Bow infinity fix
 
 
@@ -20,3 +20,4 @@ diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world
      @Override
      public Vec3 getRopeHoldPosition(final float partialTickTime) {
          double xOff = 0.22 * (this.getMainArm() == HumanoidArm.RIGHT ? -1.0 : 1.0);
+

@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Helvetica Volubi <suisuroru@blue-millennium.fun>
-Date: Mon, 19 May 2025 00:06:03 +0800
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
 Subject: [PATCH] Spawn invulnerable time
 
 
@@ -305,3 +305,4 @@ diff --git a/net/minecraft/world/item/ShovelItem.java b/net/minecraft/world/item
          BlockState newState = FLATTENABLES.get(blockState.getBlock());
          BlockState updatedState = null;
          Runnable afterAction = null; // Paper
+

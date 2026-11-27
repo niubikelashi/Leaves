@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Lumine1909 <133463833+lumine1909@users.noreply.github.com>
-Date: Wed, 26 Jun 2024 18:15:57 +0800
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
 Subject: [PATCH] Configurable MC-67
 
 
@@ -326,3 +326,4 @@ diff --git a/net/minecraft/world/item/crafting/SmithingTrimRecipe.java b/net/min
      public RecipeSerializer<SmithingTrimRecipe> getSerializer() {
          return SERIALIZER;
      }
+

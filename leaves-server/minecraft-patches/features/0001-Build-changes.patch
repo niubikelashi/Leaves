@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: violetc <58360096+s-yh-china@users.noreply.github.com>
-Date: Sun, 26 Jan 2025 13:58:49 +0800
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
 Subject: [PATCH] Build changes
 
 
@@ -298,3 +298,4 @@ diff --git a/net/minecraft/world/item/ShearsItem.java b/net/minecraft/world/item
          }
      }
  }
+

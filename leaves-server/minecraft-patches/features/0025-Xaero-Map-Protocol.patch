@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: violetc <58360096+s-yh-china@users.noreply.github.com>
-Date: Fri, 7 Feb 2025 14:23:43 +0800
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
 Subject: [PATCH] Xaero Map Protocol
 
 
@@ -17,3 +17,4 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
          if (level.isRaining()) {
              // CraftBukkit start - handle player weather
              // player.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.START_RAINING, 0.0F));
+

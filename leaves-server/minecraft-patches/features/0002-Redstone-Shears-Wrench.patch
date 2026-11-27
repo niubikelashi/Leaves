@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: violetc <58360096+s-yh-china@users.noreply.github.com>
-Date: Sun, 27 Mar 2022 12:48:40 +0800
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
 Subject: [PATCH] Redstone Shears Wrench
 
 
@@ -283,3 +283,4 @@ diff --git a/net/minecraft/world/entity/vehicle/minecart/MinecartHopper.java b/n
      public boolean suckInItems() {
          if (HopperBlockEntity.suckInItems(this.level(), this)) {
              this.immunize(); // Paper
+
