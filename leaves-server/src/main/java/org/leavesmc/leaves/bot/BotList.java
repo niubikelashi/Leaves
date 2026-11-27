@@ -5,6 +5,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.logging.LogUtils;
 import io.papermc.paper.adventure.PaperAdventure;
+import io.papermc.paper.profile.MutablePropertyMap;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.minecraft.nbt.CompoundTag;
@@ -79,7 +80,7 @@ public class BotList {
         Location location = event.getCreateLocation();
         ServerLevel world = ((CraftWorld) location.getWorld()).getHandle();
 
-        CustomGameProfile profile = new CustomGameProfile(BotUtil.getBotUUID(state), state.name(), state.skin());
+        GameProfile profile = createBotProfile(BotUtil.getBotUUID(state), state.name(), state.skin());
         ServerBot bot = new ServerBot(this.server, world, profile);
         bot.createState = state;
         if (event.getCreator() instanceof org.bukkit.entity.Player player) {
@@ -155,7 +156,7 @@ public class BotList {
         this.botsByName.put(bot.getScoreboardName().toLowerCase(Locale.ROOT), bot);
         this.botsByUUID.put(bot.getUUID(), bot);
 
-        bot.supressTrackerForLogin = true;
+        bot.suppressTrackerForLogin = true;
         world.addNewPlayer(bot);
         optional.ifPresent(nbt -> {
             bot.loadAndSpawnEnderPearls(nbt);
@@ -171,7 +172,7 @@ public class BotList {
         }
 
         bot.renderInfo();
-        bot.supressTrackerForLogin = false;
+        bot.suppressTrackerForLogin = false;
 
         bot.level().getChunkSource().chunkMap.addEntity(bot);
         bot.renderData();
@@ -337,17 +338,11 @@ public class BotList {
         return this.dataStorage.getSavedBotList();
     }
 
-    public static class CustomGameProfile extends GameProfile {
-
-        public CustomGameProfile(UUID uuid, String name, String[] skin) {
-            super(uuid, name);
-            this.setSkin(skin);
+    public static GameProfile createBotProfile(UUID uuid, String name, String[] skin) {
+        GameProfile profile = new GameProfile(uuid, name, new MutablePropertyMap());
+        if (skin != null) {
+            profile.properties().put("textures", new Property("textures", skin[0], skin[1]));
         }
-
-        public void setSkin(String[] skin) {
-            if (skin != null) {
-                this.getProperties().put("textures", new Property("textures", skin[0], skin[1]));
-            }
-        }
+        return profile;
     }
 }

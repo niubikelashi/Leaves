@@ -36,9 +36,11 @@ public enum CampfireProvider implements IServerExtensionProvider<ItemStack> {
                 }
                 stack = stack.copy();
 
+                // 1.21.9: CustomData.update(Codec...) -> update(Consumer<CompoundTag>); the jade:cooking int key is unchanged.
+                // The loop index cannot be captured by the lambda, so the remaining time is hoisted into a local (same value).
+                int time = campfire.cookingTime[i] - campfire.cookingProgress[i];
                 CustomData customData = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY)
-                    .update(NbtOps.INSTANCE, COOKING_TIME_CODEC, campfire.cookingTime[i] - campfire.cookingProgress[i])
-                    .getOrThrow();
+                    .update(tag -> tag.putInt("jade:cooking", time));
                 stack.set(DataComponents.CUSTOM_DATA, customData);
 
                 list.add(stack);

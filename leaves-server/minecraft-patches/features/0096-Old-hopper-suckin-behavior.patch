@@ -7,7 +7,7 @@ Subject: [PATCH] Old hopper suckin behavior
 diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -619,7 +619,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -571,7 +571,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
  
              return false;
          } else {

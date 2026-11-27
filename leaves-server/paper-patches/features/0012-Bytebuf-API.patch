@@ -7,7 +7,7 @@ Subject: [PATCH] Bytebuf API
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -318,6 +318,7 @@ public final class CraftServer implements Server {
+@@ -306,6 +306,7 @@ public final class CraftServer implements Server {
      private final ServerConfiguration serverConfig = new PaperServerConfiguration();
      private final org.leavesmc.leaves.entity.bot.CraftBotManager botManager; // Leaves
      private final org.leavesmc.leaves.entity.photographer.CraftPhotographerManager photographerManager = new org.leavesmc.leaves.entity.photographer.CraftPhotographerManager(); // Leaves
@@ -15,7 +15,7 @@ diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/ja
  
      // Paper start - Folia region threading API
      private final io.papermc.paper.threadedregions.scheduler.FallbackRegionScheduler regionizedScheduler = new io.papermc.paper.threadedregions.scheduler.FallbackRegionScheduler();
-@@ -3206,4 +3207,15 @@ public final class CraftServer implements Server {
+@@ -2984,4 +2985,15 @@ public final class CraftServer implements Server {
          return photographerManager;
      }
      // Leaves end - replay mod api
@@ -34,8 +34,7 @@ diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/ja
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -3446,5 +3446,17 @@
-         if (entity != null) {
+@@ -3447,4 +3447,16 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
              entity.remove();
          }
      }

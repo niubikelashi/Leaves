@@ -2,14 +2,14 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: MC_XiaoHei <xor7xiaohei@gmail.com>
 Date: Sat, 5 Jul 2025 11:31:44 +0800
 Subject: [PATCH] temp fix quick craft
-
 caused by PaperMC/Paper#11765
 should remove when PaperMC/Paper#11831 merged
+
 
 diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
-@@ -3945,11 +3945,11 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+@@ -3987,11 +3987,11 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
              return null;
          } else {
              double d = this.getEyeY() - 0.3F;

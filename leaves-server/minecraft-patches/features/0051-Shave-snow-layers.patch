@@ -7,7 +7,7 @@ Subject: [PATCH] Shave snow layers
 diff --git a/net/minecraft/world/item/ShovelItem.java b/net/minecraft/world/item/ShovelItem.java
 --- a/net/minecraft/world/item/ShovelItem.java
 +++ b/net/minecraft/world/item/ShovelItem.java
-@@ -43,6 +43,26 @@ public class ShovelItem extends Item {
+@@ -42,6 +42,26 @@ public class ShovelItem extends Item {
              return InteractionResult.PASS;
          } else {
              Player player = context.getPlayer();

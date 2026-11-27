@@ -2,6 +2,7 @@ package org.leavesmc.leaves.protocol.jade.util;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
@@ -47,8 +48,10 @@ public class CommonUtil {
         if (uuid == null) {
             return null;
         }
-        Optional<GameProfile> optional = SkullBlockEntity.fetchGameProfile(String.valueOf(uuid)).getNow(Optional.empty());
-        return optional.map(GameProfile::getName).orElse(null);
+        // 1.21.9: SkullBlockEntity.fetchGameProfile was removed; the user UUID/name cache (UserNameToIdResolver)
+        // is the last-known-name source, and it hands out NameAndId instead of GameProfile.
+        return MinecraftServer.getServer().services.nameToIdCache().get(uuid)
+            .map(net.minecraft.server.players.NameAndId::name).orElse(null);
     }
 
 

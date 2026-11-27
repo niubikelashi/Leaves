@@ -2,8 +2,8 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Mon, 3 Feb 2025 13:33:19 +0800
 Subject: [PATCH] Jade Protocol
-
 This patch is Powered by Jade(https://github.com/Snownee/Jade)
+
 
 diff --git a/net/minecraft/world/entity/animal/armadillo/Armadillo.java b/net/minecraft/world/entity/animal/armadillo/Armadillo.java
 --- a/net/minecraft/world/entity/animal/armadillo/Armadillo.java
@@ -20,7 +20,7 @@ diff --git a/net/minecraft/world/entity/animal/armadillo/Armadillo.java b/net/mi
 diff --git a/net/minecraft/world/entity/animal/frog/Tadpole.java b/net/minecraft/world/entity/animal/frog/Tadpole.java
 --- a/net/minecraft/world/entity/animal/frog/Tadpole.java
 +++ b/net/minecraft/world/entity/animal/frog/Tadpole.java
-@@ -254,7 +254,7 @@ public class Tadpole extends AbstractFish {
+@@ -247,7 +247,7 @@ public class Tadpole extends AbstractFish {
          }
      }
  

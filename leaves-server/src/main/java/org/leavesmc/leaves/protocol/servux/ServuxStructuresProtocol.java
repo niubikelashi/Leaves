@@ -79,7 +79,8 @@ public class ServuxStructuresProtocol implements LeavesProtocol {
     }
 
     public static void onStartedWatchingChunk(ServerPlayer player, LevelChunk chunk) {
-        MinecraftServer server = player.getServer();
+        // 1.21.9: Entity.getServer() was removed; the server is reached through the static accessor.
+        MinecraftServer server = MinecraftServer.getServer();
         if (players.containsKey(player.getId()) && server != null) {
             addChunkTimeoutIfHasReferences(player.getUUID(), chunk, server.getTickCount());
         }

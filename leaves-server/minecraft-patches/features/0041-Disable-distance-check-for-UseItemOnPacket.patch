@@ -7,7 +7,7 @@ Subject: [PATCH] Disable distance check for UseItemOnPacket
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -2038,7 +2038,7 @@ public class ServerGamePacketListenerImpl
+@@ -2045,7 +2045,7 @@ public class ServerGamePacketListenerImpl
                  if (this.player.canInteractWithBlock(blockPos, 1.0)) {
                      Vec3 vec3 = location.subtract(Vec3.atCenterOf(blockPos));
                      double d = 1.0000001;

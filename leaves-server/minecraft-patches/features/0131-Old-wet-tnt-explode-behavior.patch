@@ -7,7 +7,7 @@ Subject: [PATCH] Old wet tnt explode behavior
 diff --git a/net/minecraft/world/level/ServerExplosion.java b/net/minecraft/world/level/ServerExplosion.java
 --- a/net/minecraft/world/level/ServerExplosion.java
 +++ b/net/minecraft/world/level/ServerExplosion.java
-@@ -729,6 +729,7 @@ public class ServerExplosion implements Explosion {
+@@ -719,6 +719,7 @@ public class ServerExplosion implements Explosion {
      public boolean shouldAffectBlocklikeEntities() {
          boolean _boolean = this.level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
          boolean flag = this.source == null || this.source.getType() != EntityType.BREEZE_WIND_CHARGE && this.source.getType() != EntityType.WIND_CHARGE;

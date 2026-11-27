@@ -2,14 +2,13 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: MC_XiaoHei <xiaohei.xor7@outlook.com>
 Date: Mon, 22 Jul 2024 09:05:56 +0000
 Subject: [PATCH] Leaves Plugin
-
 This patch is licensed under the MIT license.
 
 
 diff --git a/src/main/java/io/papermc/paper/command/PaperPluginsCommand.java b/src/main/java/io/papermc/paper/command/PaperPluginsCommand.java
 --- a/src/main/java/io/papermc/paper/command/PaperPluginsCommand.java
 +++ b/src/main/java/io/papermc/paper/command/PaperPluginsCommand.java
-@@ -174,28 +_,41 @@174
+@@ -174,28 +174,41 @@ public class PaperPluginsCommand {
          final CommandSender sender = context.getSource().getSender();
          final TreeMap<String, PluginProvider<JavaPlugin>> paperPlugins = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
          final TreeMap<String, PluginProvider<JavaPlugin>> spigotPlugins = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
@@ -54,7 +53,7 @@ diff --git a/src/main/java/io/papermc/paper/command/PaperPluginsCommand.java b/s
          }
  
          for (final Component component : formatProviders(paperPlugins)) {
-@@ -203,8 +_,9 @@216
+@@ -203,8 +216,9 @@ public class PaperPluginsCommand {
          }
  
          if (!spigotPlugins.isEmpty()) {
@@ -68,7 +67,7 @@ diff --git a/src/main/java/io/papermc/paper/command/PaperPluginsCommand.java b/s
 diff --git a/src/main/java/io/papermc/paper/plugin/PluginInitializerManager.java b/src/main/java/io/papermc/paper/plugin/PluginInitializerManager.java
 --- a/src/main/java/io/papermc/paper/plugin/PluginInitializerManager.java
 +++ b/src/main/java/io/papermc/paper/plugin/PluginInitializerManager.java
-@@ -117,19 +_,30 @@117
+@@ -117,19 +117,30 @@ public class PluginInitializerManager {
          java.util.List<Path> files = ((java.util.List<File>) optionSet.valuesOf("add-plugin")).stream().map(File::toPath).toList();
          io.papermc.paper.plugin.util.EntrypointUtil.registerProvidersFromSource(io.papermc.paper.plugin.provider.source.PluginFlagProviderSource.INSTANCE, files);
  
@@ -103,7 +102,7 @@ diff --git a/src/main/java/io/papermc/paper/plugin/PluginInitializerManager.java
 diff --git a/src/main/java/io/papermc/paper/plugin/provider/configuration/LegacyPaperMeta.java b/src/main/java/io/papermc/paper/plugin/provider/configuration/LegacyPaperMeta.java
 --- a/src/main/java/io/papermc/paper/plugin/provider/configuration/LegacyPaperMeta.java
 +++ b/src/main/java/io/papermc/paper/plugin/provider/configuration/LegacyPaperMeta.java
-@@ -18,7 +_,7 @@18
+@@ -18,7 +18,7 @@ import java.util.List;
  import java.util.Map;
  import java.util.Set;
  
@@ -112,7 +111,7 @@ diff --git a/src/main/java/io/papermc/paper/plugin/provider/configuration/Legacy
  
  
      private static final TypeToken<Map<PluginDependencyLifeCycle, Map<String, DependencyConfiguration>>> TYPE_TOKEN = new TypeToken<>() {
-@@ -28,6 +_,12 @@28
+@@ -28,6 +28,12 @@ class LegacyPaperMeta {
          ConfigurationTransformation.chain(notVersioned()).apply(node);
      }
  
@@ -128,7 +127,7 @@ diff --git a/src/main/java/io/papermc/paper/plugin/provider/configuration/Legacy
 diff --git a/src/main/java/io/papermc/paper/plugin/provider/configuration/PaperPluginMeta.java b/src/main/java/io/papermc/paper/plugin/provider/configuration/PaperPluginMeta.java
 --- a/src/main/java/io/papermc/paper/plugin/provider/configuration/PaperPluginMeta.java
 +++ b/src/main/java/io/papermc/paper/plugin/provider/configuration/PaperPluginMeta.java
-@@ -55,7 +_,7 @@55
+@@ -55,7 +55,7 @@ public class PaperPluginMeta implements PluginMeta {
      @Required
      private String version;
      private String description;
@@ -140,7 +139,7 @@ diff --git a/src/main/java/io/papermc/paper/plugin/provider/configuration/PaperP
 diff --git a/src/main/java/io/papermc/paper/plugin/provider/type/PluginFileType.java b/src/main/java/io/papermc/paper/plugin/provider/type/PluginFileType.java
 --- a/src/main/java/io/papermc/paper/plugin/provider/type/PluginFileType.java
 +++ b/src/main/java/io/papermc/paper/plugin/provider/type/PluginFileType.java
-@@ -23,8 +_,9 @@23
+@@ -23,8 +23,9 @@ import java.util.jar.JarFile;
  public abstract class PluginFileType<T, C extends PluginMeta> {
  
      public static final String PAPER_PLUGIN_YML = "paper-plugin.yml";
@@ -151,7 +150,7 @@ diff --git a/src/main/java/io/papermc/paper/plugin/provider/type/PluginFileType.
      public static final PluginFileType<PaperPluginParent, PaperPluginMeta> PAPER = new PluginFileType<>(PAPER_PLUGIN_YML, PaperPluginParent.FACTORY) {
          @Override
          protected void register(EntrypointHandler entrypointHandler, PaperPluginParent parent) {
-@@ -43,8 +_,21 @@44
+@@ -43,8 +44,21 @@ public abstract class PluginFileType<T, C extends PluginMeta> {
              entrypointHandler.register(Entrypoint.PLUGIN, provider);
          }
      };
@@ -177,7 +176,7 @@ diff --git a/src/main/java/io/papermc/paper/plugin/provider/type/PluginFileType.
 diff --git a/src/main/java/io/papermc/paper/plugin/provider/type/paper/PaperPluginParent.java b/src/main/java/io/papermc/paper/plugin/provider/type/paper/PaperPluginParent.java
 --- a/src/main/java/io/papermc/paper/plugin/provider/type/paper/PaperPluginParent.java
 +++ b/src/main/java/io/papermc/paper/plugin/provider/type/paper/PaperPluginParent.java
-@@ -27,6 +_,7 @@27
+@@ -27,6 +27,7 @@ import java.util.jar.JarFile;
  public class PaperPluginParent {
  
      public static final PluginTypeFactory<PaperPluginParent, PaperPluginMeta> FACTORY = new PaperPluginProviderFactory();
@@ -185,7 +184,7 @@ diff --git a/src/main/java/io/papermc/paper/plugin/provider/type/paper/PaperPlug
      private final Path path;
      private final JarFile jarFile;
      private final PaperPluginMeta description;
-@@ -51,6 +_,32 @@52
+@@ -51,6 +52,32 @@ public class PaperPluginParent {
          return new PaperBootstrapProvider();
      }
  
@@ -221,7 +220,7 @@ diff --git a/src/main/java/io/papermc/paper/plugin/provider/type/paper/PaperPlug
 diff --git a/src/main/java/io/papermc/paper/plugin/storage/SimpleProviderStorage.java b/src/main/java/io/papermc/paper/plugin/storage/SimpleProviderStorage.java
 --- a/src/main/java/io/papermc/paper/plugin/storage/SimpleProviderStorage.java
 +++ b/src/main/java/io/papermc/paper/plugin/storage/SimpleProviderStorage.java
-@@ -26,6 +_,16 @@26
+@@ -26,6 +26,16 @@ public abstract class SimpleProviderStorage<T> implements ProviderStorage<T> {
  
      @Override
      public void register(PluginProvider<T> provider) {
@@ -241,7 +240,7 @@ diff --git a/src/main/java/io/papermc/paper/plugin/storage/SimpleProviderStorage
 diff --git a/src/main/java/io/papermc/paper/pluginremap/PluginRemapper.java b/src/main/java/io/papermc/paper/pluginremap/PluginRemapper.java
 --- a/src/main/java/io/papermc/paper/pluginremap/PluginRemapper.java
 +++ b/src/main/java/io/papermc/paper/pluginremap/PluginRemapper.java
-@@ -337,7 +_,13 @@337
+@@ -337,7 +337,13 @@ public final class PluginRemapper {
                      }
                      index.skip(inputFile);
                      return CompletableFuture.completedFuture(inputFile);
@@ -259,7 +258,7 @@ diff --git a/src/main/java/io/papermc/paper/pluginremap/PluginRemapper.java b/sr
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -2972,6 +_,13 @@2972
+@@ -2972,6 +2972,13 @@ public final class CraftServer implements Server {
          this.console.addPluginAllowingSleep(plugin.getName(), value);
      }
  

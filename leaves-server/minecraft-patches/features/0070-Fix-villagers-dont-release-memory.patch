@@ -5,11 +5,9 @@ Subject: [PATCH] Fix villagers dont release memory
 
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-
-diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -4076,7 +_,7 @@
+@@ -4099,7 +4099,7 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
      }
  
      @Nullable
@@ -21,7 +19,7 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
 diff --git a/net/minecraft/world/entity/npc/Villager.java b/net/minecraft/world/entity/npc/Villager.java
 --- a/net/minecraft/world/entity/npc/Villager.java
 +++ b/net/minecraft/world/entity/npc/Villager.java
-@@ -1030,4 +_,19 @@
+@@ -1030,4 +1030,19 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
              return super.applyImplicitComponent(component, value);
          }
      }

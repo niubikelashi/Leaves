@@ -2,13 +2,13 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Tue, 4 Feb 2025 19:45:19 +0800
 Subject: [PATCH] Replay Mod API
-
 This patch is Powered by ReplayMod(https://github.com/ReplayMod)
+
 
 diff --git a/net/minecraft/commands/CommandSourceStack.java b/net/minecraft/commands/CommandSourceStack.java
 --- a/net/minecraft/commands/CommandSourceStack.java
 +++ b/net/minecraft/commands/CommandSourceStack.java
-@@ -580,7 +_,7 @@
+@@ -580,7 +580,7 @@ public class CommandSourceStack implements ExecutionCommandSource<CommandSourceS
  
      @Override
      public Collection<String> getOnlinePlayerNames() {
@@ -20,7 +20,7 @@ diff --git a/net/minecraft/commands/CommandSourceStack.java b/net/minecraft/comm
 diff --git a/net/minecraft/commands/arguments/selector/EntitySelector.java b/net/minecraft/commands/arguments/selector/EntitySelector.java
 --- a/net/minecraft/commands/arguments/selector/EntitySelector.java
 +++ b/net/minecraft/commands/arguments/selector/EntitySelector.java
-@@ -129,11 +_,12 @@
+@@ -129,11 +129,12 @@ public class EntitySelector {
              return this.findPlayers(source);
          } else if (this.playerName != null) {
              ServerPlayer playerByName = source.getServer().getPlayerList().getPlayerByName(this.playerName);
@@ -34,7 +34,7 @@ diff --git a/net/minecraft/commands/arguments/selector/EntitySelector.java b/net
                      if (entity.getType().isEnabled(source.enabledFeatures())) {
                          return List.of(entity);
                      }
-@@ -147,7 +_,7 @@
+@@ -147,7 +148,7 @@ public class EntitySelector {
              AABB absoluteAabb = this.getAbsoluteAabb(vec3);
              if (this.currentEntity) {
                  Predicate<Entity> predicate = this.getPredicate(vec3, absoluteAabb, null);
@@ -43,7 +43,7 @@ diff --git a/net/minecraft/commands/arguments/selector/EntitySelector.java b/net
              } else {
                  Predicate<Entity> predicate = this.getPredicate(vec3, absoluteAabb, source.enabledFeatures());
                  List<Entity> list = new ObjectArrayList<>();
-@@ -158,6 +_,7 @@
+@@ -158,6 +159,7 @@ public class EntitySelector {
                          this.addEntities(list, serverLevel1, absoluteAabb, predicate);
                      }
                  }
@@ -51,7 +51,7 @@ diff --git a/net/minecraft/commands/arguments/selector/EntitySelector.java b/net
  
                  return this.sortAndLimit(vec3, list);
              }
-@@ -193,9 +_,11 @@
+@@ -193,9 +195,11 @@ public class EntitySelector {
          this.checkPermissions(source);
          if (this.playerName != null) {
              ServerPlayer playerByName = source.getServer().getPlayerList().getPlayerByName(this.playerName);
@@ -63,7 +63,7 @@ diff --git a/net/minecraft/commands/arguments/selector/EntitySelector.java b/net
              return playerByName == null ? List.of() : List.of(playerByName);
          } else {
              Vec3 vec3 = this.position.apply(source.getPosition());
-@@ -207,12 +_,12 @@
+@@ -207,12 +211,12 @@ public class EntitySelector {
                  int resultLimit = this.getResultLimit();
                  List<ServerPlayer> players;
                  if (this.isWorldLimited()) {
@@ -81,7 +81,7 @@ diff --git a/net/minecraft/commands/arguments/selector/EntitySelector.java b/net
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1575,7 +_,7 @@
+@@ -1575,7 +1575,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      private ServerStatus.Players buildPlayerStatus() {
@@ -90,7 +90,7 @@ diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/Mi
          int maxPlayers = this.getMaxPlayers();
          if (this.hidesOnlinePlayers()) {
              return new ServerStatus.Players(maxPlayers, players.size(), List.of());
-@@ -1802,7 +_,7 @@
+@@ -1802,7 +1802,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
      @Override
      public int getPlayerCount() {
@@ -102,7 +102,7 @@ diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/Mi
 diff --git a/net/minecraft/server/PlayerAdvancements.java b/net/minecraft/server/PlayerAdvancements.java
 --- a/net/minecraft/server/PlayerAdvancements.java
 +++ b/net/minecraft/server/PlayerAdvancements.java
-@@ -173,7 +_,7 @@
+@@ -173,7 +173,7 @@ public class PlayerAdvancements {
          }
          // Leaves end - spectator don't get advancement
          // Leaves start - bot can't get advancement
@@ -114,7 +114,7 @@ diff --git a/net/minecraft/server/PlayerAdvancements.java b/net/minecraft/server
 diff --git a/net/minecraft/server/ServerScoreboard.java b/net/minecraft/server/ServerScoreboard.java
 --- a/net/minecraft/server/ServerScoreboard.java
 +++ b/net/minecraft/server/ServerScoreboard.java
-@@ -244,7 +_,7 @@
+@@ -244,7 +244,7 @@ public class ServerScoreboard extends Scoreboard {
      public void startTrackingObjective(Objective objective) {
          List<Packet<?>> startTrackingPackets = this.getStartTrackingPackets(objective);
  
@@ -123,7 +123,7 @@ diff --git a/net/minecraft/server/ServerScoreboard.java b/net/minecraft/server/S
              if (serverPlayer.getBukkitEntity().getScoreboard().getHandle() != this) continue; // CraftBukkit - Only players on this board
              for (Packet<?> packet : startTrackingPackets) {
                  serverPlayer.connection.send(packet);
-@@ -270,7 +_,7 @@
+@@ -270,7 +270,7 @@ public class ServerScoreboard extends Scoreboard {
      public void stopTrackingObjective(Objective objective) {
          List<Packet<?>> stopTrackingPackets = this.getStopTrackingPackets(objective);
  
@@ -135,7 +135,7 @@ diff --git a/net/minecraft/server/ServerScoreboard.java b/net/minecraft/server/S
 diff --git a/net/minecraft/server/commands/ListPlayersCommand.java b/net/minecraft/server/commands/ListPlayersCommand.java
 --- a/net/minecraft/server/commands/ListPlayersCommand.java
 +++ b/net/minecraft/server/commands/ListPlayersCommand.java
-@@ -33,7 +_,7 @@
+@@ -33,7 +33,7 @@ public class ListPlayersCommand {
      private static int format(CommandSourceStack source, Function<ServerPlayer, Component> nameExtractor) {
          PlayerList playerList = source.getServer().getPlayerList();
          // CraftBukkit start
@@ -147,7 +147,7 @@ diff --git a/net/minecraft/server/commands/ListPlayersCommand.java b/net/minecra
 diff --git a/net/minecraft/server/commands/OpCommand.java b/net/minecraft/server/commands/OpCommand.java
 --- a/net/minecraft/server/commands/OpCommand.java
 +++ b/net/minecraft/server/commands/OpCommand.java
-@@ -25,7 +_,7 @@
+@@ -25,7 +25,7 @@ public class OpCommand {
                              (commandContext, suggestionsBuilder) -> {
                                  PlayerList playerList = commandContext.getSource().getServer().getPlayerList();
                                  return SharedSuggestionProvider.suggest(
@@ -159,7 +159,7 @@ diff --git a/net/minecraft/server/commands/OpCommand.java b/net/minecraft/server
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
-@@ -2763,7 +_,7 @@
+@@ -2763,7 +2763,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
              if (entity instanceof ServerPlayer serverPlayer) {
                  ServerLevel.this.players.add(serverPlayer);
                  // Leaves start - skip
@@ -168,7 +168,7 @@ diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/
                      ServerLevel.this.realPlayers.add(serverPlayer);
                  }
                  // Leaves end - skip
-@@ -2846,7 +_,7 @@
+@@ -2846,7 +2846,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
              if (entity instanceof ServerPlayer serverPlayer) {
                  ServerLevel.this.players.remove(serverPlayer);
                  // Leaves start - skip
@@ -180,7 +180,7 @@ diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -125,6 +_,7 @@
+@@ -125,6 +125,7 @@ public abstract class PlayerList {
      private int simulationDistance;
      private boolean allowCommandsForAllPlayers;
      private int sendAllPlayerInfoIn;
@@ -188,7 +188,7 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
  
      // CraftBukkit start
      private org.bukkit.craftbukkit.CraftServer cserver;
-@@ -148,6 +_,125 @@
+@@ -148,6 +149,125 @@ public abstract class PlayerList {
  
      abstract public void loadAndSaveFiles(); // Paper - fix converting txt to json file; moved from DedicatedPlayerList constructor
  
@@ -314,7 +314,7 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
      public void placeNewPlayer(Connection connection, ServerPlayer player, CommonListenerCookie cookie) {
          player.isRealPlayer = true; // Paper
          player.loginTime = System.currentTimeMillis(); // Paper - Replace OfflinePlayer#getLastPlayed
-@@ -215,6 +_,7 @@
+@@ -215,6 +335,7 @@ public abstract class PlayerList {
  
          // player.connection.send(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(this.players)); // CraftBukkit - replaced with loop below
          this.players.add(player);
@@ -322,7 +322,7 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
          this.playersByName.put(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT), player); // Spigot
          this.playersByUUID.put(player.getUUID(), player);
          // this.broadcastAll(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(player))); // CraftBukkit - replaced with loop below
-@@ -419,6 +_,7 @@
+@@ -419,6 +540,7 @@ public abstract class PlayerList {
      }
  
      protected void save(ServerPlayer player) {
@@ -330,7 +330,7 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
          if (!player.getBukkitEntity().isPersistent()) return; // CraftBukkit
          player.lastSave = MinecraftServer.currentTick; // Paper - Incremental chunk and player saving
          this.playerIo.save(player);
-@@ -433,6 +_,43 @@
+@@ -433,6 +555,43 @@ public abstract class PlayerList {
          }
      }
  
@@ -374,7 +374,7 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
      public @Nullable net.kyori.adventure.text.Component remove(ServerPlayer player) { // CraftBukkit - return string // Paper - return Component
          // Paper start - Fix kick event leave message not being sent
          return this.remove(player, net.kyori.adventure.text.Component.translatable("multiplayer.player.left", net.kyori.adventure.text.format.NamedTextColor.YELLOW, io.papermc.paper.configuration.GlobalConfiguration.get().messages.useDisplayNameInQuitMessage ? player.getBukkitEntity().displayName() : io.papermc.paper.adventure.PaperAdventure.asAdventure(player.getDisplayName())));
-@@ -506,6 +_,7 @@
+@@ -506,6 +665,7 @@ public abstract class PlayerList {
          player.retireScheduler(); // Paper - Folia schedulers
          player.getAdvancements().stopListening();
          this.players.remove(player);
@@ -382,7 +382,7 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
          this.playersByName.remove(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT)); // Spigot
          this.server.getCustomBossEvents().onPlayerDisconnect(player);
          UUID uuid = player.getUUID();
-@@ -812,8 +_,8 @@
+@@ -812,8 +972,8 @@ public abstract class PlayerList {
      public void tick() {
          if (++this.sendAllPlayerInfoIn > 600) {
              // CraftBukkit start
@@ -393,7 +393,7 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
  
                  target.connection.send(new ClientboundPlayerInfoUpdatePacket(EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LATENCY), com.google.common.collect.Collections2.filter(this.players, t -> target.getBukkitEntity().canSee(t.getBukkitEntity()))));
              }
-@@ -881,10 +_,10 @@
+@@ -881,10 +1041,10 @@ public abstract class PlayerList {
      }
  
      public String[] getPlayerNamesArray() {
@@ -406,7 +406,7 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
          }
          // Leaves end - fakeplayer support
  
-@@ -959,7 +_,7 @@
+@@ -959,7 +1119,7 @@ public abstract class PlayerList {
  
      // Paper start - whitelist verify event / login event
      public LoginResult canBypassFullServerLogin(final NameAndId nameAndId, final LoginResult currentResult) {

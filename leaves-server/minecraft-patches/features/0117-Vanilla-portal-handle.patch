@@ -7,7 +7,7 @@ Subject: [PATCH] Vanilla portal handle
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -836,6 +836,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -842,6 +842,7 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
  
      // CraftBukkit start
      public void postTick() {
@@ -15,7 +15,7 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
          // No clean way to break out of ticking once the entity has been copied to a new world, so instead we move the portalling later in the tick cycle
          if (!(this instanceof ServerPlayer) && this.isAlive()) { // Paper - don't attempt to teleport dead entities
              this.handlePortal();
-@@ -856,7 +857,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -862,7 +863,7 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
              this.boardingCooldown--;
          }
  

@@ -202,7 +202,8 @@ public class REIServerProtocol implements LeavesProtocol {
             }
         } else if (channel.equals("ci_msg")) {
             // cheat rei-client into using "delete_item" packet
-            if (MinecraftServer.getServer().getProfilePermissions(player.getGameProfile()) < 1) {
+            // 1.21.9: PlayerList.getProfilePermissions takes NameAndId; player.nameAndId() wraps the same profile.
+            if (MinecraftServer.getServer().getProfilePermissions(player.nameAndId()) < 1) {
                 player.getBukkitEntity().sendOpLevel((byte) 1);
             }
         }

@@ -2,14 +2,13 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Tue, 4 Feb 2025 20:18:35 +0800
 Subject: [PATCH] Wool Hopper Counter
-
 This patch is Powered by fabric-carpet(https://github.com/gnembon/fabric-carpet)
 
 
 diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -196,6 +_,28 @@
+@@ -206,6 +206,28 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
                      flag |= validator.getAsBoolean(); // Paper - note: this is not a validator, it's what adds/sucks in items
                  }
  
@@ -38,7 +37,7 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
                  if (flag) {
                      blockEntity.setCooldown(level.spigotConfig.hopperTransfer); // Spigot
                      setChanged(level, pos, state);
-@@ -418,6 +_,13 @@
+@@ -433,6 +455,13 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
      // Paper end - Perf: Optimize Hoppers
  
      private static boolean ejectItems(Level level, BlockPos pos, HopperBlockEntity blockEntity) {
@@ -52,7 +51,7 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
          Container attachedContainer = getAttachedContainer(level, pos, blockEntity);
          if (attachedContainer == null) {
              return false;
-@@ -484,6 +_,26 @@
+@@ -499,6 +528,26 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
          }
      }
  
@@ -79,7 +78,7 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
      private static int[] getSlots(Container container, Direction direction) {
          if (container instanceof WorldlyContainer worldlyContainer) {
              return worldlyContainer.getSlotsForFace(direction);
-@@ -618,6 +_,7 @@
+@@ -633,6 +682,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
      }
  
      public static boolean addItem(Container container, ItemEntity item) {

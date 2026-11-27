@@ -2,14 +2,13 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: MC_XiaoHei <xor7xiaohei@gmail.com>
 Date: Sun, 6 Jul 2025 10:32:36 +0800
 Subject: [PATCH] Old ender dragon part can use end portal
-
 This patch is Powered by CrystalCarpetAddition(https://github.com/Crystal0404/CrystalCarpetAddition)
 
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -187,7 +_,7 @@
+@@ -187,7 +187,7 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
      // Paper end - Share random for entities to make them more random
      public @Nullable org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason spawnReason; // Paper - Entity#getEntitySpawnReason
  
@@ -18,7 +17,7 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
  
      public org.bukkit.craftbukkit.entity.CraftEntity getBukkitEntity() {
          if (this.bukkitEntity == null) {
-@@ -4010,7 +_,7 @@
+@@ -4021,7 +4021,7 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
      @Nullable
      public Entity teleport(TeleportTransition teleportTransition) {
          // Paper start - Fix item duplication and teleport issues
@@ -27,7 +26,7 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
              LOGGER.warn("Illegal Entity Teleport {} to {}:{}", this, teleportTransition.newLevel(), teleportTransition.position(), new Throwable());
              return null;
          }
-@@ -4127,7 +_,7 @@
+@@ -4138,7 +4138,7 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
              entityx.restoreFrom(this);
              this.removeAfterChangingDimensions();
              entityx.teleportSetPosition(PositionMoveRotation.of(this), PositionMoveRotation.of(teleportTransition), teleportTransition.relatives());
@@ -36,7 +35,7 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
  
              for (Entity entity2 : list) {
                  entity2.startRiding(entityx, true, false);
-@@ -4269,6 +_,7 @@
+@@ -4280,6 +4280,7 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
      }
  
      public boolean canTeleport(Level fromLevel, Level toLevel) {
@@ -47,7 +46,7 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
 diff --git a/net/minecraft/world/entity/Mob.java b/net/minecraft/world/entity/Mob.java
 --- a/net/minecraft/world/entity/Mob.java
 +++ b/net/minecraft/world/entity/Mob.java
-@@ -395,6 +_,16 @@
+@@ -395,6 +395,16 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
          if (!this.level().isClientSide() && this.tickCount % 5 == 0) {
              this.updateControlFlags();
          }
@@ -67,7 +66,7 @@ diff --git a/net/minecraft/world/entity/Mob.java b/net/minecraft/world/entity/Mo
 diff --git a/net/minecraft/world/entity/PortalProcessor.java b/net/minecraft/world/entity/PortalProcessor.java
 --- a/net/minecraft/world/entity/PortalProcessor.java
 +++ b/net/minecraft/world/entity/PortalProcessor.java
-@@ -7,7 +_,7 @@
+@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.Portal;
  import net.minecraft.world.level.portal.TeleportTransition;
  
  public class PortalProcessor {

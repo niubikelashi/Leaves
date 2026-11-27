@@ -22,7 +22,7 @@ diff --git a/net/minecraft/world/effect/BadOmenMobEffect.java b/net/minecraft/wo
 diff --git a/net/minecraft/world/entity/raid/Raid.java b/net/minecraft/world/entity/raid/Raid.java
 --- a/net/minecraft/world/entity/raid/Raid.java
 +++ b/net/minecraft/world/entity/raid/Raid.java
-@@ -256,7 +256,7 @@ public class Raid {
+@@ -258,7 +258,7 @@ public class Raid {
      }
  
      public boolean absorbRaidOmen(ServerPlayer player) {
@@ -31,7 +31,7 @@ diff --git a/net/minecraft/world/entity/raid/Raid.java b/net/minecraft/world/ent
          if (effect == null) {
              return false;
          } else {
-@@ -333,7 +333,13 @@ public class Raid {
+@@ -335,7 +335,13 @@ public class Raid {
                          }
  
                          if (flag1) {
@@ -46,7 +46,7 @@ diff --git a/net/minecraft/world/entity/raid/Raid.java b/net/minecraft/world/ent
                          }
  
                          if (this.raidCooldownTicks == 300 || this.raidCooldownTicks % 20 == 0) {
-@@ -368,7 +374,14 @@ public class Raid {
+@@ -390,7 +396,14 @@ public class Raid {
                  int i = 0;
  
                  while (this.shouldSpawnGroup()) {
@@ -62,7 +62,7 @@ diff --git a/net/minecraft/world/entity/raid/Raid.java b/net/minecraft/world/ent
                      if (blockPos != null) {
                          this.started = true;
                          this.spawnGroup(level, blockPos);
-@@ -380,7 +393,7 @@ public class Raid {
+@@ -402,7 +415,7 @@ public class Raid {
                          i++;
                      }
  
@@ -71,7 +71,7 @@ diff --git a/net/minecraft/world/entity/raid/Raid.java b/net/minecraft/world/ent
                          org.bukkit.craftbukkit.event.CraftEventFactory.callRaidStopEvent(level, this, org.bukkit.event.raid.RaidStopEvent.Reason.UNSPAWNABLE); // CraftBukkit
                          this.stop();
                          break;
-@@ -667,7 +680,7 @@ public class Raid {
+@@ -689,7 +702,7 @@ public class Raid {
              int i2 = this.center.getX() + Mth.floor(Mth.cos(f2) * 32.0F * f) + level.random.nextInt(3) * Mth.floor(f);
              int i3 = this.center.getZ() + Mth.floor(Mth.sin(f2) * 32.0F * f) + level.random.nextInt(3) * Mth.floor(f);
              int height = level.getHeight(Heightmap.Types.WORLD_SURFACE, i2, i3);
@@ -80,7 +80,7 @@ diff --git a/net/minecraft/world/entity/raid/Raid.java b/net/minecraft/world/ent
                  mutableBlockPos.set(i2, height, i3);
                  if (!level.isVillage(mutableBlockPos) || i <= 7) {
                      int i4 = 10;
-@@ -686,6 +699,36 @@ public class Raid {
+@@ -708,6 +721,36 @@ public class Raid {
          return null;
      }
  
@@ -117,7 +117,7 @@ diff --git a/net/minecraft/world/entity/raid/Raid.java b/net/minecraft/world/ent
      private boolean addWaveMob(ServerLevel level, int wave, Raider raider) {
          return this.addWaveMob(level, wave, raider, true);
      }
-@@ -843,4 +886,43 @@ public class Raid {
+@@ -865,4 +908,43 @@ public class Raid {
              this.spawnsPerWaveBeforeBonus = spawnsPerWaveBeforeBonus;
          }
      }

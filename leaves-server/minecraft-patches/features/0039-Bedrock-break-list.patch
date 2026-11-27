@@ -5,11 +5,9 @@ Subject: [PATCH] Bedrock break list
 
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-
-diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1684,6 +_,7 @@
+@@ -1691,6 +1691,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          }
  
          profilerFiller.popPush("server gui refresh");
@@ -20,7 +18,7 @@ diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/Mi
 diff --git a/net/minecraft/server/ServerScoreboard.java b/net/minecraft/server/ServerScoreboard.java
 --- a/net/minecraft/server/ServerScoreboard.java
 +++ b/net/minecraft/server/ServerScoreboard.java
-@@ -158,6 +_,7 @@
+@@ -158,6 +158,7 @@ public class ServerScoreboard extends Scoreboard {
      @Override
      public void onObjectiveAdded(Objective objective) {
          super.onObjectiveAdded(objective);
@@ -28,7 +26,7 @@ diff --git a/net/minecraft/server/ServerScoreboard.java b/net/minecraft/server/S
          this.setDirty();
      }
  
-@@ -174,6 +_,7 @@
+@@ -174,6 +175,7 @@ public class ServerScoreboard extends Scoreboard {
      @Override
      public void onObjectiveRemoved(Objective objective) {
          super.onObjectiveRemoved(objective);
@@ -39,7 +37,7 @@ diff --git a/net/minecraft/server/ServerScoreboard.java b/net/minecraft/server/S
 diff --git a/net/minecraft/world/level/block/piston/PistonBaseBlock.java b/net/minecraft/world/level/block/piston/PistonBaseBlock.java
 --- a/net/minecraft/world/level/block/piston/PistonBaseBlock.java
 +++ b/net/minecraft/world/level/block/piston/PistonBaseBlock.java
-@@ -74,6 +_,11 @@
+@@ -74,6 +74,11 @@ public class PistonBaseBlock extends DirectionalBlock {
      @Override
      public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
          if (!level.isClientSide()) {
@@ -51,7 +49,7 @@ diff --git a/net/minecraft/world/level/block/piston/PistonBaseBlock.java b/net/m
              this.checkIfExtend(level, pos, state);
          }
      }
-@@ -229,7 +_,13 @@
+@@ -229,7 +234,13 @@ public class PistonBaseBlock extends DirectionalBlock {
                              }
                          }
                          // Paper end - Fix sticky pistons and BlockPistonRetractEvent
@@ -66,7 +64,7 @@ diff --git a/net/minecraft/world/level/block/piston/PistonBaseBlock.java b/net/m
                      } else {
                          this.moveBlocks(level, pos, direction, false);
                      }
-@@ -238,6 +_,11 @@
+@@ -238,6 +249,11 @@ public class PistonBaseBlock extends DirectionalBlock {
                  // Paper start - Protect Bedrock and End Portal/Frames from being destroyed; fix headless pistons breaking blocks
                  BlockPos headPos = pos.relative(direction);
                  if (io.papermc.paper.configuration.GlobalConfiguration.get().unsupportedSettings.allowPermanentBlockBreakExploits || level.getBlockState(headPos) == Blocks.PISTON_HEAD.defaultBlockState().setValue(FACING, direction)) { // double check to make sure we're not a headless piston

@@ -5,11 +5,9 @@ Subject: [PATCH] Leaves I18n support
 
 
 diff --git a/net/minecraft/locale/Language.java b/net/minecraft/locale/Language.java
-
-diff --git a/net/minecraft/locale/Language.java b/net/minecraft/locale/Language.java
 --- a/net/minecraft/locale/Language.java
 +++ b/net/minecraft/locale/Language.java
-@@ -36,6 +_,7 @@
+@@ -36,6 +36,7 @@ public abstract class Language {
          Map<String, String> map = new HashMap<>();
          BiConsumer<String, String> biConsumer = map::put;
          parseTranslations(biConsumer, "/assets/minecraft/lang/en_us.json");
@@ -17,7 +15,7 @@ diff --git a/net/minecraft/locale/Language.java b/net/minecraft/locale/Language.
          deprecatedTranslationsInfo.applyToMap(map);
          final Map<String, String> map1 = Map.copyOf(map);
          return new Language() {
-@@ -65,7 +_,7 @@
+@@ -65,7 +66,7 @@ public abstract class Language {
          };
      }
  
@@ -29,7 +27,7 @@ diff --git a/net/minecraft/locale/Language.java b/net/minecraft/locale/Language.
 diff --git a/net/minecraft/server/Main.java b/net/minecraft/server/Main.java
 --- a/net/minecraft/server/Main.java
 +++ b/net/minecraft/server/Main.java
-@@ -152,6 +_,8 @@
+@@ -152,6 +152,8 @@ public class Main {
                  return;
              }
  
@@ -41,10 +39,11 @@ diff --git a/net/minecraft/server/Main.java b/net/minecraft/server/Main.java
 diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -276,5 +_,6 @@
+@@ -277,6 +277,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          io.papermc.paper.command.PaperCommands.registerCommands(this); // Paper - setup /paper command
          this.server.spark.registerCommandBeforePlugins(this.server); // Paper - spark
          com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
 +        org.leavesmc.leaves.util.ServerI18nUtil.init(); // Leaves I18n
  
          org.leavesmc.leaves.LeavesConfig.init((java.io.File) options.valueOf("leaves-settings")); // Leaves - Server Config
+         this.getBotList().loadBotInfo(); // Leaves - load resident bot info

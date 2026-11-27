@@ -24,6 +24,9 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+// 1.21.9: Entity.getServer() was removed; upstream dev/1.21.10 bot/photographer code uses the static accessor.
+import static net.minecraft.server.MinecraftServer.getServer;
+
 public class ServerPhotographer extends ServerPlayer {
 
     private static final List<ServerPhotographer> photographers = new CopyOnWriteArrayList<>();
@@ -78,7 +81,7 @@ public class ServerPhotographer extends ServerPlayer {
     public void tick() {
         super.tick();
 
-        if (this.getServer().getTickCount() % 10 == 0) {
+        if (getServer().getTickCount() % 10 == 0) {
             connection.resetPosition();
             this.level().chunkSource.move(this);
         }
@@ -130,7 +133,7 @@ public class ServerPhotographer extends ServerPlayer {
         super.remove(RemovalReason.KILLED);
         photographers.remove(this);
         this.recorder.stop();
-        this.getServer().getPlayerList().removePhotographer(this);
+        getServer().getPlayerList().removePhotographer(this);
 
         LeavesLogger.LOGGER.info("Photographer " + createState.id + " removed");
 

@@ -1,0 +1,17 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: compat-bot <compat-bot@localhost>
+Date: Mon Sep 17 00:00:00 2001 +0000
+Subject: [PATCH] Spigot package version for 1.21.9
+
+
+diff --git a/src/main/java/io/papermc/paper/util/MappingEnvironment.java b/src/main/java/io/papermc/paper/util/MappingEnvironment.java
+--- a/src/main/java/io/papermc/paper/util/MappingEnvironment.java
++++ b/src/main/java/io/papermc/paper/util/MappingEnvironment.java
+@@ -11,6 +11,6 @@
+ @DefaultQualifier(NonNull.class)
+ public final class MappingEnvironment {
+     public static final boolean DISABLE_PLUGIN_REMAPPING = Boolean.getBoolean("paper.disablePluginRemapping");
+-    public static final String LEGACY_CB_VERSION = "v1_21_R5";
++    public static final String LEGACY_CB_VERSION = "v1_21_R6"; // Leaves - Spigot CraftBukkit package for 1.21.9
+     private static final @Nullable String MAPPINGS_HASH = readMappingsHash();
+     private static final boolean REOBF = checkReobf();

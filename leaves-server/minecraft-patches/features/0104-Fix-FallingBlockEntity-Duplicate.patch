@@ -7,7 +7,7 @@ Subject: [PATCH] Fix FallingBlockEntity Duplicate
 diff --git a/net/minecraft/world/entity/item/FallingBlockEntity.java b/net/minecraft/world/entity/item/FallingBlockEntity.java
 --- a/net/minecraft/world/entity/item/FallingBlockEntity.java
 +++ b/net/minecraft/world/entity/item/FallingBlockEntity.java
-@@ -387,7 +387,7 @@ public class FallingBlockEntity extends Entity {
+@@ -386,7 +386,7 @@ public class FallingBlockEntity extends Entity {
          ResourceKey<Level> resourceKey1 = this.level().dimension();
          boolean flag = (resourceKey1 == Level.END || resourceKey == Level.END) && resourceKey1 != resourceKey;
          Entity entity = super.teleport(teleportTransition);

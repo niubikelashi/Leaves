@@ -5,11 +5,9 @@ Subject: [PATCH] Servux Protocol
 
 
 diff --git a/net/minecraft/server/ServerTickRateManager.java b/net/minecraft/server/ServerTickRateManager.java
-
-diff --git a/net/minecraft/server/ServerTickRateManager.java b/net/minecraft/server/ServerTickRateManager.java
 --- a/net/minecraft/server/ServerTickRateManager.java
 +++ b/net/minecraft/server/ServerTickRateManager.java
-@@ -129,4 +_,10 @@
+@@ -129,4 +129,10 @@ public class ServerTickRateManager extends TickRateManager {
          player.connection.send(ClientboundTickingStatePacket.from(this));
          player.connection.send(ClientboundTickingStepPacket.from(this));
      }
@@ -23,7 +21,7 @@ diff --git a/net/minecraft/server/ServerTickRateManager.java b/net/minecraft/ser
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
-@@ -2279,6 +_,7 @@
+@@ -2287,6 +2287,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
      @Override
      public LevelData.RespawnData getRespawnData() {
          return this.getServer().getRespawnData();

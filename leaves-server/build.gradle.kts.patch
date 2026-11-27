@@ -44,8 +44,10 @@
      spigot {
 -        enabled = false
 +        // enabled = true // Leaves - disable
-         buildDataRef = "436eac9815c211be1a2a6ca0702615f995e81c44"
-         packageVersion = "v1_21_R5" // also needs to be updated in MappingEnvironment
+-        buildDataRef = "436eac9815c211be1a2a6ca0702615f995e81c44"
++        buildDataRef = "42d18d4c4653ffc549778dbe223f6994a031d69e" // Leaves - Spigot BuildData "Update to Minecraft 1.21.9"
+-        packageVersion = "v1_21_R5" // also needs to be updated in MappingEnvironment
++        packageVersion = "v1_21_R6" // also needs to be updated in MappingEnvironment
      }
 @@ -49,6 +_,7 @@
      libraryRepositories.addAll(

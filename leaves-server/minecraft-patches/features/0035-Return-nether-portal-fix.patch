@@ -2,13 +2,13 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Mon, 3 Feb 2025 15:36:21 +0800
 Subject: [PATCH] Return nether portal fix
-
 This patch is powered by NetherPortalFix(https://github.com/TwelveIterationMods/NetherPortalFix)
+
 
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -1468,6 +1468,21 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -1579,6 +1579,21 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
                  org.bukkit.event.player.PlayerChangedWorldEvent changeEvent = new org.bukkit.event.player.PlayerChangedWorldEvent(this.getBukkitEntity(), serverLevel.getWorld());
                  this.level().getCraftServer().getPluginManager().callEvent(changeEvent);
                  // CraftBukkit end
@@ -33,7 +33,7 @@ diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -820,6 +820,20 @@ public abstract class PlayerList {
+@@ -738,6 +738,20 @@ public abstract class PlayerList {
          if (fromWorld != level) {
              org.bukkit.event.player.PlayerChangedWorldEvent event = new org.bukkit.event.player.PlayerChangedWorldEvent(player.getBukkitEntity(), fromWorld.getWorld());
              this.server.server.getPluginManager().callEvent(event);
@@ -57,7 +57,7 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
 diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
-@@ -257,7 +257,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+@@ -258,7 +258,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
      protected ItemStack useItem = ItemStack.EMPTY;
      public int useItemRemaining;
      protected int fallFlyTicks;

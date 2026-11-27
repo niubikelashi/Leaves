@@ -5,11 +5,9 @@ Subject: [PATCH] Make shears in dispenser can unlimited use
 
 
 diff --git a/net/minecraft/core/dispenser/ShearsDispenseItemBehavior.java b/net/minecraft/core/dispenser/ShearsDispenseItemBehavior.java
-
-diff --git a/net/minecraft/core/dispenser/ShearsDispenseItemBehavior.java b/net/minecraft/core/dispenser/ShearsDispenseItemBehavior.java
 --- a/net/minecraft/core/dispenser/ShearsDispenseItemBehavior.java
 +++ b/net/minecraft/core/dispenser/ShearsDispenseItemBehavior.java
-@@ -45,6 +_,6 @@
+@@ -45,7 +45,7 @@ public class ShearsDispenseItemBehavior extends OptionalDispenseItemBehavior {
              BlockPos blockPos = blockSource.pos().relative(blockSource.state().getValue(DispenserBlock.FACING));
              this.setSuccess(tryShearBeehive(serverLevel, item, blockPos) || tryShearEntity(serverLevel, blockPos, item, bukkitBlock, craftItem)); // CraftBukkit
              if (this.isSuccess()) {
@@ -17,3 +15,4 @@ diff --git a/net/minecraft/core/dispenser/ShearsDispenseItemBehavior.java b/net/
 +                item.hurtAndBreak(1, serverLevel, null, item1 -> { if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.shearsInDispenserCanZeroAmount) item.grow(1); }); // Leaves - Make shears in dispenser can unlimited use
              }
          }
+ 

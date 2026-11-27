@@ -7,7 +7,7 @@ Subject: [PATCH] Spawn invulnerable time
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -232,6 +232,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -240,6 +240,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
      private int lastSentFood = -99999999;
      private boolean lastFoodSaturationZero = true;
      public int lastSentExp = -99999999;
@@ -15,7 +15,7 @@ diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server
      private ChatVisiblity chatVisibility = ChatVisiblity.FULL;
      public ParticleStatus particleStatus = ParticleStatus.ALL;
      private boolean canChatColor = true;
-@@ -752,6 +753,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -729,6 +730,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
          this.resetOperationCountPerTick(); // Leaves - player operation limiter
          this.gameMode.tick();
          this.wardenSpawnTracker.tick();
@@ -23,7 +23,7 @@ diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server
          if (this.invulnerableTime > 0) {
              this.invulnerableTime--;
          }
-@@ -1203,6 +1205,13 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -1310,6 +1312,13 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
          if (this.isInvulnerableTo(level, damageSource)) {
              return false;
          } else {

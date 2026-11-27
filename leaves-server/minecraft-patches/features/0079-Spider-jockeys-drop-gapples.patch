@@ -5,11 +5,9 @@ Subject: [PATCH] Spider jockeys drop gapples
 
 
 diff --git a/net/minecraft/world/entity/monster/Skeleton.java b/net/minecraft/world/entity/monster/Skeleton.java
-
-diff --git a/net/minecraft/world/entity/monster/Skeleton.java b/net/minecraft/world/entity/monster/Skeleton.java
 --- a/net/minecraft/world/entity/monster/Skeleton.java
 +++ b/net/minecraft/world/entity/monster/Skeleton.java
-@@ -129,4 +_,16 @@
+@@ -129,4 +129,16 @@ public class Skeleton extends AbstractSkeleton {
      SoundEvent getStepSound() {
          return SoundEvents.SKELETON_STEP;
      }
@@ -29,7 +27,7 @@ diff --git a/net/minecraft/world/entity/monster/Skeleton.java b/net/minecraft/wo
 diff --git a/net/minecraft/world/entity/monster/Spider.java b/net/minecraft/world/entity/monster/Spider.java
 --- a/net/minecraft/world/entity/monster/Spider.java
 +++ b/net/minecraft/world/entity/monster/Spider.java
-@@ -139,6 +_,18 @@
+@@ -139,6 +139,18 @@ public class Spider extends Monster {
          this.entityData.set(DATA_FLAGS_ID, b);
      }
  
@@ -51,7 +49,7 @@ diff --git a/net/minecraft/world/entity/monster/Spider.java b/net/minecraft/worl
 diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -196,28 +_,6 @@
+@@ -206,28 +206,6 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
                      flag |= validator.getAsBoolean(); // Paper - note: this is not a validator, it's what adds/sucks in items
                  }
  
@@ -80,7 +78,7 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
                  if (flag) {
                      blockEntity.setCooldown(level.spigotConfig.hopperTransfer); // Spigot
                      setChanged(level, pos, state);
-@@ -440,13 +_,6 @@
+@@ -455,13 +433,6 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
      // Paper end - Perf: Optimize Hoppers
  
      private static boolean ejectItems(Level level, BlockPos pos, HopperBlockEntity blockEntity) {
@@ -94,7 +92,7 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
          Container attachedContainer = getAttachedContainer(level, pos, blockEntity);
          if (attachedContainer == null) {
              return false;
-@@ -513,26 +_,6 @@
+@@ -528,26 +499,6 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
          }
      }
  
@@ -121,7 +119,7 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
      private static int[] getSlots(Container container, Direction direction) {
          if (container instanceof WorldlyContainer worldlyContainer) {
              return worldlyContainer.getSlotsForFace(direction);
-@@ -667,7 +_,6 @@
+@@ -682,7 +633,6 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
      }
  
      public static boolean addItem(Container container, ItemEntity item) {

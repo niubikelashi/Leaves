@@ -7,7 +7,7 @@ Subject: [PATCH] Renewable deepslate
 diff --git a/net/minecraft/world/level/block/LiquidBlock.java b/net/minecraft/world/level/block/LiquidBlock.java
 --- a/net/minecraft/world/level/block/LiquidBlock.java
 +++ b/net/minecraft/world/level/block/LiquidBlock.java
-@@ -190,7 +190,7 @@ public class LiquidBlock extends Block implements BucketPickup {
+@@ -194,7 +194,7 @@ public class LiquidBlock extends Block implements BucketPickup {
              for (Direction direction : POSSIBLE_FLOW_DIRECTIONS) {
                  BlockPos blockPos = pos.relative(direction.getOpposite());
                  if (level.getFluidState(blockPos).is(FluidTags.WATER)) {
@@ -19,7 +19,7 @@ diff --git a/net/minecraft/world/level/block/LiquidBlock.java b/net/minecraft/wo
 diff --git a/net/minecraft/world/level/material/LavaFluid.java b/net/minecraft/world/level/material/LavaFluid.java
 --- a/net/minecraft/world/level/material/LavaFluid.java
 +++ b/net/minecraft/world/level/material/LavaFluid.java
-@@ -223,7 +223,7 @@ public abstract class LavaFluid extends FlowingFluid {
+@@ -224,7 +224,7 @@ public abstract class LavaFluid extends FlowingFluid {
              if (this.is(FluidTags.LAVA) && fluidState1.is(FluidTags.WATER)) {
                  if (blockState.getBlock() instanceof LiquidBlock) {
                      // CraftBukkit start

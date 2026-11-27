@@ -3,10 +3,11 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Fri, 17 Mar 2023 15:57:08 +0800
 Subject: [PATCH] Catch update suppression crash
 
+
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1660,6 +_,10 @@
+@@ -1663,6 +1663,10 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
              try {
                  serverLevel.tick(hasTimeLeft);
@@ -20,7 +21,7 @@ diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/Mi
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
-@@ -833,6 +_,9 @@
+@@ -835,6 +835,9 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
                                      if (org.leavesmc.leaves.LeavesConfig.performance.remove.tickGuardLambda) {
                                          try {
                                              this.tickNonPassenger(entity); // Leaves - changed
@@ -33,7 +34,7 @@ diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -901,6 +_,10 @@
+@@ -901,6 +901,10 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
                  ((org.bukkit.craftbukkit.CraftWorldBorder) this.getBukkitEntity().getWorldBorder()).getHandle().tick();
              }
              // CraftBukkit end
@@ -47,7 +48,7 @@ diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -1361,9 +_,13 @@
+@@ -1361,9 +1361,13 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
                      this.walkingStepSound(pos, state);
                  }
  
@@ -65,7 +66,7 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
 diff --git a/net/minecraft/world/level/block/ShulkerBoxBlock.java b/net/minecraft/world/level/block/ShulkerBoxBlock.java
 --- a/net/minecraft/world/level/block/ShulkerBoxBlock.java
 +++ b/net/minecraft/world/level/block/ShulkerBoxBlock.java
-@@ -183,7 +_,17 @@
+@@ -183,7 +183,17 @@ public class ShulkerBoxBlock extends BaseEntityBlock {
  
      @Override
      protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
@@ -87,7 +88,7 @@ diff --git a/net/minecraft/world/level/block/ShulkerBoxBlock.java b/net/minecraf
 diff --git a/net/minecraft/world/level/block/state/StateHolder.java b/net/minecraft/world/level/block/state/StateHolder.java
 --- a/net/minecraft/world/level/block/state/StateHolder.java
 +++ b/net/minecraft/world/level/block/state/StateHolder.java
-@@ -104,6 +_,7 @@
+@@ -104,6 +104,7 @@ public abstract class StateHolder<O, S> implements ca.spottedleaf.moonrise.patch
          if (ret != null) {
              return ret;
          }
@@ -98,7 +99,7 @@ diff --git a/net/minecraft/world/level/block/state/StateHolder.java b/net/minecr
 diff --git a/net/minecraft/world/level/chunk/LevelChunk.java b/net/minecraft/world/level/chunk/LevelChunk.java
 --- a/net/minecraft/world/level/chunk/LevelChunk.java
 +++ b/net/minecraft/world/level/chunk/LevelChunk.java
-@@ -380,7 +_,7 @@
+@@ -380,7 +380,7 @@ public class LevelChunk extends ChunkAccess implements DebugValueSource, ca.spot
              if (blockState == state) {
                  return null;
              } else {
@@ -107,7 +108,7 @@ diff --git a/net/minecraft/world/level/chunk/LevelChunk.java b/net/minecraft/wor
                  this.heightmaps.get(Heightmap.Types.MOTION_BLOCKING).update(i, y, i2, state);
                  this.heightmaps.get(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES).update(i, y, i2, state);
                  this.heightmaps.get(Heightmap.Types.OCEAN_FLOOR).update(i, y, i2, state);
-@@ -452,6 +_,7 @@
+@@ -452,6 +452,7 @@ public class LevelChunk extends ChunkAccess implements DebugValueSource, ca.spot
                      this.markUnsaved();
                      return blockState;
                  }
@@ -118,7 +119,7 @@ diff --git a/net/minecraft/world/level/chunk/LevelChunk.java b/net/minecraft/wor
 diff --git a/net/minecraft/world/level/redstone/NeighborUpdater.java b/net/minecraft/world/level/redstone/NeighborUpdater.java
 --- a/net/minecraft/world/level/redstone/NeighborUpdater.java
 +++ b/net/minecraft/world/level/redstone/NeighborUpdater.java
-@@ -60,9 +_,17 @@
+@@ -60,9 +60,17 @@ public interface NeighborUpdater {
              state.handleNeighborChanged(level, pos, neighborBlock, orientation, movedByPiston);
              // Spigot start
          } catch (StackOverflowError ex) {

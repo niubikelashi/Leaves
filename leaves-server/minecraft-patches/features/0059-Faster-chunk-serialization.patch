@@ -2,10 +2,8 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Tue, 18 Jul 2023 13:14:15 +0800
 Subject: [PATCH] Faster chunk serialization
-
 This patch is Powered by Gale(https://github.com/GaleMC/Gale)
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
-
 This patch is based on the following mixins and classes:
 * "net/caffeinemc/mods/lithium/common/world/chunk/CompactingPackedIntegerArray.java"
 * "net/caffeinemc/mods/lithium/common/world/chunk/LithiumHashPalette.java"
@@ -15,10 +13,11 @@ By: Angeline <jellysquid3@users.noreply.github.com>
 As part of: Lithium (https://github.com/CaffeineMC/lithium-fabric)
 Licensed under: LGPL-3.0 (https://www.gnu.org/licenses/lgpl-3.0.html)
 
+
 diff --git a/net/minecraft/util/BitStorage.java b/net/minecraft/util/BitStorage.java
 --- a/net/minecraft/util/BitStorage.java
 +++ b/net/minecraft/util/BitStorage.java
-@@ -38,4 +_,6 @@
+@@ -38,4 +38,6 @@ public interface BitStorage extends ca.spottedleaf.moonrise.patches.block_counti
          return ret;
      }
      // Paper end - block counting
@@ -28,7 +27,7 @@ diff --git a/net/minecraft/util/BitStorage.java b/net/minecraft/util/BitStorage.
 diff --git a/net/minecraft/util/SimpleBitStorage.java b/net/minecraft/util/SimpleBitStorage.java
 --- a/net/minecraft/util/SimpleBitStorage.java
 +++ b/net/minecraft/util/SimpleBitStorage.java
-@@ -465,4 +_,45 @@
+@@ -465,4 +465,45 @@ public class SimpleBitStorage implements BitStorage {
              super(message);
          }
      }
@@ -77,7 +76,7 @@ diff --git a/net/minecraft/util/SimpleBitStorage.java b/net/minecraft/util/Simpl
 diff --git a/net/minecraft/util/ZeroBitStorage.java b/net/minecraft/util/ZeroBitStorage.java
 --- a/net/minecraft/util/ZeroBitStorage.java
 +++ b/net/minecraft/util/ZeroBitStorage.java
-@@ -80,4 +_,6 @@
+@@ -80,4 +80,6 @@ public class ZeroBitStorage implements BitStorage {
          return ret;
      }
      // Paper end - block counting
@@ -87,7 +86,7 @@ diff --git a/net/minecraft/util/ZeroBitStorage.java b/net/minecraft/util/ZeroBit
 diff --git a/net/minecraft/world/level/chunk/PalettedContainer.java b/net/minecraft/world/level/chunk/PalettedContainer.java
 --- a/net/minecraft/world/level/chunk/PalettedContainer.java
 +++ b/net/minecraft/world/level/chunk/PalettedContainer.java
-@@ -23,6 +_,22 @@
+@@ -23,6 +23,22 @@ import net.minecraft.util.ThreadingDetector;
  import net.minecraft.util.ZeroBitStorage;
  
  public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainerRO<T> {

@@ -53,7 +53,8 @@ public class EntityUtils {
                 Entity passenger = createEntityAndPassengersFromNBT(tagList.getCompoundOrEmpty(i), world);
 
                 if (passenger != null) {
-                    passenger.startRiding(entity, true);
+                    // 1.21.9: Entity.startRiding gained a sendGameEvent flag; upstream dev/1.21.10 passes (true, true).
+                    passenger.startRiding(entity, true, true);
                 }
             }
         }

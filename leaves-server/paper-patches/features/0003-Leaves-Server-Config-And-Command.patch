@@ -36,7 +36,7 @@ diff --git a/src/main/java/io/papermc/paper/command/brigadier/bukkit/BukkitComma
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -1076,6 +1076,7 @@ public final class CraftServer implements Server {
+@@ -1020,6 +1020,7 @@ public final class CraftServer implements Server {
              playerMetadata.removeAll(plugin);
          }
          // Paper end

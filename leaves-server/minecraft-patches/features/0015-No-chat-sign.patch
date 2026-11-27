@@ -5,11 +5,9 @@ Subject: [PATCH] No chat sign
 
 
 diff --git a/net/minecraft/commands/arguments/ArgumentSignatures.java b/net/minecraft/commands/arguments/ArgumentSignatures.java
-
-diff --git a/net/minecraft/commands/arguments/ArgumentSignatures.java b/net/minecraft/commands/arguments/ArgumentSignatures.java
 --- a/net/minecraft/commands/arguments/ArgumentSignatures.java
 +++ b/net/minecraft/commands/arguments/ArgumentSignatures.java
-@@ -13,10 +_,17 @@
+@@ -13,10 +13,17 @@ public record ArgumentSignatures(List<ArgumentSignatures.Entry> entries) {
      private static final int MAX_ARGUMENT_COUNT = 8;
      private static final int MAX_ARGUMENT_NAME_LENGTH = 16;
  
@@ -31,7 +29,7 @@ diff --git a/net/minecraft/commands/arguments/ArgumentSignatures.java b/net/mine
 diff --git a/net/minecraft/network/protocol/game/ServerboundChatPacket.java b/net/minecraft/network/protocol/game/ServerboundChatPacket.java
 --- a/net/minecraft/network/protocol/game/ServerboundChatPacket.java
 +++ b/net/minecraft/network/protocol/game/ServerboundChatPacket.java
-@@ -16,7 +_,7 @@
+@@ -16,7 +16,7 @@ public record ServerboundChatPacket(String message, Instant timeStamp, long salt
      );
  
      private ServerboundChatPacket(FriendlyByteBuf buffer) {
@@ -40,7 +38,7 @@ diff --git a/net/minecraft/network/protocol/game/ServerboundChatPacket.java b/ne
      }
  
      private void write(FriendlyByteBuf buffer) {
-@@ -27,6 +_,14 @@
+@@ -27,6 +27,14 @@ public record ServerboundChatPacket(String message, Instant timeStamp, long salt
          this.lastSeenMessages.write(buffer);
      }
  
@@ -58,7 +56,7 @@ diff --git a/net/minecraft/network/protocol/game/ServerboundChatPacket.java b/ne
 diff --git a/net/minecraft/network/protocol/game/ServerboundChatSessionUpdatePacket.java b/net/minecraft/network/protocol/game/ServerboundChatSessionUpdatePacket.java
 --- a/net/minecraft/network/protocol/game/ServerboundChatSessionUpdatePacket.java
 +++ b/net/minecraft/network/protocol/game/ServerboundChatSessionUpdatePacket.java
-@@ -26,6 +_,11 @@
+@@ -26,6 +26,11 @@ public record ServerboundChatSessionUpdatePacket(RemoteChatSession.Data chatSess
  
      @Override
      public void handle(ServerGamePacketListener handler) {
@@ -73,7 +71,7 @@ diff --git a/net/minecraft/network/protocol/game/ServerboundChatSessionUpdatePac
 diff --git a/net/minecraft/network/protocol/status/ServerStatus.java b/net/minecraft/network/protocol/status/ServerStatus.java
 --- a/net/minecraft/network/protocol/status/ServerStatus.java
 +++ b/net/minecraft/network/protocol/status/ServerStatus.java
-@@ -19,7 +_,8 @@
+@@ -19,7 +19,8 @@ public record ServerStatus(
      Optional<ServerStatus.Players> players,
      Optional<ServerStatus.Version> version,
      Optional<ServerStatus.Favicon> favicon,
@@ -83,7 +81,7 @@ diff --git a/net/minecraft/network/protocol/status/ServerStatus.java b/net/minec
  ) {
      public static final Codec<ServerStatus> CODEC = RecordCodecBuilder.create(
          instance -> instance.group(
-@@ -27,11 +_,18 @@
+@@ -27,11 +28,18 @@ public record ServerStatus(
                  ServerStatus.Players.CODEC.lenientOptionalFieldOf("players").forGetter(ServerStatus::players),
                  ServerStatus.Version.CODEC.lenientOptionalFieldOf("version").forGetter(ServerStatus::version),
                  ServerStatus.Favicon.CODEC.lenientOptionalFieldOf("favicon").forGetter(ServerStatus::favicon),
@@ -106,7 +104,7 @@ diff --git a/net/minecraft/network/protocol/status/ServerStatus.java b/net/minec
 diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -778,7 +_,7 @@
+@@ -782,7 +782,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          // Paper start - Add setting for proxy online mode status
          return properties.enforceSecureProfile
              && io.papermc.paper.configuration.GlobalConfiguration.get().proxies.isProxyOnlineMode()
@@ -118,7 +116,7 @@ diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft
 diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 --- a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-@@ -308,6 +_,20 @@
+@@ -323,6 +323,20 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
      }
  
      public void send(Packet<?> packet) {
@@ -142,7 +140,7 @@ diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -1203,7 +_,7 @@
+@@ -1237,7 +1237,7 @@ public abstract class PlayerList {
      }
  
      public boolean verifyChatTrusted(PlayerChatMessage message) {

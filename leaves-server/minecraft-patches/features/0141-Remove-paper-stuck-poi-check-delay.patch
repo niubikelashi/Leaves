@@ -2,13 +2,13 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: MC_XiaoHei <xor7xiaohei@gmail.com>
 Date: Sun, 10 Aug 2025 17:03:40 +0800
 Subject: [PATCH] Remove paper stuck poi check delay
-
 Fix https://github.com/LeavesMC/Leaves/issues/626
+
 
 diff --git a/net/minecraft/world/entity/ai/behavior/AcquirePoi.java b/net/minecraft/world/entity/ai/behavior/AcquirePoi.java
 --- a/net/minecraft/world/entity/ai/behavior/AcquirePoi.java
 +++ b/net/minecraft/world/entity/ai/behavior/AcquirePoi.java
-@@ -69,7 +_,7 @@
+@@ -69,7 +69,7 @@ public class AcquirePoi {
                              return false;
                          } else {
                              mutableLong.setValue(time + 20L + level.getRandom().nextInt(20));

@@ -31,7 +31,7 @@ public class ServerMountAction extends ServerBotAction<ServerMountAction> {
         )).toList();
 
         for (Vehicle vehicle : vehicles) {
-            if (bot.startRiding(((CraftEntity) vehicle).getHandle(), false)) {
+            if (bot.startRiding(((CraftEntity) vehicle).getHandle())) {
                 return true;
             }
         }

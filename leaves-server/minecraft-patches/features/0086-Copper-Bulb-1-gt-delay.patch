@@ -7,7 +7,7 @@ Subject: [PATCH] Copper Bulb 1 gt delay
 diff --git a/net/minecraft/world/level/block/CopperBulbBlock.java b/net/minecraft/world/level/block/CopperBulbBlock.java
 --- a/net/minecraft/world/level/block/CopperBulbBlock.java
 +++ b/net/minecraft/world/level/block/CopperBulbBlock.java
-@@ -32,14 +32,26 @@ public class CopperBulbBlock extends Block {
+@@ -33,14 +33,26 @@ public class CopperBulbBlock extends Block {
      @Override
      protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
          if (oldState.getBlock() != state.getBlock() && level instanceof ServerLevel serverLevel) {
@@ -36,7 +36,7 @@ diff --git a/net/minecraft/world/level/block/CopperBulbBlock.java b/net/minecraf
          }
      }
  
-@@ -56,6 +68,15 @@ public class CopperBulbBlock extends Block {
+@@ -57,6 +69,15 @@ public class CopperBulbBlock extends Block {
          }
      }
  

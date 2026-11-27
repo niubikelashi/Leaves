@@ -2,13 +2,13 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Mon, 12 Dec 2022 16:41:52 +0800
 Subject: [PATCH] Renewable Elytra
-
 This patch is Powered by Carpet-TIS-Addition(https://github.com/plusls/Carpet-TIS-Addition)
+
 
 diff --git a/net/minecraft/world/entity/monster/Phantom.java b/net/minecraft/world/entity/monster/Phantom.java
 --- a/net/minecraft/world/entity/monster/Phantom.java
 +++ b/net/minecraft/world/entity/monster/Phantom.java
-@@ -246,6 +246,20 @@ public class Phantom extends Mob implements Enemy {
+@@ -241,6 +241,20 @@ public class Phantom extends Mob implements Enemy {
          return targetingConditions.test(level, this, entity);
      }
  

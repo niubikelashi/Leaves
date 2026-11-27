@@ -127,7 +127,7 @@ diff --git a/net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity.j
 diff --git a/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.java b/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.java
-@@ -145,6 +145,12 @@ public abstract class BaseContainerBlockEntity extends BlockEntity implements Co
+@@ -149,6 +149,12 @@ public abstract class BaseContainerBlockEntity extends BlockEntity implements Co
      @Override
      public void setItem(int slot, ItemStack stack) {
          this.getItems().set(slot, stack);
@@ -143,7 +143,7 @@ diff --git a/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.jav
 diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -113,6 +113,11 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -114,6 +114,11 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
      public void setItem(int index, ItemStack stack) {
          this.unpackLootTable(null);
          this.getItems().set(index, stack);

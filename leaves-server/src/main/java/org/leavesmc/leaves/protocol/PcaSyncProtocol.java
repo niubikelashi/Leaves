@@ -142,12 +142,14 @@ public class PcaSyncProtocol implements LeavesProtocol {
                             }
                         }
                         case OPS -> {
-                            if (!(entity instanceof ServerBot) && !server.getPlayerList().isOp(player.gameProfile)) {
+                            // 1.21.9: PlayerList.isOp takes NameAndId; player.nameAndId() wraps the same profile.
+                            if (!(entity instanceof ServerBot) && !server.getPlayerList().isOp(player.nameAndId())) {
                                 return;
                             }
                         }
                         case OPS_AND_SELF -> {
-                            if (!(entity instanceof ServerBot) && !server.getPlayerList().isOp(player.gameProfile) && entity != player) {
+                            // 1.21.9: PlayerList.isOp takes NameAndId; player.nameAndId() wraps the same profile.
+                            if (!(entity instanceof ServerBot) && !server.getPlayerList().isOp(player.nameAndId()) && entity != player) {
                                 return;
                             }
                         }

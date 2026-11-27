@@ -7,7 +7,7 @@ Subject: [PATCH] BBOR Protocol
 diff --git a/net/minecraft/world/level/chunk/LevelChunk.java b/net/minecraft/world/level/chunk/LevelChunk.java
 --- a/net/minecraft/world/level/chunk/LevelChunk.java
 +++ b/net/minecraft/world/level/chunk/LevelChunk.java
-@@ -749,6 +749,11 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
+@@ -757,6 +757,11 @@ public class LevelChunk extends ChunkAccess implements DebugValueSource, ca.spot
  
      public void setLoaded(boolean loaded) {
          this.loaded = loaded;

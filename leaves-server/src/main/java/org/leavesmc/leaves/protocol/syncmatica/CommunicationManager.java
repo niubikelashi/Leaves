@@ -54,8 +54,9 @@ public class CommunicationManager implements LeavesProtocol {
         final ExchangeTarget newPlayer = player.connection.exchangeTarget;
         final VersionHandshakeServer hi = new VersionHandshakeServer(newPlayer);
         playerMap.put(newPlayer, player);
+        // 1.21.9: GameProfile accessors renamed (getId/getName -> id/name); same values.
         final GameProfile profile = player.getGameProfile();
-        SyncmaticaProtocol.getPlayerIdentifierProvider().updateName(profile.getId(), profile.getName());
+        SyncmaticaProtocol.getPlayerIdentifierProvider().updateName(profile.id(), profile.name());
         startExchangeUnchecked(hi);
     }
 
@@ -149,7 +150,8 @@ public class CommunicationManager implements LeavesProtocol {
             final UUID placementId = packetBuf.readUUID();
             final ServerPlacement placement = SyncmaticaProtocol.getSyncmaticManager().getPlacement(placementId);
             if (placement != null) {
-                if (!getGameProfile(source).getId().equals(placement.getOwner().uuid)) {
+                // 1.21.9: GameProfile.getId() -> id(); same UUID.
+                if (!getGameProfile(source).id().equals(placement.getOwner().uuid)) {
                     return;
                 }
 

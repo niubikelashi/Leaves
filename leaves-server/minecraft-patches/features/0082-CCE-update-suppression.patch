@@ -3,10 +3,11 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Thu, 28 Sep 2023 17:07:02 +0800
 Subject: [PATCH] CCE update suppression
 
+
 diff --git a/net/minecraft/world/level/block/ShulkerBoxBlock.java b/net/minecraft/world/level/block/ShulkerBoxBlock.java
 --- a/net/minecraft/world/level/block/ShulkerBoxBlock.java
 +++ b/net/minecraft/world/level/block/ShulkerBoxBlock.java
-@@ -185,7 +_,9 @@
+@@ -185,7 +185,9 @@ public class ShulkerBoxBlock extends BaseEntityBlock {
      protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
          // Leaves start - fix update suppression crash
          try {

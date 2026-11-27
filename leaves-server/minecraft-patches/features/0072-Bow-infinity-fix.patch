@@ -7,7 +7,7 @@ Subject: [PATCH] Bow infinity fix
 diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
-@@ -2187,8 +2187,10 @@ public abstract class Player extends LivingEntity {
+@@ -1967,8 +1967,10 @@ public abstract class Player extends Avatar implements ContainerUser {
                      }
                  }
  

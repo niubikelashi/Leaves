@@ -5,7 +5,6 @@ Subject: [PATCH] Build changes
 
 
 diff --git a/ca/spottedleaf/moonrise/paper/PaperHooks.java b/ca/spottedleaf/moonrise/paper/PaperHooks.java
-index 42899a91b9061b85985fbbd0de4032c757f4aa8f..a93f00d1a64e4deb9b89435bab258f3bad487e2f 100644
 --- a/ca/spottedleaf/moonrise/paper/PaperHooks.java
 +++ b/ca/spottedleaf/moonrise/paper/PaperHooks.java
 @@ -29,7 +29,7 @@ import net.minecraft.world.phys.AABB;
@@ -18,10 +17,9 @@ index 42899a91b9061b85985fbbd0de4032c757f4aa8f..a93f00d1a64e4deb9b89435bab258f3b
      private static final org.slf4j.Logger LOGGER = com.mojang.logging.LogUtils.getLogger();
  
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 7aac2a6889af3edaebfaf94deecbf00d00758b68..d2895962ad3879632ff7a33eb3ce656097aebaec 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1193,7 +1193,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1126,7 +1126,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                  LOGGER.info("*************************************************************************************");
                  LOGGER.info("This is the first time you're starting this server.");
                  LOGGER.info("It's recommended you read our 'Getting Started' documentation for guidance.");
@@ -30,7 +28,7 @@ index 7aac2a6889af3edaebfaf94deecbf00d00758b68..d2895962ad3879632ff7a33eb3ce6560
                  LOGGER.info("*************************************************************************************");
              }
              // Paper end - Add onboarding message for initial server start
-@@ -1855,7 +1855,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1800,7 +1800,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
      @DontObfuscate
      public String getServerModName() {
@@ -40,7 +38,6 @@ index 7aac2a6889af3edaebfaf94deecbf00d00758b68..d2895962ad3879632ff7a33eb3ce6560
  
      public SystemReport fillSystemReport(SystemReport systemReport) {
 diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
-index 98927d4a5fba2a0dcdb147ac10b82c3286ccdc6b..461dc90ac9ae7f9af693653bc56a8cf448b7823e 100644
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -275,9 +275,10 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
@@ -56,7 +53,6 @@ index 98927d4a5fba2a0dcdb147ac10b82c3286ccdc6b..461dc90ac9ae7f9af693653bc56a8cf4
          LOGGER.info("Default game type: {}", properties.gameMode.get());
          // Paper start - Unix domain socket support
 diff --git a/net/minecraft/server/gui/MinecraftServerGui.java b/net/minecraft/server/gui/MinecraftServerGui.java
-index f262a7c5ae4e7d56f16f5c0f4f145a2e428abbe4..a2b69a0cc34adb4d3da00250db8320b26d0ed697 100644
 --- a/net/minecraft/server/gui/MinecraftServerGui.java
 +++ b/net/minecraft/server/gui/MinecraftServerGui.java
 @@ -183,7 +183,7 @@ public class MinecraftServerGui extends JComponent {

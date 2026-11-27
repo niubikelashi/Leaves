@@ -2,13 +2,13 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Thu, 19 Jan 2023 23:38:50 +0800
 Subject: [PATCH] MC Technical Survival Mode
-
 Will automatically overwrite some configuration after startup
+
 
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -1654,7 +1654,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -1768,7 +1768,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
      public boolean isInvulnerableTo(ServerLevel level, DamageSource damageSource) {
          return (super.isInvulnerableTo(level, damageSource) // Paper - disable player cramming;
              || this.isChangingDimension() && !damageSource.is(DamageTypes.ENDER_PEARL)
@@ -44,7 +44,7 @@ diff --git a/net/minecraft/world/entity/item/PrimedTnt.java b/net/minecraft/worl
 diff --git a/net/minecraft/world/level/NaturalSpawner.java b/net/minecraft/world/level/NaturalSpawner.java
 --- a/net/minecraft/world/level/NaturalSpawner.java
 +++ b/net/minecraft/world/level/NaturalSpawner.java
-@@ -82,7 +82,7 @@ public final class NaturalSpawner {
+@@ -84,7 +84,7 @@ public final class NaturalSpawner {
                  MobCategory category = entity.getType().getCategory();
                  if (category != MobCategory.MISC) {
                      // Paper start - Only count natural spawns
@@ -56,7 +56,7 @@ diff --git a/net/minecraft/world/level/NaturalSpawner.java b/net/minecraft/world
 diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -275,7 +275,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -276,7 +276,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
                  origItemStack.setCount(originalItemCount);
              }
          }
@@ -65,7 +65,7 @@ diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net
              hopper.setCooldown(level.spigotConfig.hopperTransfer);
          }
          return false;
-@@ -316,7 +316,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -317,7 +317,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
          }
          origItemStack.setCount(originalItemCount);
  

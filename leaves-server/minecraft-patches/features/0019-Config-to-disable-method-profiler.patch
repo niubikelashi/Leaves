@@ -2,13 +2,13 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Mon, 15 Aug 2022 10:18:36 +0800
 Subject: [PATCH] Config to disable method profiler
-
 This patch is Powered by Pufferfish(https://github.com/pufferfish-gg/Pufferfish)
+
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1248,7 +1248,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1181,7 +1181,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                  lastTick = currentTime;
                  this.nextTickTimeNanos += l;
  

@@ -20,7 +20,8 @@ public enum ChiseledBookshelfProvider implements StreamServerDataProvider<BlockA
 
     @Override
     public @Nullable ItemStack streamData(@NotNull BlockAccessor accessor) {
-        int slot = ((ChiseledBookShelfBlock) accessor.getBlock()).getHitSlot(accessor.getHitResult(), accessor.getBlockState()).orElse(-1);
+        // 1.21.9: ChiseledBookShelfBlock.getHitSlot takes the facing Direction instead of the BlockState.
+        int slot = ((ChiseledBookShelfBlock) accessor.getBlock()).getHitSlot(accessor.getHitResult(), accessor.getBlockState().getValue(ChiseledBookShelfBlock.FACING)).orElse(-1);
         if (slot == -1) {
             return null;
         }

@@ -2,13 +2,13 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Sun, 14 Aug 2022 00:00:51 +0800
 Subject: [PATCH] Dont send useless entity packets
-
 This patch is Powered by Purpur(https://github.com/PurpurMC/Purpur)
+
 
 diff --git a/net/minecraft/server/level/ServerEntity.java b/net/minecraft/server/level/ServerEntity.java
 --- a/net/minecraft/server/level/ServerEntity.java
 +++ b/net/minecraft/server/level/ServerEntity.java
-@@ -200,6 +200,11 @@ public class ServerEntity {
+@@ -188,6 +188,11 @@ public class ServerEntity {
                      } else if (flag) {
                          packet = new ClientboundMoveEntityPacket.Rot(this.entity.getId(), b, b1, this.entity.onGround());
                          flag4 = true;
@@ -20,7 +20,7 @@ diff --git a/net/minecraft/server/level/ServerEntity.java b/net/minecraft/server
                      }
                  } else {
                      packet = new ClientboundMoveEntityPacket.PosRot(this.entity.getId(), (short)l, (short)l1, (short)l2, b, b1, this.entity.onGround());
-@@ -319,6 +324,21 @@ public class ServerEntity {
+@@ -300,6 +305,21 @@ public class ServerEntity {
          this.positionCodec.setBase(this.entity.position());
      }
  

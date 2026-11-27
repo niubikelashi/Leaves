@@ -2,8 +2,8 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Sun, 14 Aug 2022 10:35:42 +0800
 Subject: [PATCH] Only check for spooky season once an hour
-
 This patch is Powered by Pufferfish(https://github.com/pufferfish-gg/Pufferfish)
+
 
 diff --git a/net/minecraft/world/entity/ambient/Bat.java b/net/minecraft/world/entity/ambient/Bat.java
 --- a/net/minecraft/world/entity/ambient/Bat.java

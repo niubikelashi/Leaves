@@ -2,13 +2,13 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Mon, 15 Aug 2022 10:45:13 +0800
 Subject: [PATCH] Throttle goal selector during inactive ticking
-
 This patch is Powered by Pufferfish(https://github.com/pufferfish-gg/Pufferfish)
+
 
 diff --git a/net/minecraft/world/entity/Mob.java b/net/minecraft/world/entity/Mob.java
 --- a/net/minecraft/world/entity/Mob.java
 +++ b/net/minecraft/world/entity/Mob.java
-@@ -207,11 +207,13 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
+@@ -217,11 +217,13 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
          return this.lookControl;
      }
  

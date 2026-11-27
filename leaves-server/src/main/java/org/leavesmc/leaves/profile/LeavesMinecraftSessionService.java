@@ -63,9 +63,10 @@ public class LeavesMinecraftSessionService extends PaperMinecraftSessionService 
                 arguments.put("ip", address.getHostAddress());
             }
 
-            GameProfile cache = null;
+            // 1.21.9: the profile cache became a name->id cache (UserNameToIdResolver), handing out NameAndId.
+            net.minecraft.server.players.NameAndId cache = null;
             if (LeavesConfig.mics.yggdrasil.loginProtect) {
-                cache = MinecraftServer.getServer().services.profileCache().getProfileIfCached(profileName);
+                cache = MinecraftServer.getServer().services.nameToIdCache().getIfCached(profileName);
             }
 
             for (URL checkUrl : extraYggdrasilList) {
@@ -74,14 +75,16 @@ public class LeavesMinecraftSessionService extends PaperMinecraftSessionService 
                     final HasJoinedMinecraftServerResponse response = client.get(url, HasJoinedMinecraftServerResponse.class);
                     if (response != null && response.id() != null) {
                         if (LeavesConfig.mics.yggdrasil.loginProtect && cache != null) {
-                            if (!response.id().equals(cache.getId())) {
+                            // 1.21.9: GameProfile.getId() -> NameAndId.id(); same UUID.
+                            if (!response.id().equals(cache.id())) {
                                 continue;
                             }
                         }
 
-                        final GameProfile result1 = new GameProfile(response.id(), profileName);
+                        // 1.21.9: GameProfile is final and its properties accessor is properties(); the mutable map comes from Paper.
+                        final GameProfile result1 = new GameProfile(response.id(), profileName, new io.papermc.paper.profile.MutablePropertyMap());
                         if (response.properties() != null) {
-                            result1.getProperties().putAll(response.properties());
+                            result1.properties().putAll(response.properties());
                         }
 
                         final Set<ProfileActionType> profileActions = response.profileActions().stream()

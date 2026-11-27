@@ -3,10 +3,11 @@ From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Thu, 2 Jan 2025 22:01:36 +0800
 Subject: [PATCH] Fix CraftPortalEvent logic
 
+
 diff --git a/net/minecraft/world/level/block/EndPortalBlock.java b/net/minecraft/world/level/block/EndPortalBlock.java
 --- a/net/minecraft/world/level/block/EndPortalBlock.java
 +++ b/net/minecraft/world/level/block/EndPortalBlock.java
-@@ -111,10 +_,10 @@
+@@ -111,10 +111,10 @@ public class EndPortalBlock extends BaseEntityBlock implements Portal {
              }
  
              // CraftBukkit start

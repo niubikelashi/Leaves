@@ -7,7 +7,7 @@ Subject: [PATCH] Despawn enderman with block
 diff --git a/net/minecraft/world/entity/monster/EnderMan.java b/net/minecraft/world/entity/monster/EnderMan.java
 --- a/net/minecraft/world/entity/monster/EnderMan.java
 +++ b/net/minecraft/world/entity/monster/EnderMan.java
-@@ -448,7 +448,7 @@ public class EnderMan extends Monster implements NeutralMob {
+@@ -454,7 +454,7 @@ public class EnderMan extends Monster implements NeutralMob {
  
      @Override
      public boolean requiresCustomPersistence() {

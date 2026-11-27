@@ -90,7 +90,8 @@ public class ServerLookAction extends ServerBotAction<ServerLookAction> {
     @Override
     public void loadCommand(ServerPlayer player, @NotNull CommandArgumentResult result) {
         String nameOrX = result.readString(player.getScoreboardName());
-        ServerPlayer player1 = player.getServer().getPlayerList().getPlayerByName(nameOrX);
+        // 1.21.9: Entity.getServer() was removed; the server is reached through the static accessor.
+        ServerPlayer player1 = MinecraftServer.getServer().getPlayerList().getPlayerByName(nameOrX);
         if (player1 != null) {
             this.setTarget(player1);
             return;

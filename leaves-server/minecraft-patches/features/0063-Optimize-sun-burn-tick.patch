@@ -2,14 +2,13 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: violetc <58360096+s-yh-china@users.noreply.github.com>
 Date: Thu, 20 Jul 2023 15:18:50 +0800
 Subject: [PATCH] Optimize sun burn tick
-
 This patch is Powered by Gale(https://github.com/GaleMC/Gale)
 
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -2154,9 +_,20 @@
+@@ -2164,9 +2164,20 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
  
      @Deprecated
      public float getLightLevelDependentMagicValue() {
@@ -33,7 +32,7 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
      }
  
      public void absSnapTo(double x, double y, double z, float yRot, float xRot) {
-@@ -2171,6 +_,7 @@
+@@ -2181,6 +2192,7 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
          this.xRotO = this.getXRot();
          this.setYHeadRot(yRot); // Paper - Update head rotation
      }
@@ -44,7 +43,7 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
 diff --git a/net/minecraft/world/entity/Mob.java b/net/minecraft/world/entity/Mob.java
 --- a/net/minecraft/world/entity/Mob.java
 +++ b/net/minecraft/world/entity/Mob.java
-@@ -1567,13 +_,32 @@
+@@ -1567,14 +1567,33 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
  
      public boolean isSunBurnTick() {
          if (this.level().isBrightOutside() && !this.level().isClientSide()) {
@@ -85,3 +84,4 @@ diff --git a/net/minecraft/world/entity/Mob.java b/net/minecraft/world/entity/Mo
 +            // Leaves end - optimize sun burn tick
              }
          }
+ 

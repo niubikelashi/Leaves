@@ -5,11 +5,9 @@ Subject: [PATCH] Leaves Protocol Core
 
 
 diff --git a/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java b/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
-
-diff --git a/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java b/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
 --- a/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
 +++ b/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
-@@ -40,13 +_,22 @@
+@@ -40,13 +40,22 @@ public interface CustomPacketPayload {
  
              @Override
              public void encode(B buffer, CustomPacketPayload value) {
@@ -36,7 +34,7 @@ diff --git a/net/minecraft/network/protocol/common/custom/CustomPacketPayload.ja
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1685,6 +_,8 @@
+@@ -1685,6 +1685,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          profilerFiller.popPush("server gui refresh");
  
@@ -48,7 +46,7 @@ diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/Mi
 diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 --- a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-@@ -58,6 +_,7 @@
+@@ -58,6 +58,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
      public @Nullable String playerBrand;
      public final java.util.Set<String> pluginMessagerChannels;
      // Paper end - retain certain values
@@ -56,7 +54,7 @@ diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/
  
      public ServerCommonPacketListenerImpl(MinecraftServer server, Connection connection, CommonListenerCookie cookie) {
          this.server = server;
-@@ -71,6 +_,7 @@
+@@ -71,6 +72,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
          this.pluginMessagerChannels = cookie.channels();
          this.keepAlive = cookie.keepAlive();
          // Paper end
@@ -64,7 +62,7 @@ diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/
      }
  
      // Paper start - configuration phase API
-@@ -150,6 +_,18 @@
+@@ -150,6 +152,18 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
  
      @Override
      public void handleCustomPayload(ServerboundCustomPayloadPacket packet) {
@@ -83,7 +81,7 @@ diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/
          // Paper start
          if (!(packet.payload() instanceof final net.minecraft.network.protocol.common.custom.DiscardedPayload discardedPayload)) {
              return;
-@@ -209,10 +_,11 @@
+@@ -209,10 +223,11 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
          final String channel = new String(data, from, length, java.nio.charset.StandardCharsets.US_ASCII);
          if (register) {
              bridge.addChannel(channel);
@@ -96,7 +94,7 @@ diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/
      }
  
      @Override
-@@ -380,9 +_,9 @@
+@@ -380,9 +395,9 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
              net.minecraft.server.level.ServerPlayer player = serverGamePacketListener.player;
              org.bukkit.event.player.PlayerKickEvent.Cause cause = disconnectionDetails.disconnectionReason().orElseThrow().game().orElse(org.bukkit.event.player.PlayerKickEvent.Cause.UNKNOWN);
              org.bukkit.event.player.PlayerKickEvent event = new org.bukkit.event.player.PlayerKickEvent(
@@ -109,7 +107,7 @@ diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/
  
              );
  
-@@ -415,10 +_,10 @@
+@@ -415,10 +430,10 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
  
      private void disconnect0(DisconnectionDetails disconnectionDetails) {
          this.connection
@@ -127,7 +125,7 @@ diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -238,6 +_,8 @@
+@@ -238,6 +238,8 @@ public abstract class PlayerList {
              return;
          }
  
@@ -136,7 +134,7 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
          final net.kyori.adventure.text.Component jm = playerJoinEvent.joinMessage();
  
          if (jm != null && !jm.equals(net.kyori.adventure.text.Component.empty())) { // Paper - Adventure
-@@ -423,6 +_,7 @@
+@@ -423,6 +425,7 @@ public abstract class PlayerList {
          return this.remove(player, net.kyori.adventure.text.Component.translatable("multiplayer.player.left", net.kyori.adventure.text.format.NamedTextColor.YELLOW, io.papermc.paper.configuration.GlobalConfiguration.get().messages.useDisplayNameInQuitMessage ? player.getBukkitEntity().displayName() : io.papermc.paper.adventure.PaperAdventure.asAdventure(player.getDisplayName())));
      }
      public @Nullable net.kyori.adventure.text.Component remove(ServerPlayer player, net.kyori.adventure.text.Component leaveMessage) {
@@ -144,7 +142,7 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
          // Paper end - Fix kick event leave message not being sent
          ServerLevel serverLevel = player.level();
          player.awardStat(Stats.LEAVE_GAME);
-@@ -1331,6 +_,7 @@
+@@ -1331,6 +1334,7 @@ public abstract class PlayerList {
              serverPlayer.connection.send(clientboundUpdateRecipesPacket);
              serverPlayer.getRecipeBook().sendInitialRecipeBook(serverPlayer);
          }

@@ -78,6 +78,10 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Predicate;
 
+// 1.21.9: Entity.getServer() is gone; server access goes through the static MinecraftServer.getServer(),
+// which is what upstream dev/1.21.10 bot code uses.
+import static net.minecraft.server.MinecraftServer.getServer;
+
 public class ServerBot extends ServerPlayer {
 
     private final List<ServerBotAction<?>> actions;
@@ -195,7 +199,7 @@ public class ServerBot extends ServerPlayer {
                 this.notSleepTicks = 0;
             }
 
-            if (!this.level().isClientSide && this.level().isBrightOutside()) {
+            if (!this.level().isClientSide() && this.level().isBrightOutside()) { // 1.21.9: isClientSide field is private; use the accessor
                 this.stopSleepInBed(false, true);
             }
         } else if (this.sleepCounter > 0) {
@@ -208,7 +212,7 @@ public class ServerBot extends ServerPlayer {
         this.updateIsUnderwater();
 
         if (this.getConfigValue(Configs.TICK_TYPE) == TickType.NETWORK) {
-            this.getServer().scheduleOnMain(this::runAction);
+            getServer().scheduleOnMain(this::runAction);
         }
 
         this.livingEntityTick();
@@ -346,7 +350,7 @@ public class ServerBot extends ServerPlayer {
         if (LeavesConfig.modify.fakeplayer.canOpenInventory) {
             if (player instanceof ServerPlayer player1 && player.getMainHandItem().isEmpty()) {
                 BotInventoryOpenEvent event = new BotInventoryOpenEvent(this.getBukkitEntity(), player1.getBukkitEntity());
-                this.getServer().server.getPluginManager().callEvent(event);
+                getServer().server.getPluginManager().callEvent(event);
                 if (!event.isCancelled()) {
                     player.openMenu(new SimpleMenuProvider((i, inventory, p) -> ChestMenu.sixRows(i, inventory, this.container), this.getDisplayName()));
                     return InteractionResult.SUCCESS;
@@ -418,7 +422,9 @@ public class ServerBot extends ServerPlayer {
         createBuilder.createReason(BotCreateEvent.CreateReason.INTERNAL).creator(null);
 
         this.createState = createBuilder.build();
-        this.gameProfile = new BotList.CustomGameProfile(this.getUUID(), this.createState.name(), this.createState.skin());
+        // 1.21.9: GameProfile is final and can no longer be subclassed (BotList.CustomGameProfile is gone);
+        // BotList.createBotProfile builds a GameProfile backed by Paper's MutablePropertyMap.
+        this.gameProfile = BotList.createBotProfile(this.getUUID(), this.createState.name(), this.createState.skin());
 
 
         if (nbt.list("actions", CompoundTag.CODEC).isPresent()) {
@@ -475,19 +481,19 @@ public class ServerBot extends ServerPlayer {
     }
 
     public void renderInfo() {
-        this.getServer().getPlayerList().getPlayers().forEach(
+        getServer().getPlayerList().getPlayers().forEach(
             player -> this.sendPlayerInfo(player)
         );
     }
 
     public void renderData() {
-        this.getServer().getPlayerList().getPlayers().forEach(
+        getServer().getPlayerList().getPlayers().forEach(
             player -> this.sendFakeDataIfNeed(player, false)
         );
     }
 
     private void sendPacket(Packet<?> packet) {
-        this.getServer().getPlayerList().getPlayers().forEach(player -> player.connection.send(packet));
+        getServer().getPlayerList().getPlayers().forEach(player -> player.connection.send(packet));
     }
 
     @Override
@@ -496,7 +502,7 @@ public class ServerBot extends ServerPlayer {
         Component defaultMessage = this.getCombatTracker().getDeathMessage();
 
         BotDeathEvent event = new BotDeathEvent(this.getBukkitEntity(), PaperAdventure.asAdventure(defaultMessage), flag);
-        this.getServer().server.getPluginManager().callEvent(event);
+        getServer().server.getPluginManager().callEvent(event);
 
         if (event.isCancelled()) {
             if (this.getHealth() <= 0) {
@@ -509,10 +515,10 @@ public class ServerBot extends ServerPlayer {
 
         net.kyori.adventure.text.Component deathMessage = event.deathMessage();
         if (event.isSendDeathMessage() && deathMessage != null && !deathMessage.equals(net.kyori.adventure.text.Component.empty())) {
-            this.getServer().getPlayerList().broadcastSystemMessage(PaperAdventure.asVanilla(deathMessage), false);
+            getServer().getPlayerList().broadcastSystemMessage(PaperAdventure.asVanilla(deathMessage), false);
         }
 
-        this.getServer().getBotList().removeBot(this, BotRemoveEvent.RemoveReason.DEATH, null, false);
+        getServer().getBotList().removeBot(this, BotRemoveEvent.RemoveReason.DEATH, null, false);
     }
 
     public void removeTab() {

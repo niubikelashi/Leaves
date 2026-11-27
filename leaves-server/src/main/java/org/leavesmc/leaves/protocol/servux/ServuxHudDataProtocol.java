@@ -164,11 +164,13 @@ public class ServuxHudDataProtocol implements LeavesProtocol {
 
     private static void putWorldData(@NotNull CompoundTag metadata) {
         ServerLevel level = MinecraftServer.getServer().overworld();
-        BlockPos spawnPos = level.levelData.getSpawnPos();
+        // 1.21.9: LevelData.getSpawnPos() -> getRespawnData().pos(); same spawn coordinates.
+        BlockPos spawnPos = level.levelData.getRespawnData().pos();
         metadata.putInt("spawnPosX", spawnPos.getX());
         metadata.putInt("spawnPosY", spawnPos.getY());
         metadata.putInt("spawnPosZ", spawnPos.getZ());
-        metadata.putInt("spawnChunkRadius", level.getGameRules().getInt(GameRules.RULE_SPAWN_CHUNK_RADIUS));
+        // 1.21.9: spawnChunkRadius became the spawnRadius game rule (RULE_SPAWN_RADIUS); the protocol key name stays put.
+        metadata.putInt("spawnChunkRadius", level.getGameRules().getInt(GameRules.RULE_SPAWN_RADIUS));
 
         if (LeavesConfig.protocol.servux.hudMetadataShareSeed) {
             metadata.putLong("worldSeed", level.getSeed());

@@ -7,7 +7,7 @@ Subject: [PATCH] Fix chunk reload detector
 diff --git a/net/minecraft/server/level/ServerEntity.java b/net/minecraft/server/level/ServerEntity.java
 --- a/net/minecraft/server/level/ServerEntity.java
 +++ b/net/minecraft/server/level/ServerEntity.java
-@@ -390,7 +390,7 @@ public class ServerEntity {
+@@ -371,7 +371,7 @@ public class ServerEntity {
              if (!list.isEmpty()) {
                  consumer.accept(new ClientboundSetEquipmentPacket(this.entity.getId(), list, true)); // Paper - data sanitization
              }
