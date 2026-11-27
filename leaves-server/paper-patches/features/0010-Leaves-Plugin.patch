@@ -1,8 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: MC_XiaoHei <xiaohei.xor7@outlook.com>
-Date: Mon, 22 Jul 2024 09:05:56 +0000
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
 Subject: [PATCH] Leaves Plugin
-This patch is licensed under the MIT license.
 
 
 diff --git a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
@@ -103,3 +102,4 @@ diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/
          return null;
      }
  
+
