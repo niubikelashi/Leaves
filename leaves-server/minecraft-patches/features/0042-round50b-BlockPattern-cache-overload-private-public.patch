@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] round50b: BlockPattern cache overload private -> public
+
+
+diff --git a/net/minecraft/world/level/block/state/pattern/BlockPattern.java b/net/minecraft/world/level/block/state/pattern/BlockPattern.java
+--- a/net/minecraft/world/level/block/state/pattern/BlockPattern.java
++++ b/net/minecraft/world/level/block/state/pattern/BlockPattern.java
+@@ -57,7 +57,7 @@ public class BlockPattern {
+         return this.matches(origin, forwards, up, cache);
+     }
+ 
+-    private BlockPattern.@Nullable BlockPatternMatch matches(
++    public BlockPattern.@Nullable BlockPatternMatch matches( // Leaves - private -> public
+         final BlockPos origin, final Direction forwards, final Direction up, final LoadingCache<BlockPos, BlockInWorld> cache
+     ) {
+         for (int x = 0; x < this.width; x++) {
+
