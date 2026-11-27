@@ -13,10 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-// Leaves - 26.2 compat: RegionFileStorage 不再暴露 REGION_SHIFT，内联为常量 5
-private static final int REGION_SHIFT = 5;
-
 public class IRegionFileFactory {
+
+    // Leaves - 26.2 compat: RegionFileStorage 不再暴露 REGION_SHIFT，内联为常量 5
+    private static final int REGION_SHIFT = 5;
 
     private static final List<String> regionArguments;
 
