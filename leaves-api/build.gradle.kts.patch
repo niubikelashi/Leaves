@@ -1,6 +1,6 @@
 --- a/paper-api/build.gradle.kts
 +++ b/paper-api/build.gradle.kts
-@@ -1,25 +_,,15 @@
+@@ -1,25 +_,15 @@
 -import io.papermc.paperweight.checkstyle.JavadocTag
  import paper.libs.com.google.gson.Gson
  
@@ -27,7 +27,7 @@
  }
  
  val annotationsVersion = "26.0.2"
-@@ -104,23 +_,,35 @@
+@@ -104,23 +_,35 @@
      mockitoAgent("org.mockito:mockito-core:5.22.0") { isTransitive = false } // configure mockito agent that is needed in newer java versions
      testRuntimeOnly("org.junit.platform:junit-platform-launcher:6.0.3")
  
@@ -71,7 +71,7 @@
  
  val outgoingVariants = arrayOf("runtimeElements", "apiElements", "sourcesElements", "javadocElements")
  val mainCapability = "${project.group}:${project.name}:${project.version}"
-@@ -155,6 +_,,16 @@
+@@ -155,6 +_,16 @@
      }
  }
  
@@ -88,7 +88,7 @@
  abstract class GenerateApiVersioningFile : DefaultTask() {
      @get:OutputFile
      abstract val outputFile: RegularFileProperty
-@@ -200,7 +_,,7 @@
+@@ -200,7 +_,7 @@
  
  tasks.withType<Javadoc>().configureEach {
      val options = options as StandardJavadocDocletOptions
@@ -97,7 +97,7 @@
      options.use()
      options.isDocFilesSubDirs = true
      options.links(
-@@ -215,7 +_,,7 @@
+@@ -215,7 +_,7 @@
          "https://logging.apache.org/log4j/2.x/javadoc/log4j-api/",
          "https://www.javadocs.dev/org.apache.maven.resolver/maven-resolver-api/1.7.3",
      )
@@ -106,7 +106,7 @@
  
      inputs.files(javadocSourcepath).ignoreEmptyDirectories().withPropertyName(javadocSourcepath.name + "-configuration")
      val javadocSourcepathElements = javadocSourcepath.elements
-@@ -227,16 +_,,18 @@
+@@ -227,16 +_,18 @@
      }
  
      // workaround for https://github.com/gradle/gradle/issues/4046

@@ -1,11 +1,11 @@
 --- a/paper-server/build.gradle.kts
 +++ b/paper-server/build.gradle.kts
-@@ -1,4 +_,,3 @@
+@@ -1,4 +_,3 @@
 -import io.papermc.fill.model.BuildChannel
  import io.papermc.paperweight.attribute.DevBundleOutput
  import io.papermc.paperweight.util.*
  import java.time.Instant
-@@ -7,20 +_,,33 @@
+@@ -7,20 +_,33 @@
      `java-library`
      `maven-publish`
      idea
@@ -43,7 +43,7 @@
  
      updatingMinecraft {
          // oldPaperCommit = "d4fe85375af18bfa88f44d7c1e6a61904ae550cc"
-@@ -31,6 +_,,7 @@
+@@ -31,6 +_,7 @@
      libraryRepositories.addAll(
          "https://repo.maven.apache.org/maven2/",
          paperMavenPublicUrl,
@@ -51,7 +51,7 @@
      )
  }
  
-@@ -86,13 +_,,28 @@
+@@ -86,13 +_,28 @@
      }
  }
  
@@ -81,7 +81,7 @@
      attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
      extendsFrom(configurations.getByName(sourceSets.main.get().runtimeElementsConfigurationName))
  }
-@@ -109,7 +_,,18 @@
+@@ -109,7 +_,18 @@
  }
  
  dependencies {
@@ -101,7 +101,7 @@
      implementation("ca.spottedleaf:leafpile:1.2.0")
      implementation("org.jline:jline-terminal-ffm:3.27.1") // use ffm on java 22+
      implementation("org.jline:jline-terminal-jni:3.27.1") // fall back to jni on java 21
-@@ -159,26 +_,,36 @@
+@@ -159,26 +_,36 @@
      implementation("me.lucko:spark-paper:1.10.180")
  }
  
@@ -144,7 +144,7 @@
              "Build-Number" to (build ?: ""),
              "Build-Time" to buildTime.toString(),
              "Git-Branch" to gitBranch,
-@@ -246,7 +_,,7 @@
+@@ -246,7 +_,7 @@
      jvmArgumentProviders.add(provider)
  }
  
@@ -153,7 +153,7 @@
  idea {
      module {
          generatedSourceDirs.add(generatedDir.toFile())
-@@ -284,6 +_,,10 @@
+@@ -284,6 +_,10 @@
      }
  
      args("--nogui")
@@ -164,7 +164,7 @@
      systemProperty("net.kyori.adventure.text.warnWhenLegacyFormattingDetected", true)
      if (providers.gradleProperty("paper.runDisableWatchdog").getOrElse("false") == "true") {
          systemProperty("disable.watchdog", true)
-@@ -320,25 +_,,18 @@
+@@ -320,25 +_,18 @@
      classpath(tasks.createBundlerJar.flatMap { it.outputZip })
      mainClass.set(null as String?)
  }
