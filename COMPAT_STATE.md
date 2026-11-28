@@ -92,7 +92,7 @@ Paper 仓库当前状态：默认分支 `gradle.properties` = `mcVersion=26.3`�
 | 版本 | 分支 | 状态 | 备注 |
 | --- | --- | --- | --- |
 | 1.21.8 | （基线工作树，无分支） | 基线构建 success | `applyAllPatches` + `createMojmapLeavesclipJar` 均 BUILD SUCCESSFUL，见 §5 |
-| 1.21.9 | `compat/1.21.9` | **conflict-needs-review**（10/10 轮已用满） | 见 §7：语义冲突（上游删除 `Entity.getServer()`），已提交部分成果 `8e0597c`，未合并 |
+| 1.21.9 | `compat/1.21.9` | **success**（第 31 轮收口，提交 `eac71f4` 已推送、tag `leaves-1.21.9-compat`） | 见 §7 + `compat_state_23.md`：补丁链重建为 142 个 mc 补丁（含 0142 API 移植），apply/compile/四个产物全绿；语义债 0038 PacketUtils、0038 ShulkerBoxBlock、0059 PalettedContainer hunk#2/#3 仍 deferred，待回补 |
 | 1.21.10 | `compat/1.21.10` | **conflict-needs-review**（第 9 轮，未合并） | 见 §8：语义冲突（Paper 1.21.10 把 `spigot { enabled = false }` 改为 `enabled = true`），api 层已适配完成 |
 | 1.21.11 | `compat/1.21.11` | **conflict-needs-review**（第 12 轮，未合并） | 见 §11：111/141 个 feature 补丁已重锚到 1.21.11/Paper 基线并推送（`6d522ed`），剩 30 个语义冲突；另有 Spigot 启用、`Entity.getServer()`、插件定版三处待裁决 |
 | 26.1 | `compat/26.1` | skipped-no-paper-base | 人工裁决：Paper 无精确基线（§3），不算失败、不触发停止 |
@@ -290,7 +290,7 @@ compat/26.1.2 第 1 轮证据（分支 `compat/26.1.2`，从 `8ba0135` 切出并
 
 用户指令（原话要点）：「一路构建到最新版本，先适配版本再回来修改」→ 先把版本适配跑通，低版本语义债之后再回补。
 
-- 目标版本：Minecraft / Paper **26.3**。基线 Paper 主干提交 `894b2e1eafd3630abe89d9701508834aa5a33977`（见 §3 的授权偏离说明）。分支 `compat/26.3`（从 `compat/26.2` 的 `6f2d7e6` 切出），外层最终 commit **`e549c5eda5c33b2678cfd20504a1d74280c3c78f`**，已 push origin（GitHub API 复核 remote `compat/26.3` = `e549c5e…`），tag `leaves-26.3-compat`（annotated object `603932cd…`，指向 `e549c5e`）已 push。产物构建后重跑了一次（`26.3-gradle-final.log`，BUILD SUCCESSFUL in 3m 9s），使 jar 内嵌 `Git-Branch: compat/26.3` / `Git-Commit: e549c5e` 与实际 ref 一致。
+- 目标版本：Minecraft / Paper **26.3**。基线 Paper 主干提交 `894b2e1eafd3630abe89d9701508834aa5a33977`（见 §3 的授权偏离说明）。分支 `compat/26.3`（从 `compat/26.2` 的 `6f2d7e6` 切出）；产物构建时的外层 commit 为 `e549c5eda5c33b2678cfd20504a1d74280c3c78f`，随后补了一条 docs commit **`63cbdedddc1a04087d01ad110ac885ae8457d737`**（即当前 `compat/26.3` 的 HEAD，本地与 origin 一致），tag `leaves-26.3-compat` 指向 `63cbded`（远端复核 tag_sha=`63cbded…`，release id 461254440）。产物在 `63cbded` 上重跑一次（`26.3-gradle-final2.log`，BUILD SUCCESSFUL in 3m 11s），jar 内嵌 `Git-Branch: compat/26.3` / `Git-Commit: 63cbded` / `Implementation-Version: 26.3-DEV-63cbded`，与 tag 指向的 commit 一致（`26.3-final-manifest.txt`）。
 - 配置：`gradle.properties` `version=26.3-R0.1-SNAPSHOT` / `mcVersion=26.3` / `paperRef=894b2e1ea…` / `apiVersion=26.3`；wrapper `gradle-9.8.0-bin.zip`（`GradleWrapperMain` 不受 `org.gradle.jvmargs` 影响，TLS 靠 cmd 环境 `JAVA_OPTS=-Djavax.net.ssl.trustStore=…`）；JDK 25（`languageVersion=JavaLanguageVersion.of(25)`、`options.release=25`）；插件 `org.leavesmc.leavesweight.{core,patcher}` 2.2.0-SNAPSHOT、`org.leavesmc:leavesclip:3.0.10`。
 - 补丁层重建：`tools/chain_gen.py`（base：mc fork `8dc1e41`「leaves File Patches」、paper-server `7d6d0fbf4`「leaves paperServer File Patches」；orig 层传 baseline 原始目录）。结果 mc **43 patch / deferred 109**（日志 `26.3-chain-mc6.txt`，层 `mc-layer-263e`，延期 `deferred-26.3-mc-e`）；paper-server **15 / deferred 5**（`26.3-chain-ps.txt`）；paper-api **9 / deferred 0**。
   - 坑：base 提交 `8dc1e41` 自身生成的补丁是空补丁，`git am` 报 `Patch is empty.` → 从层里删掉（`0001-leaves-File-Patches.patch`），43 个补丁才可通过。
@@ -317,3 +317,21 @@ compat/26.1.2 第 1 轮证据（分支 `compat/26.1.2`，从 `8ba0135` 切出并
 - 下一个目标：回补低版本语义债（1.21.9/1.21.10/1.21.11/26.1.2 的剩余冲突与 26.2/26.3 deferred），以及 `HopperBlockEntity` vanillaHopper 重锚定、`PaperAuthenticationService` 删除后 Technical Survival Mode 的认证集成重建。
 
 
+
+## 15. 第 54 轮：可复现口径升级为逐条目 CRC，并核对已发布产物（2026-11-28）
+
+本轮不改补丁层、不改源码，只做三件事：把「可复现」的判定口径换成逐条目 CRC；用干净重建复核 26.2 / 1.21.9；把结论写进文档并同步记错本。
+
+- 新口径与工具：`tools/crc_entries.py` 对 jar 的每个 zip 条目记 `(条目名, 解压字节数, CRC32)` 并生成 sidecar（首行 `# entries=N aggregate(no-manifest)=<sha256>`），聚合摘要**排除 `META-INF/MANIFEST.MF`**（唯一不可复现来源是 `Build-Time` / `Implementation-Vendor` 时间戳）。`compare A B <label>` 输出条目数、聚合是否一致、只在 A/B 的条目、以及 size/crc 变化的条目名，落盘到 `E:\mc\leaves-work\crc-compare-<label>.txt`。
+- `tools/verify_trees.py` + `tools/expected_trees.json`：把当前脏 0 状态下三个嵌套 repo 的 `HEAD^{tree}` 记为期望值；干净 apply 之后必须 tree match=True 且 dirty=0。
+- `tools/repro_version.ps1`：单模块 apply（`resetPatchTaskStatus applyMinecraftPatches` / `applyPaperServerPatches` / `applyPaperApiPatches`，各自一次 gradle 调用）→ tree 校验 → 四个产物任务。**绝不跑 `applyAllPatchesSequentially` 或 `rebuild*`**（见记错本 E046）。
+  - 坑：产物任务名随版本变化——1.21.x 是 `createMojmapBundlerJar` / `createMojmapLeavesclipJar`，26.x 是 `createBundlerJar` / `createLeavesclipJar`；在 1.21.9 用 26.x 名字会报 `task 'createBundlerJar' is ambiguous ... Candidates: createMojmapBundlerJar, createReobfBundlerJar`（记错本 E051）。脚本按版本前缀选择任务名后，1.21.9 全绿。
+  - 脚本现在会在每次 gradle 调用后强制要求日志里出现 `BUILD SUCCESSFUL`，否则抛错，避免把旧的 `build/libs` 产物当成新证据（第一次跑就踩了这个：jar 是上一轮留下的，构建其实 FAILED）。
+- 复核结果（published = GitHub Release 上已发布的 asset 下载回本地，rebuild = 本轮干净重建产物；逐条目 CRC 比对）：
+  - **26.2**（tag `leaves-26.2-compat` → `6f2d7e62e2b31141de7cc4cbc5023ec7ae24c449`，分支 HEAD 相同、dirty=0）：三次 apply 均 BUILD SUCCESSFUL，三层 tree 与期望一致（mc `bfb081abb676…`、paper-server `a01367a14522…`、paper-api `68eaeeb122bd…`），`ALL_MATCH=True`。
+    server 聚合 `4942fddcf331…` 两边相同、api 聚合 `25c5c3b9f6c8…` 两边相同；差异条目只有 `META-INF/MANIFEST.MF`（server 1 条）、bundler 的 `versions.list` + 内嵌 `leaves-26.2.jar`、leavesclip 的 `patches.list` + `versions.list` + `server-26.2.jar.patch`（bsdiff 随基线 jar 变）。
+  - **26.3**（tag `leaves-26.3-compat` → `63cbded`，§14 已把旧文档里的 `e549c5e` 说法改成实际 tag/commit）：api 聚合 `7c27740fad8f…` 一致；server 唯一差异条目是 MANIFEST；bundler/leavesclip 差异只有派生条目（`versions.list`、内嵌 jar、bsdiff、`patches.list`）。sidecar 已作为**新增 asset** 上传到 26.3 与 26.2 两个 release（未删除、未覆盖任何既有 asset；26.3 final assets 12，26.2 final assets 8）。
+  - **1.21.9**（tag `leaves-1.21.9-compat` → `eac71f46ac062f1a33db7595a8dd5530fad6b62b`，分支 HEAD 相同、dirty=0）：干净重建 `1.21.9-apply-{mc,ps,api}-repro.log` 三次均 BUILD SUCCESSFUL（1m27s / 31s / 28s），三层 tree match=True 且 dirty=0（mc `0934e3518b3f…`、paper-server `099790fdbbf7…`、paper-api `e28d52aaf9c0…`），产物构建 `1.21.9-build-repro.log` BUILD SUCCESSFUL in 3m 4s。逐条目 CRC：server 聚合 `2832f59cef2d…` 一致（唯一差异条目 MANIFEST）、api 聚合 `84762adfe82c…` 一致（差异条目 0）、bundler/leavesclip 差异只有 `versions.list` / 内嵌 jar / bsdiff / `patches.list`。
+- 语义：本轮没有改写任何补丁或源码，因此不产生新的语义债；已发布产物与干净重建在「排除 MANIFEST 时间戳」口径下内容逐条目一致，说明 26.2 / 26.3 / 1.21.9 的补丁层与源码是确定性的。
+- 记错本：新增 E044–E051（Gradle 9.8 隐式依赖、空补丁、rebuild 污染层、上游改名、jar 哈希不一致→逐条目 CRC、push Basic auth、chain_gen 累积与 orig 目录错误、产物任务名随版本变化），索引表同步。
+- 下一个目标：`compat/26.1.2`（该工作树脏 172，且 `leaves-server/src/minecraft/java`、`paper-server` 两个嵌套 repo 目录缺失，需要按提交链重建层后跑全绿）；之后回补低版本语义债（1.21.9 的 `0038 PacketUtils`、`0038 ShulkerBoxBlock`、`0059 PalettedContainer`）。
