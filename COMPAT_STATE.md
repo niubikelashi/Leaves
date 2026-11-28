@@ -293,13 +293,13 @@ compat 语义改写清单（逐条落盘，证据在 `E:\mc\leaves-work\26.1.2-*
 - `resetPatchTaskStatus` BUILD SUCCESSFUL（`26.1.2-apply-reset9.log`）
 - `applyAllPatches` BUILD SUCCESSFUL 2m3s（`26.1.2-apply-all9.log`，`applyPaperServerFilePatches` Applied 1 patches）
 - `:leaves-api:compileJava` + `:leaves-server:compileJava` BUILD SUCCESSFUL（`26.1.2-compile-api5.log` / `26.1.2-compile-server5.log`；第 4 轮前是 23 unique 错误站点 / 8 文件，见 `26.1.2-compile-errors4.txt`）
-- 可复现双趟：`repro-26.1.2-b`（`26.1.2-repro-*.log`）与 `repro-26.1.2-c`（`26.1.2-reproC-*.log`），两次嵌套树 tree 相同：mc `20c91c0bf1379452eb339535c69f3f533aaf43ca`、ps `94c0d707ccce0242abdab5c949d16b638ce05351`、api `34c55f0a1ebc3856bb8626c1a302a4fda9f83b50`（`26.1.2-verify-trees.txt` / `26.1.2-verify-trees-reproC.txt` ALL_MATCH=True，dirty=0；期望值已写入 `tools\expected_trees.json` 的 `26.1.2`）
+- 可复现三趟：`repro-26.1.2-b`（`26.1.2-repro-*.log`）、`repro-26.1.2-c`（`26.1.2-reproC-*.log`）、`repro-26.1.2-d`（`26.1.2-reproD-*.log`，在 outer commit `3af0c3e` 之后重建，manifest 内嵌 `Git-Branch: compat/26.1.2`、`Git-Commit: 3af0c3e`），三趟嵌套树 tree 相同：mc `20c91c0bf1379452eb339535c69f3f533aaf43ca`、ps `94c0d707ccce0242abdab5c949d16b638ce05351`、api `34c55f0a1ebc3856bb8626c1a302a4fda9f83b50`（`26.1.2-verify-trees.txt` / `26.1.2-verify-trees-reproC.txt` / `26.1.2-verify-trees-reproD.txt` ALL_MATCH=True，dirty=0；期望值已写入 `tools\expected_trees.json` 的 `26.1.2`）
 - 逐条目 CRC（排除 `META-INF/MANIFEST.MF`，`tools\crc_entries.py`，日志 `crc-compare-26.1.2-*.txt`）：
-  - api：2352 条目，聚合两侧一致 `a84249f3edc6…`，差异条目 0
-  - server：18913 条目，聚合两侧一致 `02cd5feb346f…`，唯一 DIFF = `META-INF/MANIFEST.MF`
+  - api：2352 条目，三趟聚合一致 `a84249f3edc6…`，差异条目 0
+  - server：18913 条目，三趟聚合一致 `02cd5feb346f…`，唯一 DIFF = `META-INF/MANIFEST.MF`
   - bundler：聚合不同，差异只有 2 条派生条目（`META-INF/versions.list`、内嵌 `META-INF/versions/26.1.2/leaves-26.1.2.jar`）
   - leavesclip：聚合不同，差异只有 3 条派生条目（`META-INF/patches.list`、`META-INF/versions.list`、`META-INF/versions/26.1.2/server-26.1.2.jar.patch`）
-- 产物（`repro-26.1.2-c` 为发布集）：api 2901994B、server 29634651B、bundler 106916361B、leavesclip 68899688B。
+- 发布产物集（`repro-26.1.2-d`，随 tag `leaves-26.1.2-compat`）：api 2901994B（sha256 `57beb7eab48f…`）、server 29634649B（`76089bdf6f4e…`）、bundler 106916348B（`082fc42573df…`）、leavesclip 68899199B（`cce700814416…`），每个 jar 附 `.entries.crc.txt` 与 `.sha256`。
 
 底线复核：`Leaves-base-1218` detached `d93e976` dirty=0 只读；4 个 1.21.8 jar 字节不变；未 success 不合并 master；已有 Release/asset 不删不覆盖，只新增。
 
