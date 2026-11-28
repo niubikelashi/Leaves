@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Lumine1909 <133463833+Lumine1909@users.noreply.github.com>
+Date: Wed, 22 May 2024 10:12:04 +0800
+Subject: [PATCH] Bytebuf API
+
+
+diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
+--- a/src/main/java/org/bukkit/Bukkit.java
++++ b/src/main/java/org/bukkit/Bukkit.java
+@@ -3020,4 +3020,10 @@ public final class Bukkit {
+         return server.getPhotographerManager();
+     }
+     // Leaves end - Photographer API
++
++    // Leaves start - Bytebuf API
++    public static org.leavesmc.leaves.bytebuf.BytebufAllocator getBytebufManager() {
++        return server.getBytebufAllocator();
++    }
++    // Leaves end - Bytebuf API
+ }
+diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
+--- a/src/main/java/org/bukkit/Server.java
++++ b/src/main/java/org/bukkit/Server.java
+@@ -2772,4 +2772,6 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+     // Leaves end - Bot API
+ 
+     @NotNull org.leavesmc.leaves.entity.photographer.PhotographerManager getPhotographerManager(); // Leaves - Photographer API
++
++    org.leavesmc.leaves.bytebuf.BytebufAllocator getBytebufAllocator(); // Leaves - Bytebuf API
+ }
+diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
+--- a/src/main/java/org/bukkit/entity/Player.java
++++ b/src/main/java/org/bukkit/entity/Player.java
+@@ -72,7 +72,7 @@
+  * Represents a player, connected or not
+  */
+ @NullMarked
+-public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginMessageRecipient, net.kyori.adventure.identity.Identified, net.kyori.adventure.bossbar.BossBarViewer, com.destroystokyo.paper.network.NetworkClient, ObjectContentsLike { // Paper
++public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginMessageRecipient, net.kyori.adventure.identity.Identified, net.kyori.adventure.bossbar.BossBarViewer, com.destroystokyo.paper.network.NetworkClient, ObjectContentsLike, org.leavesmc.leaves.bytebuf.PacketAudience { // Paper // Leaves - Bytbuf API
+ 
+     // Paper start
+     @Override

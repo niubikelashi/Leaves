@@ -1,0 +1,80 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] fix(compat): 26.2 修正 bow 弹药参数/蜘蛛重复注解/区块 ticker 包装可见性/gossip 字段与 ServerLevel realPlayers
+
+
+diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
+--- a/net/minecraft/server/level/ServerLevel.java
++++ b/net/minecraft/server/level/ServerLevel.java
+@@ -2397,6 +2397,13 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+         return this.players;
+     }
+ 
++    // Leaves start - skip bot
++    public List<ServerPlayer> realPlayers() {
++        // 26.2 compat: bot 子系统已延期，此时 realPlayers 等价于 players（docs/deferred-26.2/REMOVED-FEATURES.md）
++        return this.players;
++    }
++    // Leaves end - skip bot
++
+     @Override
+     public void updatePOIOnBlockStateChange(final BlockPos pos, final BlockState oldState, final BlockState newState) {
+         Optional<Holder<PoiType>> oldType = PoiTypes.forState(oldState);
+diff --git a/net/minecraft/world/entity/ai/gossip/GossipType.java b/net/minecraft/world/entity/ai/gossip/GossipType.java
+--- a/net/minecraft/world/entity/ai/gossip/GossipType.java
++++ b/net/minecraft/world/entity/ai/gossip/GossipType.java
+@@ -15,10 +15,10 @@ public enum GossipType implements StringRepresentable {
+     public static final int REPUTATION_CHANGE_PER_TRADE = 2;
+     public final String id;
+     public final int weight;
+-    public final int max;
+     public int max; // Leaves - not final
+-    public final int decayPerTransfer;
++    public final int decayPerDay;
+     public int decayPerTransfer; // Leaves - not final
++    public static final Codec<GossipType> CODEC = StringRepresentable.fromEnum(GossipType::values);
+ 
+     GossipType(final String id, final int weight, final int max, final int decayPerDay, final int decayPerTransfer) {
+         this.id = id;
+diff --git a/net/minecraft/world/entity/monster/spider/Spider.java b/net/minecraft/world/entity/monster/spider/Spider.java
+--- a/net/minecraft/world/entity/monster/spider/Spider.java
++++ b/net/minecraft/world/entity/monster/spider/Spider.java
+@@ -142,7 +142,6 @@ public class Spider extends Monster {
+         this.entityData.set(DATA_FLAGS_ID, flags);
+     }
+ 
+-    @Override
+     // Leaves start - spider jockeys drop gapples
+     @Override
+     protected void dropFromLootTable(net.minecraft.server.level.ServerLevel level, DamageSource damageSource, boolean causedByPlayer) {
+diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
+--- a/net/minecraft/world/entity/player/Player.java
++++ b/net/minecraft/world/entity/player/Player.java
+@@ -2078,7 +2078,7 @@ public abstract class Player extends Avatar implements ContainerUser {
+ 
+         // Leaves start - bow infinity fix
+         if ((org.leavesmc.leaves.LeavesConfig.modify.bowInfinityFix || anyEventCancelled.booleanValue()) && !this.abilities.instabuild && this instanceof final ServerPlayer player) this.resyncUsingItem(player); // Paper - resync if no item matched the Predicate
+-        return this.hasInfiniteMaterials() || (org.leavesmc.leaves.LeavesConfig.modify.bowInfinityFix && net.minecraft.world.item.enchantment.EnchantmentHelper.processAmmoUse((ServerLevel) this.level(), shootable, new ItemStack(Items.ARROW), 1) <= 0) ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
++        return this.hasInfiniteMaterials() || (org.leavesmc.leaves.LeavesConfig.modify.bowInfinityFix && net.minecraft.world.item.enchantment.EnchantmentHelper.processAmmoUse((ServerLevel) this.level(), heldWeapon, new ItemStack(Items.ARROW), 1) <= 0) ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
+         // Leaves end - bow infinity fix
+     }
+     @Override
+diff --git a/net/minecraft/world/level/chunk/LevelChunk.java b/net/minecraft/world/level/chunk/LevelChunk.java
+--- a/net/minecraft/world/level/chunk/LevelChunk.java
++++ b/net/minecraft/world/level/chunk/LevelChunk.java
+@@ -1016,10 +1016,11 @@ public class LevelChunk extends ChunkAccess implements DebugValueSource, ca.spot
+         void run(LevelChunk levelChunk);
+     }
+ 
+-    private static class RebindableTickingBlockEntityWrapper implements TickingBlockEntity {
++    // Leaves - 26.2 compat: lithium 的 SleepingBlockEntity 需要该包装器类型（原由 Access Transformer 提供，AT 层已延期）
++    public static class RebindableTickingBlockEntityWrapper implements TickingBlockEntity {
+         private TickingBlockEntity ticker;
+ 
+-        private RebindableTickingBlockEntityWrapper(final TickingBlockEntity ticker) {
++        public RebindableTickingBlockEntityWrapper(final TickingBlockEntity ticker) {
+             this.ticker = ticker;
+         }
+ 
+

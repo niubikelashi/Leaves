@@ -4,6 +4,7 @@ import com.destroystokyo.paper.profile.PaperMinecraftSessionService;
 import com.mojang.authlib.Environment;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.HttpAuthenticationService;
+import com.mojang.authlib.minecraft.client.MinecraftClient;
 import com.mojang.authlib.exceptions.AuthenticationUnavailableException;
 import com.mojang.authlib.exceptions.MinecraftClientException;
 import com.mojang.authlib.yggdrasil.ProfileActionType;
@@ -17,7 +18,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.NameAndId;
 import org.jetbrains.annotations.Nullable;
 import org.leavesmc.leaves.LeavesConfig;
-import org.leavesmc.leaves.bot.ServerBot;
 
 import java.net.InetAddress;
 import java.net.Proxy;
@@ -34,7 +34,11 @@ public class LeavesMinecraftSessionService extends PaperMinecraftSessionService 
 
     protected LeavesMinecraftSessionService(ServicesKeySet keySet, Proxy authenticationService, Environment environment) {
         super(keySet, authenticationService, environment);
+        this.leavesClient = new MinecraftClient("Leaves/ExtraYggdrasil", authenticationService);
     }
+
+    // Leaves - 26.2 compat: authlib 9.x 的 YggdrasilMinecraftSessionService.client 不再可见，改用自建 MinecraftClient
+    private final MinecraftClient leavesClient;
 
     private static List<URL> extraYggdrasilList = List.of();
 
@@ -52,7 +56,7 @@ public class LeavesMinecraftSessionService extends PaperMinecraftSessionService 
         ProfileResult result = super.hasJoinedServer(profileName, serverId, address); // mojang
 
         ServerPlayer player = MinecraftServer.getServer().getPlayerList().getPlayerByName(profileName);
-        if (player != null && !(player instanceof ServerBot)) {
+        if (player != null) {
             return null; // if it has same name, return null
         }
 
@@ -67,13 +71,13 @@ public class LeavesMinecraftSessionService extends PaperMinecraftSessionService 
 
             NameAndId cache = null;
             if (LeavesConfig.mics.yggdrasil.loginProtect) {
-                cache = MinecraftServer.getServer().services.nameToIdCache().getIfCached(profileName);
+                cache = MinecraftServer.getServer().services().nameToIdCache().getIfCached(profileName);
             }
 
             for (URL checkUrl : extraYggdrasilList) {
                 URL url = HttpAuthenticationService.concatenateURL(checkUrl, HttpAuthenticationService.buildQuery(arguments));
                 try {
-                    final HasJoinedMinecraftServerResponse response = client.get(url, HasJoinedMinecraftServerResponse.class);
+                    final HasJoinedMinecraftServerResponse response = leavesClient.get(url, HasJoinedMinecraftServerResponse.class);
                     if (response != null && response.id() != null) {
                         if (LeavesConfig.mics.yggdrasil.loginProtect && cache != null) {
                             if (!response.id().equals(cache.id())) {

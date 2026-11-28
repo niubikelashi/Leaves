@@ -1,0 +1,329 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] Configurable MC-67
+
+
+diff --git a/net/minecraft/commands/Commands.java b/net/minecraft/commands/Commands.java
+--- a/net/minecraft/commands/Commands.java
++++ b/net/minecraft/commands/Commands.java
+@@ -189,7 +189,21 @@ public class Commands {
+     };
+     private final CommandDispatcher<CommandSourceStack> dispatcher = new CommandDispatcher<>();
+ 
+-    public Commands(final Commands.CommandSelection commandSelection, final CommandBuildContext context) {
++    // Leaves start - force minecraft command
++    private final CommandDispatcher<CommandSourceStack> dispatcher = new CommandDispatcher<>() {
++
++        @Override
++        public com.mojang.brigadier.tree.LiteralCommandNode<CommandSourceStack> register(com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> command) {
++            try {
++                if (org.leavesmc.leaves.LeavesConfig.mics.forceMinecraftCommand && getRoot().getChild("minecraft:" + command.getLiteral()) != null) {
++                    return command.build();
++                }
++            } catch (Exception ignored) {
++            }
++            return super.register(command);
++        }
++    };
++    // Leaves end - force minecraft command
+     // Paper start - Brigadier API - modern minecraft overloads that do not use redirects but are copies instead
+         this(commandSelection, context, false);
+     }
+diff --git a/net/minecraft/server/PlayerAdvancements.java b/net/minecraft/server/PlayerAdvancements.java
+--- a/net/minecraft/server/PlayerAdvancements.java
++++ b/net/minecraft/server/PlayerAdvancements.java
+@@ -173,6 +173,11 @@ public class PlayerAdvancements {
+             // Paper start - Add PlayerAdvancementCriterionGrantEvent
+             if (!new com.destroystokyo.paper.event.player.PlayerAdvancementCriterionGrantEvent(this.player.getBukkitEntity(), holder.toBukkit(), criterion).callEvent()) {
+                 progress.revokeProgress(criterion);
++        // Leaves start - spectator don't get advancement
++        if (org.leavesmc.leaves.LeavesConfig.modify.spectatorDontGetAdvancement && player.gameMode.getGameModeForPlayer() == net.minecraft.world.level.GameType.SPECTATOR) {
++            return false;
++        }
++        // Leaves end - spectator don't get advancement
+                 return false;
+             }
+             // Paper end - Add PlayerAdvancementCriterionGrantEvent
+diff --git a/net/minecraft/server/level/ServerEntity.java b/net/minecraft/server/level/ServerEntity.java
+--- a/net/minecraft/server/level/ServerEntity.java
++++ b/net/minecraft/server/level/ServerEntity.java
+@@ -359,7 +359,7 @@ public class ServerEntity {
+             }
+             ((LivingEntity) this.entity).detectEquipmentUpdates(); // CraftBukkit - SPIGOT-3789: sync again immediately after sending
+         }
+-
++            if (this.entity.totalEntityAge == 0) ((LivingEntity) this.entity).detectEquipmentUpdates(); // CraftBukkit - SPIGOT-3789: sync again immediately after sending // Leaves - fix chunk reload detector (#492)
+         if (!this.entity.getPassengers().isEmpty()) {
+             broadcast.accept(new ClientboundSetPassengersPacket(this.entity));
+         }
+diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
+--- a/net/minecraft/server/level/ServerPlayer.java
++++ b/net/minecraft/server/level/ServerPlayer.java
+@@ -439,6 +439,10 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+     public boolean suppressTrackerForLogin = false; // Paper - Fire PlayerJoinEvent when Player is actually ready
+     // CraftBukkit end
+     public boolean isRealPlayer; // Paper
++    // Leaves start - player operation limiter
++    private int instaBreakCountPerTick = 0;
++    private int placeBlockCountPerTick = 0;
++    // Leaves end - player operation limiter
+     public com.destroystokyo.paper.event.entity.@Nullable PlayerNaturallySpawnCreaturesEvent playerNaturallySpawnedEvent; // Paper - PlayerNaturallySpawnCreaturesEvent
+     public org.bukkit.event.player.PlayerQuitEvent.@Nullable QuitReason quitReason = null; // Paper - Add API for quit reason; there are a lot of changes to do if we change all methods leading to the event
+ 
+@@ -723,6 +727,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+         }
+         // CraftBukkit end
+         this.connection.tickClientLoadTimeout();
++        this.resetOperationCountPerTick(); // Leaves - player operation limiter
+         this.gameMode.tick();
+         this.wardenSpawnTracker.tick();
+         if (this.invulnerableTime > 0) {
+@@ -3136,6 +3141,33 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+     @Override
+     public org.bukkit.craftbukkit.entity.CraftPlayer getBukkitEntity() {
+         return (org.bukkit.craftbukkit.entity.CraftPlayer) super.getBukkitEntity();
++
++    // Leaves start - player operation limiter
++    protected void resetOperationCountPerTick() {
++        instaBreakCountPerTick = 0;
++        placeBlockCountPerTick = 0;
++    }
++
++    public int getInstaBreakCountPerTick() {
++        return instaBreakCountPerTick;
++    }
++
++    public int getPlaceBlockCountPerTick() {
++        return placeBlockCountPerTick;
++    }
++
++    public void addInstaBreakCountPerTick() {
++        ++instaBreakCountPerTick;
++    }
++
++    public void addPlaceBlockCountPerTick() {
++        ++placeBlockCountPerTick;
++    }
++
++    public boolean allowOperation() {
++        return (instaBreakCountPerTick == 0 || placeBlockCountPerTick == 0) && (instaBreakCountPerTick <= 1 && placeBlockCountPerTick <= 2);
++    }
++    // Leaves end - player operation limiter
+     }
+     // CraftBukkit end
+ }
+diff --git a/net/minecraft/server/level/ServerPlayerGameMode.java b/net/minecraft/server/level/ServerPlayerGameMode.java
+--- a/net/minecraft/server/level/ServerPlayerGameMode.java
++++ b/net/minecraft/server/level/ServerPlayerGameMode.java
+@@ -324,6 +324,19 @@ public class ServerPlayerGameMode {
+     }
+ 
+     public void destroyAndAck(final BlockPos pos, final int sequence, final String exitId) {
++        // Leaves start - player operation limiter
++        if (org.leavesmc.leaves.LeavesConfig.modify.playerOperationLimiter) {
++            if (message.equals("insta mine")) {
++                player.addInstaBreakCountPerTick();
++                if (!player.allowOperation()) {
++                    this.level.getCraftServer().getPluginManager().callEvent(new org.leavesmc.leaves.event.player.PlayerOperationLimitEvent(player.getBukkitEntity(), org.leavesmc.leaves.event.player.PlayerOperationLimitEvent.Operation.MINE, org.bukkit.craftbukkit.block.CraftBlock.at(level, pos)));
++                    this.player.connection.send(new ClientboundBlockUpdatePacket(pos, this.level.getBlockState(pos)));
++                    this.debugLogging(pos, false, sequence, message);
++                    return;
++                }
++            }
++        }
++        // Leaves end - player operation limiter
+         if (this.destroyBlock(pos)) {
+             this.debugLogging(pos, true, sequence, exitId);
+         } else {
+diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
+--- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
++++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
+@@ -339,6 +339,9 @@ public class ServerGamePacketListenerImpl
+         player.connection = this;
+         player.getTextFilter().join();
+         this.signedMessageDecoder = SignedMessageChain.Decoder.unsigned(player.getUUID(), server::enforceSecureProfile);
++        this.exchangeTarget = new org.leavesmc.leaves.protocol.syncmatica.exchange.ExchangeTarget(this); // Leaves - Syncmatica Protocol
++    public final org.leavesmc.leaves.protocol.syncmatica.exchange.ExchangeTarget exchangeTarget; // Leaves - Syncmatica Protocol
++
+         this.chatMessageChain = new FutureChain(server.chatExecutor); // CraftBukkit - async chat
+         this.tickEndEvent = new io.papermc.paper.event.packet.ClientTickEndEvent(player.getBukkitEntity()); // Paper - add client tick end event
+         this.playerGameConnection = new io.papermc.paper.connection.PaperPlayerGameConnection(this); // Paper
+diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
+--- a/net/minecraft/world/entity/Entity.java
++++ b/net/minecraft/world/entity/Entity.java
+@@ -278,6 +278,7 @@ public abstract class Entity
+     private float yRot;
+     private float xRot;
+     public float yRotO;
++    private boolean boundingBoxChanged = false; // Leaves - skip entity move if movement is zero
+     public float xRotO;
+     private AABB bb = INITIAL_AABB;
+     public boolean onGround;
+@@ -1140,6 +1141,13 @@ public abstract class Entity
+     public void move(final MoverType moverType, Vec3 delta) {
+         final Vec3 originalMovement = delta; // Paper - Expose pre-collision velocity
+         // Paper start - detailed watchdog information
++        // Leaves start - skip entity move if movement is zero
++        if (org.leavesmc.leaves.LeavesConfig.performance.skipEntityMoveIfMovementIsZero) {
++            if (!this.boundingBoxChanged && movement.equals(Vec3.ZERO)) {
++                return;
++            }
++        }
++        // Leaves end - skip entity move if movement is zero
+         ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread("Cannot move an entity off-main");
+         synchronized (this.posLock) {
+             this.moveStartX = this.getX();
+@@ -4325,6 +4333,7 @@ public abstract class Entity
+     }
+ 
+     public boolean canTeleport(final Level from, final Level to) {
++        if (!org.leavesmc.leaves.LeavesConfig.modify.oldMC.allowEntityPortalWithPassenger && (this.isPassenger() || this.isVehicle())) return false; // Leaves - allowEntityPortalWithPassenger
+         if (!this.isAlive() || !this.valid) return false; // Paper - Fix item duplication and teleport issues
+         if (from.dimension() == Level.END && to.dimension() == Level.OVERWORLD) {
+             for (Entity passenger : this.getPassengers()) {
+@@ -4591,6 +4600,7 @@ public abstract class Entity
+ 
+     public final void setBoundingBox(final AABB bb) {
+         // CraftBukkit start - block invalid bounding boxes
++        if (!this.bb.equals(bb)) this.boundingBoxChanged = true; // Leaves - skip entity move if movement is zero
+         double minX = bb.minX,
+                 minY = bb.minY,
+                 minZ = bb.minZ,
+diff --git a/net/minecraft/world/entity/NeutralMob.java b/net/minecraft/world/entity/NeutralMob.java
+--- a/net/minecraft/world/entity/NeutralMob.java
++++ b/net/minecraft/world/entity/NeutralMob.java
+@@ -90,6 +90,21 @@ public interface NeutralMob {
+                 this.stopBeingAngry();
+             }
+         }
++
++            // Leaves start - fix stuck zombified piglin anger target
++            if (org.leavesmc.leaves.LeavesConfig.modify.fixStuckZombifiedPiglinAngerTarget && this.isAngry()) {
++                if (target instanceof Player && !isValidPlayerTarget(target)) {
++                    boolean shouldStop = true;
++                    if (persistentAngerTarget != null) {
++                        LivingEntity resolved = EntityReference.getLivingEntity(persistentAngerTarget, level);
++                        shouldStop = resolved instanceof Player && !isValidPlayerTarget(resolved);
++                    }
++                    if (shouldStop) {
++                        this.stopBeingAngry();
++                    }
++                }
++            }
++            // Leaves end - fix stuck zombified piglin anger target
+     }
+ 
+     private static boolean isValidPlayerTarget(final LivingEntity target) {
+diff --git a/net/minecraft/world/entity/monster/Phantom.java b/net/minecraft/world/entity/monster/Phantom.java
+--- a/net/minecraft/world/entity/monster/Phantom.java
++++ b/net/minecraft/world/entity/monster/Phantom.java
+@@ -230,6 +230,20 @@ public class Phantom extends Mob implements Enemy {
+ 
+     private enum AttackPhase {
+         CIRCLE,
++    // Leaves start - renewable elytra
++    @Override
++    protected void dropFromLootTable(ServerLevel level, DamageSource source, boolean causedByPlayer) {
++        super.dropFromLootTable(level, source, causedByPlayer);
++        if (org.leavesmc.leaves.LeavesConfig.modify.renewableElytra > 0.0D) {
++            if (source.getEntity() instanceof Shulker && this.random.nextDouble() < org.leavesmc.leaves.LeavesConfig.modify.renewableElytra) {
++                net.minecraft.world.item.ItemStack item = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ELYTRA);
++                item.setDamageValue(431);
++                this.spawnAtLocation(level, item);
++            }
++        }
++    }
++    // Leaves end - renewable elytra
++
+         SWOOP;
+     }
+ 
+diff --git a/net/minecraft/world/item/BlockItem.java b/net/minecraft/world/item/BlockItem.java
+--- a/net/minecraft/world/item/BlockItem.java
++++ b/net/minecraft/world/item/BlockItem.java
+@@ -61,6 +61,21 @@ public class BlockItem extends Item {
+ 
+         BlockState placementState = this.getPlacementState(updatedPlaceContext);
+         final org.bukkit.block.BlockState previousState = org.bukkit.craftbukkit.block.CraftBlockStates.getBlockState(updatedPlaceContext.getLevel(), updatedPlaceContext.getClickedPos()); // Paper - Reset placed block on exception
++                // Leaves start - player operation limiter
++                if (org.leavesmc.leaves.LeavesConfig.modify.playerOperationLimiter && !context.getLevel().isClientSide()) {
++                    ServerPlayer player = (ServerPlayer) context.getPlayer();
++                    if (player != null && placementState != null) {
++                        player.addPlaceBlockCountPerTick();
++                        if (!player.allowOperation()) {
++                            if (bukkitState != null) {
++                                context.getLevel().getCraftServer().getPluginManager().callEvent(new org.leavesmc.leaves.event.player.PlayerOperationLimitEvent(player.getBukkitEntity(), org.leavesmc.leaves.event.player.PlayerOperationLimitEvent.Operation.PLACE, bukkitState.getBlock()));
++                            }
++                            return InteractionResult.FAIL;
++                        }
++                    }
++                }
++                // Leaves end - player operation limiter
++
+         if (placementState == null) {
+             return InteractionResult.FAIL;
+         }
+diff --git a/net/minecraft/world/item/ShovelItem.java b/net/minecraft/world/item/ShovelItem.java
+--- a/net/minecraft/world/item/ShovelItem.java
++++ b/net/minecraft/world/item/ShovelItem.java
+@@ -44,6 +44,26 @@ public class ShovelItem extends Item {
+         }
+ 
+         Player player = context.getPlayer();
++            // Leaves start - shaveSnowLayers
++            if (org.leavesmc.leaves.LeavesConfig.modify.shaveSnowLayers && blockState.is(Blocks.SNOW)) {
++                int layers = blockState.getValue(net.minecraft.world.level.block.SnowLayerBlock.LAYERS);
++                ItemStack tool = context.getItemInHand();
++                boolean hasSilkTouch = net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT).getOrThrow(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH), tool) > 0;
++                BlockState shavedBlockState = layers > 1 ? blockState.setValue(net.minecraft.world.level.block.SnowLayerBlock.LAYERS, layers - 1) : Blocks.AIR.defaultBlockState();
++
++                level.setBlock(clickedPos, shavedBlockState, Block.UPDATE_ALL_IMMEDIATE);
++                level.gameEvent(GameEvent.BLOCK_CHANGE, clickedPos, GameEvent.Context.of(player, shavedBlockState));
++
++                Block.popResource(level, clickedPos, new ItemStack(hasSilkTouch ? Items.SNOW : Items.SNOWBALL));
++                level.playSound(player, clickedPos, SoundEvents.SNOW_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
++
++                if (player != null) {
++                    tool.hurtAndBreak(1, player, context.getHand());
++                }
++
++                return InteractionResult.SUCCESS;
++            }
++            // Leaves end -  shaveSnowLayers
+         BlockState newState = FLATTENABLES.get(blockState.getBlock());
+         BlockState updatedState = null;
+         Runnable afterAction = null; // Paper
+diff --git a/net/minecraft/world/item/crafting/SmithingTransformRecipe.java b/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
+--- a/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
++++ b/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
+@@ -115,6 +115,12 @@ public class SmithingTransformRecipe extends SimpleSmithingRecipe {
+         );
+     }
+ 
++    // Leaves start - REI
++    public SlotDisplay getResult() {
++        return this.result.display();
++    }
++    // Leaves end - REI
++
+     // CraftBukkit start
+     @Override
+     public org.bukkit.inventory.Recipe toBukkitRecipe(org.bukkit.NamespacedKey id) {
+diff --git a/net/minecraft/world/item/crafting/SmithingTrimRecipe.java b/net/minecraft/world/item/crafting/SmithingTrimRecipe.java
+--- a/net/minecraft/world/item/crafting/SmithingTrimRecipe.java
++++ b/net/minecraft/world/item/crafting/SmithingTrimRecipe.java
+@@ -110,6 +110,12 @@ public class SmithingTrimRecipe extends SimpleSmithingRecipe {
+     }
+ 
+     @Override
++    // Leaves start
++    public Holder<TrimPattern> pattern() {
++        return pattern;
++    }
++    // Leaves end
++
+     public RecipeSerializer<SmithingTrimRecipe> getSerializer() {
+         return SERIALIZER;
+     }
+

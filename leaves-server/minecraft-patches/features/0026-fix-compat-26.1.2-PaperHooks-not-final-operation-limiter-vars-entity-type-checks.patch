@@ -1,0 +1,76 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] fix(compat): 26.1.2 PaperHooks not final for LeavesHooks, operation limiter local vars, EntityType checks
+
+--- a/ca/spottedleaf/moonrise/paper/PaperHooks.java
++++ b/ca/spottedleaf/moonrise/paper/PaperHooks.java
+@@ -29,7 +29,7 @@ import net.minecraft.world.phys.AABB;
+ import java.util.List;
+ import java.util.function.Predicate;
+ 
+-public final class PaperHooks extends BaseChunkSystemHooks implements PlatformHooks {
++public class PaperHooks extends BaseChunkSystemHooks implements PlatformHooks { // Leaves - not final
+ 
+     private static final org.slf4j.Logger LOGGER = com.mojang.logging.LogUtils.getLogger();
+ 
+--- a/net/minecraft/server/level/ServerPlayerGameMode.java
++++ b/net/minecraft/server/level/ServerPlayerGameMode.java
+@@ -326,12 +326,12 @@ public class ServerPlayerGameMode {
+     public void destroyAndAck(final BlockPos pos, final int sequence, final String exitId) {
+         // Leaves start - player operation limiter
+         if (org.leavesmc.leaves.LeavesConfig.modify.playerOperationLimiter) {
+-            if (message.equals("insta mine")) {
++            if (exitId.equals("insta mine")) {
+                 player.addInstaBreakCountPerTick();
+                 if (!player.allowOperation()) {
+                     this.level.getCraftServer().getPluginManager().callEvent(new org.leavesmc.leaves.event.player.PlayerOperationLimitEvent(player.getBukkitEntity(), org.leavesmc.leaves.event.player.PlayerOperationLimitEvent.Operation.MINE, org.bukkit.craftbukkit.block.CraftBlock.at(level, pos)));
+                     this.player.connection.send(new ClientboundBlockUpdatePacket(pos, this.level.getBlockState(pos)));
+-                    this.debugLogging(pos, false, sequence, message);
++                    this.debugLogging(pos, false, sequence, exitId);
+                     return;
+                 }
+             }
+--- a/net/minecraft/world/entity/monster/skeleton/Skeleton.java
++++ b/net/minecraft/world/entity/monster/skeleton/Skeleton.java
+@@ -145,7 +145,7 @@ public class Skeleton extends AbstractSkeleton {
+     protected void dropFromLootTable(net.minecraft.server.level.ServerLevel level, DamageSource damageSource, boolean causedByPlayer) {
+         super.dropFromLootTable(level, damageSource, causedByPlayer);
+         if (org.leavesmc.leaves.LeavesConfig.modify.spiderJockeysDropGapples > 0.0D) {
+-            if (this.getRootVehicle().is(net.minecraft.world.entity.EntityTypes.SPIDER) && this.random.nextDouble() < org.leavesmc.leaves.LeavesConfig.modify.spiderJockeysDropGapples) {
++            if (this.getRootVehicle().getType() == net.minecraft.world.entity.EntityType.SPIDER && this.random.nextDouble() < org.leavesmc.leaves.LeavesConfig.modify.spiderJockeysDropGapples) {
+                 this.spawnAtLocation(level, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ENCHANTED_GOLDEN_APPLE));
+             }
+         }
+--- a/net/minecraft/world/entity/monster/spider/Spider.java
++++ b/net/minecraft/world/entity/monster/spider/Spider.java
+@@ -146,7 +146,7 @@ public class Spider extends Monster {
+     protected void dropFromLootTable(net.minecraft.server.level.ServerLevel level, DamageSource damageSource, boolean causedByPlayer) {
+         super.dropFromLootTable(level, damageSource, causedByPlayer);
+         if (org.leavesmc.leaves.LeavesConfig.modify.spiderJockeysDropGapples > 0.0D) {
+-            if (this.hasPassenger(entity -> entity.is(net.minecraft.world.entity.EntityTypes.SKELETON)) && this.random.nextDouble() < org.leavesmc.leaves.LeavesConfig.modify.spiderJockeysDropGapples) {
++            if (this.hasPassenger(entity -> entity.getType() == net.minecraft.world.entity.EntityType.SKELETON) && this.random.nextDouble() < org.leavesmc.leaves.LeavesConfig.modify.spiderJockeysDropGapples) {
+                 this.spawnAtLocation(level, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ENCHANTED_GOLDEN_APPLE));
+             }
+         }
+--- a/net/minecraft/world/item/BlockItem.java
++++ b/net/minecraft/world/item/BlockItem.java
+@@ -62,13 +62,13 @@ public class BlockItem extends Item {
+         BlockState placementState = this.getPlacementState(updatedPlaceContext);
+         final org.bukkit.block.BlockState previousState = org.bukkit.craftbukkit.block.CraftBlockStates.getBlockState(updatedPlaceContext.getLevel(), updatedPlaceContext.getClickedPos()); // Paper - Reset placed block on exception
+                 // Leaves start - player operation limiter
+-                if (org.leavesmc.leaves.LeavesConfig.modify.playerOperationLimiter && !context.getLevel().isClientSide()) {
+-                    ServerPlayer player = (ServerPlayer) context.getPlayer();
++                if (org.leavesmc.leaves.LeavesConfig.modify.playerOperationLimiter && !placeContext.getLevel().isClientSide()) {
++                    ServerPlayer player = (ServerPlayer) placeContext.getPlayer();
+                     if (player != null && placementState != null) {
+                         player.addPlaceBlockCountPerTick();
+                         if (!player.allowOperation()) {
+-                            if (bukkitState != null) {
+-                                context.getLevel().getCraftServer().getPluginManager().callEvent(new org.leavesmc.leaves.event.player.PlayerOperationLimitEvent(player.getBukkitEntity(), org.leavesmc.leaves.event.player.PlayerOperationLimitEvent.Operation.PLACE, bukkitState.getBlock()));
++                            if (previousState != null) {
++                                placeContext.getLevel().getCraftServer().getPluginManager().callEvent(new org.leavesmc.leaves.event.player.PlayerOperationLimitEvent(player.getBukkitEntity(), org.leavesmc.leaves.event.player.PlayerOperationLimitEvent.Operation.PLACE, previousState.getBlock()));
+                             }
+                             return InteractionResult.FAIL;
+                         }
+

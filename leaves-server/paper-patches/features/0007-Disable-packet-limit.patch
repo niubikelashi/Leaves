@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] [PATCH] Disable packet limit
+
+
+diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
+--- a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
++++ b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
+@@ -261,7 +261,7 @@ public class GlobalConfiguration extends ConfigurationPart {
+             }
+ 
+             public boolean isEnabled() {
+-                return this.interval > 0.0 && this.maxPacketRate > 0.0;
++                return !org.leavesmc.leaves.LeavesConfig.modify.disablePacketLimit && (this.interval > 0.0 && this.maxPacketRate > 0.0); // Leaves - disable packet limit
+             }
+ 
+             public enum ViolateAction {
+

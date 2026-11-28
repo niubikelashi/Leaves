@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] [PATCH] [PATCH] Can disable LivingEntity aiStep alive check
+
+
+diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
+--- a/net/minecraft/world/entity/LivingEntity.java
++++ b/net/minecraft/world/entity/LivingEntity.java
+@@ -3428,7 +3428,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+             }
+         }
+ 
+-        if (!this.isRemoved()) {
++        if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.disableLivingEntityAiStepAliveCheck || !this.isRemoved()) { // Leaves - can disable check
+             this.aiStep();
+         }
+ 
+

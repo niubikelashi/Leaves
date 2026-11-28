@@ -1,0 +1,291 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] Fix 26.2 mis-anchored Leaves lines and defer vanilla hopper
+
+
+diff --git a/net/minecraft/advancements/Advancement.java b/net/minecraft/advancements/Advancement.java
+--- a/net/minecraft/advancements/Advancement.java
++++ b/net/minecraft/advancements/Advancement.java
+@@ -62,9 +62,8 @@ public record Advancement(
+         final AdvancementRequirements requirements,
+         final boolean sendsTelemetryEvent
+     ) {
+-        this(parent, display, rewards, Map.copyOf(criteria), requirements, sendsTelemetryEvent, display.map(Advancement::decorateName));
+-    }
+         this(parent, display, rewards, !org.leavesmc.leaves.LeavesConfig.performance.skipCloningAdvancementCriteria ? Map.copyOf(criteria) : criteria, requirements, sendsTelemetryEvent, display.map(Advancement::decorateName)); // Leaves - skip cloning advancement criteria
++    }
+     private static DataResult<Advancement> validate(final Advancement advancement) {
+         return advancement.requirements().validate(advancement.criteria().keySet()).map(r -> advancement);
+     }
+diff --git a/net/minecraft/commands/Commands.java b/net/minecraft/commands/Commands.java
+--- a/net/minecraft/commands/Commands.java
++++ b/net/minecraft/commands/Commands.java
+@@ -187,8 +187,6 @@ public class Commands {
+             return !requirement.test(this.noPermissionSource);
+         }
+     };
+-    private final CommandDispatcher<CommandSourceStack> dispatcher = new CommandDispatcher<>();
+-
+     // Leaves start - force minecraft command
+     private final CommandDispatcher<CommandSourceStack> dispatcher = new CommandDispatcher<>() {
+ 
+@@ -205,8 +203,10 @@ public class Commands {
+     };
+     // Leaves end - force minecraft command
+     // Paper start - Brigadier API - modern minecraft overloads that do not use redirects but are copies instead
++    public Commands(final Commands.CommandSelection commandSelection, final CommandBuildContext context) {
+         this(commandSelection, context, false);
+     }
++
+     public Commands(final Commands.CommandSelection commandSelection, final CommandBuildContext context, final boolean modern) {
+     // Paper end - Brigadier API - modern minecraft overloads that do not use redirects but are copies instead
+         AdvancementCommands.register(this.dispatcher);
+diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
+--- a/net/minecraft/server/MinecraftServer.java
++++ b/net/minecraft/server/MinecraftServer.java
+@@ -1948,9 +1948,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+     }
+ 
+     public String getServerModName() {
+-        return io.papermc.paper.ServerBuildInfo.buildInfo().brandName(); // Paper
+-    }
+         return org.leavesmc.leaves.LeavesConfig.mics.serverModName; // Leaves - Custom // Paper
++    }
+     public ServerClockManager clockManager() {
+         return this.clockManager;
+     }
+diff --git a/net/minecraft/world/entity/monster/EnderMan.java b/net/minecraft/world/entity/monster/EnderMan.java
+--- a/net/minecraft/world/entity/monster/EnderMan.java
++++ b/net/minecraft/world/entity/monster/EnderMan.java
+@@ -430,7 +430,6 @@ public class EnderMan extends Monster implements NeutralMob {
+ 
+     @Override
+     public boolean requiresCustomPersistence() {
+-        return super.requiresCustomPersistence() || this.getCarriedBlock() != null;
+         return super.requiresCustomPersistence() || (!org.leavesmc.leaves.LeavesConfig.modify.despawnEndermanWithBlock && this.getCarriedBlock() != null); // Leaves - despawn enderman with block
+ 
+     private static class EndermanFreezeWhenLookedAt extends Goal {
+diff --git a/net/minecraft/world/entity/monster/skeleton/Skeleton.java b/net/minecraft/world/entity/monster/skeleton/Skeleton.java
+--- a/net/minecraft/world/entity/monster/skeleton/Skeleton.java
++++ b/net/minecraft/world/entity/monster/skeleton/Skeleton.java
+@@ -131,7 +131,6 @@ public class Skeleton extends AbstractSkeleton {
+     protected SoundEvent getStepSound() {
+         return SoundEvents.SKELETON_STEP;
+     }
+-}
+ 
+     // Leaves start - spider jockeys drop gapples
+     @Override
+diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
+--- a/net/minecraft/world/entity/player/Player.java
++++ b/net/minecraft/world/entity/player/Player.java
+@@ -2076,12 +2076,11 @@ public abstract class Player extends Avatar implements ContainerUser {
+             }
+         }
+ 
+-        if (anyEventCancelled.booleanValue() && !this.abilities.instabuild && this instanceof final ServerPlayer player) this.resyncUsingItem(player); // Paper - resync if no item matched the Predicate
+-        return this.hasInfiniteMaterials() ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
+-                // Leaves start - bow infinity fix
+-                if ((org.leavesmc.leaves.LeavesConfig.modify.bowInfinityFix || anyEventCancelled.booleanValue()) && !this.abilities.instabuild && this instanceof final ServerPlayer player) this.resyncUsingItem(player); // Paper - resync if no item matched the Predicate
+-                return this.hasInfiniteMaterials() || (org.leavesmc.leaves.LeavesConfig.modify.bowInfinityFix && net.minecraft.world.item.enchantment.EnchantmentHelper.processAmmoUse((ServerLevel) this.level(), shootable, new ItemStack(Items.ARROW), 1) <= 0) ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
+-                // Leaves end - bow infinity fix
++        // Leaves start - bow infinity fix
++        if ((org.leavesmc.leaves.LeavesConfig.modify.bowInfinityFix || anyEventCancelled.booleanValue()) && !this.abilities.instabuild && this instanceof final ServerPlayer player) this.resyncUsingItem(player); // Paper - resync if no item matched the Predicate
++        return this.hasInfiniteMaterials() || (org.leavesmc.leaves.LeavesConfig.modify.bowInfinityFix && net.minecraft.world.item.enchantment.EnchantmentHelper.processAmmoUse((ServerLevel) this.level(), shootable, new ItemStack(Items.ARROW), 1) <= 0) ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
++        // Leaves end - bow infinity fix
++    }
+     @Override
+     public Vec3 getRopeHoldPosition(final float partialTickTime) {
+         double xOff = 0.22 * (this.getMainArm() == HumanoidArm.RIGHT ? -1.0 : 1.0);
+diff --git a/net/minecraft/world/level/block/BambooStalkBlock.java b/net/minecraft/world/level/block/BambooStalkBlock.java
+--- a/net/minecraft/world/level/block/BambooStalkBlock.java
++++ b/net/minecraft/world/level/block/BambooStalkBlock.java
+@@ -108,11 +108,11 @@ public class BambooStalkBlock extends Block implements BonemealableBlock {
+     protected void tick(final BlockState state, final ServerLevel level, final BlockPos pos, final RandomSource random) {
+         if (!state.canSurvive(level, pos)) {
+             level.destroyBlock(pos, true);
+-        }
+-            // Leaves start - zero tick plants
++        // Leaves start - zero tick plants
+         } else if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.zeroTickPlants) {
+             this.randomTick(state, level, pos, random);
+-            // Leaves end - zero tick plants
++        // Leaves end - zero tick plants
++        }
+     }
+ 
+     @Override
+diff --git a/net/minecraft/world/level/block/CactusBlock.java b/net/minecraft/world/level/block/CactusBlock.java
+--- a/net/minecraft/world/level/block/CactusBlock.java
++++ b/net/minecraft/world/level/block/CactusBlock.java
+@@ -47,11 +47,11 @@ public class CactusBlock extends Block {
+     protected void tick(final BlockState state, final ServerLevel level, final BlockPos pos, final RandomSource random) {
+         if (!state.canSurvive(level, pos)) {
+             level.destroyBlock(pos, true);
+-        }
+-            // Leaves start - zero tick plants
++        // Leaves start - zero tick plants
+         } else if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.zeroTickPlants) {
+             this.randomTick(state, level, pos, random);
+-            // Leaves end - zero tick plants
++        // Leaves end - zero tick plants
++        }
+     }
+ 
+     @Override
+diff --git a/net/minecraft/world/level/block/ChorusFlowerBlock.java b/net/minecraft/world/level/block/ChorusFlowerBlock.java
+--- a/net/minecraft/world/level/block/ChorusFlowerBlock.java
++++ b/net/minecraft/world/level/block/ChorusFlowerBlock.java
+@@ -47,10 +47,11 @@ public class ChorusFlowerBlock extends Block {
+     protected void tick(final BlockState state, final ServerLevel level, final BlockPos pos, final RandomSource random) {
+         if (!state.canSurvive(level, pos)) {
+             level.destroyBlock(pos, true);
+-        }
++        // Leaves start - zero tick plants
+         } else if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.zeroTickPlants) {
+             this.randomTick(state, level, pos, random);
+-            // Leaves end - zero tick plants
++        // Leaves end - zero tick plants
++        }
+     }
+ 
+     @Override
+diff --git a/net/minecraft/world/level/block/SugarCaneBlock.java b/net/minecraft/world/level/block/SugarCaneBlock.java
+--- a/net/minecraft/world/level/block/SugarCaneBlock.java
++++ b/net/minecraft/world/level/block/SugarCaneBlock.java
+@@ -43,11 +43,11 @@ public class SugarCaneBlock extends Block {
+     protected void tick(final BlockState state, final ServerLevel level, final BlockPos pos, final RandomSource random) {
+         if (!state.canSurvive(level, pos)) {
+             level.destroyBlock(pos, true);
+-        }
+-            // Leaves start - zero tick plants
++        // Leaves start - zero tick plants
+         } else if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.zeroTickPlants) {
+             this.randomTick(state, level, pos, random);
+-            // Leaves end - zero tick plants
++        // Leaves end - zero tick plants
++        }
+     }
+ 
+     @Override
+diff --git a/net/minecraft/world/level/block/TntBlock.java b/net/minecraft/world/level/block/TntBlock.java
+--- a/net/minecraft/world/level/block/TntBlock.java
++++ b/net/minecraft/world/level/block/TntBlock.java
+@@ -47,9 +47,9 @@ public class TntBlock extends Block {
+     @Override
+     protected void onPlace(final BlockState state, final Level level, final BlockPos pos, final BlockState oldState, final boolean movedByPiston) {
+         if (!oldState.is(state.getBlock())) {
+-            if (level.hasNeighborSignal(pos) && prime(level, pos, () -> org.bukkit.craftbukkit.event.CraftEventFactory.callTNTPrimeEvent(level, pos, org.bukkit.event.block.TNTPrimeEvent.PrimeCause.REDSTONE, null, null))) { // CraftBukkit - TNTPrimeEvent
+-                level.removeBlock(pos, false);
+             if (level.hasNeighborSignal(pos) && !org.leavesmc.leaves.LeavesConfig.modify.noTNTPlaceUpdate && prime(level, pos, () -> org.bukkit.craftbukkit.event.CraftEventFactory.callTNTPrimeEvent(level, pos, org.bukkit.event.block.TNTPrimeEvent.PrimeCause.REDSTONE, null, null))) { // CraftBukkit - TNTPrimeEvent // Leaves - prevent update
++                level.removeBlock(pos, false);
++            }
+         }
+     }
+ 
+diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+--- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
++++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+@@ -273,58 +273,36 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+         final int movedItemCount = Math.min(level.spigotConfig.hopperAmount, originalItemCount);
+         container.setChanged(); // original logic always marks source inv as changed even if no move happens.
+         movedItem.setCount(movedItemCount);
+-        // Leaves start - fix vanilla
+-        if (org.leavesmc.leaves.LeavesConfig.fix.vanillaHopper && movedItem.getCount() <= movedItemCount) {
+-            if (!skipPullModeEventFire) {
+-                movedItem = callPullMoveEvent(hopper, container, movedItem);
+-                if (movedItem == null) { // cancelled
+-                    origItemStack.setCount(originalItemCount);
+-                    // Drastically improve performance by returning true.
+-                    // No plugin could have relied on the behavior of false as the other call
+-                    // site for IMIE did not exhibit the same behavior
+-                    return true;
+-                }
++
++        if (!skipPullModeEventFire) {
++            movedItem = callPullMoveEvent(hopper, container, movedItem);
++            if (movedItem == null) { // cancelled
++                origItemStack.setCount(originalItemCount);
++                // Drastically improve performance by returning true.
++                // No plugin could have relied on the behavior of false as the other call
++                // site for IMIE did not exhibit the same behavior
++                return true;
+             }
+-            movedItem = origItemStack.copy();
+-            final ItemStack remainingItem = addItem(container, hopper,  container.removeItem(i, movedItemCount), null);
+-            if (remainingItem.isEmpty()) {
+-                container.setChanged();
+         }
+ 
+-            container.setItem(i, movedItem);
+-        } else {
+-            container.setChanged(); // original logic always marks source inv as changed even if no move happens.
+-            movedItem.setCount(movedItemCount);
++        final ItemStack remainingItem = addItem(container, hopper, movedItem, null);
+         final int remainingItemCount = remainingItem.getCount();
+-            if (!skipPullModeEventFire) {
+-                movedItem = callPullMoveEvent(hopper, container, movedItem);
+-                if (movedItem == null) { // cancelled
+-                    origItemStack.setCount(originalItemCount);
+-                    // Drastically improve performance by returning true.
+-                    // No plugin could have relied on the behavior of false as the other call
+-                    // site for IMIE did not exhibit the same behavior
+-                    return true;
+-                }
++        if (remainingItemCount != movedItemCount) {
++            origItemStack = origItemStack.copy(true);
++            origItemStack.setCount(originalItemCount);
++            if (!origItemStack.isEmpty()) {
++                origItemStack.setCount(originalItemCount - movedItemCount + remainingItemCount);
++            }
++
+             ignoreBlockEntityUpdates = true;
+             container.setItem(i, origItemStack);
+-            final ItemStack remainingItem = addItem(container, hopper, movedItem, null);
+-            final int remainingItemCount = remainingItem.getCount();
+-            if (remainingItemCount != movedItemCount) {
+-                origItemStack = origItemStack.copy(true);
+-                origItemStack.setCount(originalItemCount);
+-                if (!origItemStack.isEmpty()) {
+-                    origItemStack.setCount(originalItemCount - movedItemCount + remainingItemCount);
+-                }
+-
+-                ignoreBlockEntityUpdates = true;
+-                container.setItem(i, origItemStack);
+-                ignoreBlockEntityUpdates = false;
+-                container.setChanged();
+-                return true;
+-            }
+-            origItemStack.setCount(originalItemCount);
++            ignoreBlockEntityUpdates = false;
++            container.setChanged();
++            return true;
++        }
++        origItemStack.setCount(originalItemCount);
+ 
+-        // Leaves end - fix vanilla
++        if (level.paperConfig().hopper.cooldownWhenFull) {
+             applyCooldown(hopper);
+         }
+ 
+diff --git a/net/minecraft/world/level/chunk/LevelChunk.java b/net/minecraft/world/level/chunk/LevelChunk.java
+--- a/net/minecraft/world/level/chunk/LevelChunk.java
++++ b/net/minecraft/world/level/chunk/LevelChunk.java
+@@ -749,13 +749,13 @@ public class LevelChunk extends ChunkAccess implements DebugValueSource, ca.spot
+ 
+     public void setLoaded(final boolean loaded) {
+         this.loaded = loaded;
+-    }
+-
+         // Leaves start - bbor
+         if (loaded) {
+             org.leavesmc.leaves.protocol.BBORProtocol.onChunkLoaded(this);
+         }
+         // Leaves end - bbor
++    }
++
+     public Level getLevel() {
+         return this.level;
+     }
+

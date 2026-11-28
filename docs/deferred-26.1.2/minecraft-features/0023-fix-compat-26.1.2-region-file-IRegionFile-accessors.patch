@@ -1,0 +1,59 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] fix(compat): 26.1.2 region file plain IRegionFile accessors delegate to moonrise API
+
+--- a/net/minecraft/world/level/chunk/storage/RegionFile.java
++++ b/net/minecraft/world/level/chunk/storage/RegionFile.java
+@@ -418,6 +418,50 @@ public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patche
+     }
+     // Paper end - rewrite chunk system
+ 
++    // Leaves start - more region format compat (26.3 moonrise region IO)
++    // org.leavesmc.leaves.region.IRegionFile still declares the plain accessors; 26.3 renamed
++    // them to the moonrise$ API, so these delegate instead of re-implementing the header logic.
++    public int getRecalculateCount() {
++        return this.moonrise$getRecalculateCount();
++    }
++
++    public boolean recalculateHeader() throws java.io.IOException {
++        return this.moonrise$recalculateHeader();
++    }
++
++    public synchronized boolean isOversized(final int x, final int z) {
++        // 26.3 marks oversized chunks with EXTERNAL_STREAM_FLAG in the sector header's version byte.
++        final ChunkPos pos = new ChunkPos(x, z);
++        final int offset = this.getOffset(pos);
++        if (offset == CHUNK_NOT_PRESENT) {
++            return false;
++        }
++        try {
++            final ByteBuffer buffer = ByteBuffer.allocate(5);
++            this.file.read(buffer, getSectorNumber(offset) * SECTOR_BYTES);
++            buffer.flip();
++            if (buffer.remaining() < 5) {
++                return false;
++            }
++            buffer.getInt();
++            return isExternalStreamChunk(buffer.get());
++        } catch (java.io.IOException e) {
++            return false;
++        }
++    }
++
++    public net.minecraft.nbt.CompoundTag getOversizedData(final int x, final int z) throws java.io.IOException {
++        // 26.3 reads oversized chunks through createExternalChunkInputStream inside getChunkDataInputStream;
++        // there is no separate 'oversized NBT' reader any more, so this is a documented stub.
++        throw new java.io.IOException("getOversizedData is not supported by the 26.3 moonrise region format: " + this.path);
++    }
++
++    public void setOversized(final int x, final int z, final boolean oversized) throws java.io.IOException {
++        // Moonrise decides internal-vs-external storage from the written payload size; there is no
++        // manual oversized switch in 26.3, so this stays a no-op stub (same shape as LinearRegionFile).
++    }
++    // Leaves end - more region format compat
++
+     public RegionFile(final RegionStorageInfo info, final Path path, final Path externalFileDir, final boolean sync) throws IOException {
+         this(info, path, externalFileDir, RegionFileVersion.getSelected(), sync);
+     }
+

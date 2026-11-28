@@ -1,0 +1,208 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] fix(compat): 26.1.2 visibility relax (language, packet listener, entity, neutral mob, creeper, skeleton, spider, player, firework, shears, region file, coral features)
+
+--- a/net/minecraft/locale/Language.java
++++ b/net/minecraft/locale/Language.java
+@@ -66,7 +66,7 @@ public abstract class Language {
+         };
+     }
+ 
+-    private static void parseTranslations(final BiConsumer<String, String> output, final String path) {
++    public static void parseTranslations(final BiConsumer<String, String> output, final String path) { // Leaves - private -> public
+         try (InputStream stream = Language.class.getResourceAsStream(path)) {
+             loadFromJson(stream, output);
+         } catch (IOException | JsonParseException e) {
+--- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
++++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
+@@ -328,6 +328,7 @@ public class ServerGamePacketListenerImpl
+     private static final int MAX_SIGN_LINE_LENGTH = Integer.getInteger("Paper.maxSignLength", 80); // Paper - Limit client sign length
+     private final io.papermc.paper.event.packet.ClientTickEndEvent tickEndEvent; // Paper - add client tick end event
+     public final io.papermc.paper.connection.PaperPlayerGameConnection playerGameConnection; // Paper
++    public final org.leavesmc.leaves.protocol.syncmatica.exchange.ExchangeTarget exchangeTarget; // Leaves - Syncmatica Protocol
+ 
+     public ServerGamePacketListenerImpl(final MinecraftServer server, final Connection connection, final ServerPlayer player, final CommonListenerCookie cookie) {
+         super(server, connection, cookie);
+@@ -343,7 +344,6 @@ public class ServerGamePacketListenerImpl
+         this.playerGameConnection =  new io.papermc.paper.connection.PaperPlayerGameConnection(this); // Paper
+     }
+ 
+-    public final org.leavesmc.leaves.protocol.syncmatica.exchange.ExchangeTarget exchangeTarget; // Leaves - Syncmatica Protocol
+ 
+     // Paper start - configuration phase API
+     @Override
+--- a/net/minecraft/world/entity/Entity.java
++++ b/net/minecraft/world/entity/Entity.java
+@@ -204,7 +204,7 @@ public abstract class Entity
+     // Paper end - Share random for entities to make them more random
+     public org.bukkit.event.entity.CreatureSpawnEvent.@Nullable SpawnReason spawnReason; // Paper - Entity#getEntitySpawnReason
+ 
+-    private volatile org.bukkit.craftbukkit.entity.@Nullable CraftEntity bukkitEntity; // Paper - Folia schedulers - volatile
++    public volatile org.bukkit.craftbukkit.entity.@Nullable CraftEntity bukkitEntity; // Paper - Folia schedulers - volatile // Leaves - private -> public
+ 
+     public org.bukkit.craftbukkit.entity.CraftEntity getBukkitEntity() {
+         if (this.bukkitEntity == null) {
+--- a/net/minecraft/world/entity/NeutralMob.java
++++ b/net/minecraft/world/entity/NeutralMob.java
+@@ -93,7 +93,8 @@ public interface NeutralMob {
+ 
+             // Leaves start - fix stuck zombified piglin anger target
+             if (org.leavesmc.leaves.LeavesConfig.modify.fixStuckZombifiedPiglinAngerTarget && this.isAngry()) {
+-                if (target instanceof Player && !isValidPlayerTarget(target)) {
++                LivingEntity leavesAngerTarget = this.getTarget();
++                if (leavesAngerTarget instanceof Player && !isValidPlayerTarget(leavesAngerTarget)) {
+                     boolean shouldStop = true;
+                     if (persistentAngerTarget != null) {
+                         LivingEntity resolved = EntityReference.getLivingEntity(persistentAngerTarget, level);
+--- a/net/minecraft/world/entity/monster/skeleton/Skeleton.java
++++ b/net/minecraft/world/entity/monster/skeleton/Skeleton.java
+@@ -146,7 +146,7 @@ public class Skeleton extends AbstractSkeleton {
+     protected void dropFromLootTable(net.minecraft.server.level.ServerLevel level, DamageSource damageSource, boolean causedByPlayer) {
+         super.dropFromLootTable(level, damageSource, causedByPlayer);
+         if (org.leavesmc.leaves.LeavesConfig.modify.spiderJockeysDropGapples > 0.0D) {
+-            if (this.getRootVehicle().getType() == EntityType.SPIDER && this.random.nextDouble() < org.leavesmc.leaves.LeavesConfig.modify.spiderJockeysDropGapples) {
++            if (this.getRootVehicle().is(net.minecraft.world.entity.EntityTypes.SPIDER) && this.random.nextDouble() < org.leavesmc.leaves.LeavesConfig.modify.spiderJockeysDropGapples) {
+                 this.spawnAtLocation(level, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ENCHANTED_GOLDEN_APPLE));
+             }
+         }
+--- a/net/minecraft/world/entity/monster/spider/Spider.java
++++ b/net/minecraft/world/entity/monster/spider/Spider.java
+@@ -146,7 +146,7 @@ public class Spider extends Monster {
+     protected void dropFromLootTable(net.minecraft.server.level.ServerLevel level, DamageSource damageSource, boolean causedByPlayer) {
+         super.dropFromLootTable(level, damageSource, causedByPlayer);
+         if (org.leavesmc.leaves.LeavesConfig.modify.spiderJockeysDropGapples > 0.0D) {
+-            if (this.hasPassenger(entity -> entity.getType() == EntityType.SKELETON) && this.random.nextDouble() < org.leavesmc.leaves.LeavesConfig.modify.spiderJockeysDropGapples) {
++            if (this.hasPassenger(entity -> entity.is(net.minecraft.world.entity.EntityTypes.SKELETON)) && this.random.nextDouble() < org.leavesmc.leaves.LeavesConfig.modify.spiderJockeysDropGapples) {
+                 this.spawnAtLocation(level, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ENCHANTED_GOLDEN_APPLE));
+             }
+         }
+--- a/net/minecraft/world/entity/player/Player.java
++++ b/net/minecraft/world/entity/player/Player.java
+@@ -132,6 +132,7 @@ public abstract class Player extends Avatar implements ContainerUser {
+     public static final int CRAFTING_SLOT_OFFSET = 500;
+     public static final float DEFAULT_BLOCK_INTERACTION_RANGE = 4.5F;
+     public static final float DEFAULT_ENTITY_INTERACTION_RANGE = 3.0F;
++    public boolean elytraAeronauticsNoChunk = false; // Leaves - Elytra aeronautics
+     private static final EntityDataAccessor<Float> DATA_PLAYER_ABSORPTION_ID = SynchedEntityData.defineId(Player.class, EntityDataSerializers.FLOAT);
+     private static final EntityDataAccessor<Integer> DATA_SCORE_ID = SynchedEntityData.defineId(Player.class, EntityDataSerializers.INT);
+     private static final EntityDataAccessor<OptionalInt> DATA_SHOULDER_PARROT_LEFT = SynchedEntityData.defineId(
+--- a/net/minecraft/world/entity/projectile/FireworkRocketEntity.java
++++ b/net/minecraft/world/entity/projectile/FireworkRocketEntity.java
+@@ -324,7 +324,7 @@ public class FireworkRocketEntity extends Projectile implements ItemSupplier {
+         this.spawningEntity = input.read("SpawningEntity", net.minecraft.core.UUIDUtil.CODEC).orElse(null); // Paper
+     }
+ 
+-    private List<FireworkExplosion> getExplosions() {
++    public List<FireworkExplosion> getExplosions() { // Leaves - private -> public
+         ItemStack sourceItemStack = this.entityData.get(DATA_ID_FIREWORKS_ITEM);
+         Fireworks fireworks = sourceItemStack.get(DataComponents.FIREWORKS);
+         return fireworks != null ? fireworks.explosions() : List.of();
+--- a/net/minecraft/world/item/ShearsItem.java
++++ b/net/minecraft/world/item/ShearsItem.java
+@@ -81,7 +81,7 @@ public class ShearsItem extends Item {
+             return InteractionResult.SUCCESS;
+         } else {
+             // Leaves start - shears wrench
+-            InteractionResult result = org.leavesmc.leaves.util.ShearsWrenchUtil.tryApplyRotate(context, blockState);
++            InteractionResult result = org.leavesmc.leaves.util.ShearsWrenchUtil.tryApplyRotate(context, state);
+             return result == null ? super.useOn(context) : result;
+             // Leaves end - shears wrench
+         }
+--- a/net/minecraft/world/level/chunk/storage/RegionFile.java
++++ b/net/minecraft/world/level/chunk/storage/RegionFile.java
+@@ -22,7 +22,7 @@ import net.minecraft.world.level.ChunkPos;
+ import org.jspecify.annotations.Nullable;
+ import org.slf4j.Logger;
+ 
+-public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patches.chunk_system.storage.ChunkSystemRegionFile { // Paper - rewrite chunk system
++public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patches.chunk_system.storage.ChunkSystemRegionFile, org.leavesmc.leaves.region.IRegionFile { // Paper - rewrite chunk system // Leaves - more region format
+     private static final Logger LOGGER = LogUtils.getLogger();
+     public static final int MAX_CHUNK_SIZE = 500 * 1024 * 1024; // Paper - don't write garbage data to disk if writing serialization fails
+     private static final int SECTOR_BYTES = 4096;
+@@ -130,7 +130,7 @@ public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patche
+         return this.recalculateCount.get();
+     }
+ 
+-    boolean recalculateHeader() throws IOException {
++    public boolean recalculateHeader() throws IOException { // Leaves - more region format
+         if (!this.canRecalcHeader) {
+             return false;
+         }
+@@ -789,7 +789,7 @@ public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patche
+         }
+     }
+ 
+-    protected synchronized void write(final ChunkPos pos, final ByteBuffer data) throws IOException {
++    public synchronized void write(final ChunkPos pos, final ByteBuffer data) throws IOException { // Leaves - more region format
+         int offsetIndex = getOffsetIndex(pos);
+         int offset = this.offsets.get(offsetIndex);
+         int sectorNumber = getSectorNumber(offset);
+@@ -973,11 +973,11 @@ public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patche
+         return (x & 31) + (z & 31) * 32;
+     }
+ 
+-    synchronized boolean isOversized(int x, int z) {
++    public synchronized boolean isOversized(int x, int z) { // Leaves - more region format
+         return this.oversized[getChunkIndex(x, z)] == 1;
+     }
+ 
+-    synchronized void setOversized(int x, int z, boolean oversized) throws IOException {
++    public synchronized void setOversized(int x, int z, boolean oversized) throws IOException { // Leaves - more region format
+         final int offset = getChunkIndex(x, z);
+         boolean previous = this.oversized[offset] == 1;
+         this.oversized[offset] = (byte) (oversized ? 1 : 0);
+@@ -1016,7 +1016,7 @@ public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patche
+         return this.path.getParent().resolve(this.path.getFileName().toString().replaceAll("\\.mca$", "") + "_oversized_" + x + "_" + z + ".nbt");
+     }
+ 
+-    synchronized net.minecraft.nbt.CompoundTag getOversizedData(int x, int z) throws IOException {
++    public synchronized net.minecraft.nbt.CompoundTag getOversizedData(int x, int z) throws IOException { // Leaves - more region format
+         Path file = getOversizedFile(x, z);
+         try (DataInputStream out = new DataInputStream(new java.io.BufferedInputStream(new java.util.zip.InflaterInputStream(Files.newInputStream(file))))) {
+             return net.minecraft.nbt.NbtIo.read((java.io.DataInput) out);
+--- a/net/minecraft/world/level/levelgen/feature/CoralClawFeature.java
++++ b/net/minecraft/world/level/levelgen/feature/CoralClawFeature.java
+@@ -17,7 +17,7 @@ public class CoralClawFeature extends CoralFeature {
+     }
+ 
+     @Override
+-    protected boolean placeFeature(final LevelAccessor level, final RandomSource random, final BlockPos origin, final BlockState state) {
++    public boolean placeFeature(final LevelAccessor level, final RandomSource random, final BlockPos origin, final BlockState state) { // Leaves - protected -> public
+         if (!this.placeCoralBlock(level, random, origin, state)) {
+             return false;
+         }
+--- a/net/minecraft/world/level/levelgen/feature/CoralFeature.java
++++ b/net/minecraft/world/level/levelgen/feature/CoralFeature.java
+@@ -31,7 +31,7 @@ public abstract class CoralFeature extends Feature<NoneFeatureConfiguration> {
+         return !coral.isEmpty() && this.placeFeature(level, random, origin, coral.get().defaultBlockState());
+     }
+ 
+-    protected abstract boolean placeFeature(final LevelAccessor level, final RandomSource random, final BlockPos origin, final BlockState state);
++    public abstract boolean placeFeature(final LevelAccessor level, final RandomSource random, final BlockPos origin, final BlockState state); // Leaves - protected -> public
+ 
+     protected boolean placeCoralBlock(final LevelAccessor level, final RandomSource random, final BlockPos pos, final BlockState state) {
+         BlockPos above = pos.above();
+--- a/net/minecraft/world/level/levelgen/feature/CoralMushroomFeature.java
++++ b/net/minecraft/world/level/levelgen/feature/CoralMushroomFeature.java
+@@ -14,7 +14,7 @@ public class CoralMushroomFeature extends CoralFeature {
+     }
+ 
+     @Override
+-    protected boolean placeFeature(final LevelAccessor level, final RandomSource random, final BlockPos origin, final BlockState state) {
++    public boolean placeFeature(final LevelAccessor level, final RandomSource random, final BlockPos origin, final BlockState state) { // Leaves - protected -> public
+         int height = random.nextInt(3) + 3;
+         int width = random.nextInt(3) + 3;
+         int length = random.nextInt(3) + 3;
+--- a/net/minecraft/world/level/levelgen/feature/CoralTreeFeature.java
++++ b/net/minecraft/world/level/levelgen/feature/CoralTreeFeature.java
+@@ -15,7 +15,7 @@ public class CoralTreeFeature extends CoralFeature {
+     }
+ 
+     @Override
+-    protected boolean placeFeature(final LevelAccessor level, final RandomSource random, final BlockPos origin, final BlockState state) {
++    public boolean placeFeature(final LevelAccessor level, final RandomSource random, final BlockPos origin, final BlockState state) { // Leaves - protected -> public
+         BlockPos.MutableBlockPos mutPos = origin.mutable();
+         int trunckHeight = random.nextInt(3) + 1;
+ 
+

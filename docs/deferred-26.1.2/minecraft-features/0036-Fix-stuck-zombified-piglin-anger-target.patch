@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] Fix stuck zombified piglin anger target
+
+
+diff --git a/net/minecraft/world/entity/NeutralMob.java b/net/minecraft/world/entity/NeutralMob.java
+--- a/net/minecraft/world/entity/NeutralMob.java
++++ b/net/minecraft/world/entity/NeutralMob.java
+@@ -90,6 +90,21 @@ public interface NeutralMob {
+                 this.stopBeingAngry();
+             }
+         }
++
++            // Leaves start - fix stuck zombified piglin anger target
++            if (org.leavesmc.leaves.LeavesConfig.modify.fixStuckZombifiedPiglinAngerTarget && this.isAngry()) {
++                if (target instanceof Player && !isValidPlayerTarget(target)) {
++                    boolean shouldStop = true;
++                    if (persistentAngerTarget != null) {
++                        LivingEntity resolved = EntityReference.getLivingEntity(persistentAngerTarget, level);
++                        shouldStop = resolved instanceof Player && !isValidPlayerTarget(resolved);
++                    }
++                    if (shouldStop) {
++                        this.stopBeingAngry();
++                    }
++                }
++            }
++            // Leaves end - fix stuck zombified piglin anger target
+     }
+ 
+     private static boolean isValidPlayerTarget(final LivingEntity target) {
+

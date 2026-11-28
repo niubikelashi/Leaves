@@ -1,0 +1,81 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] Zero tick plants
+
+
+diff --git a/net/minecraft/world/level/block/BambooStalkBlock.java b/net/minecraft/world/level/block/BambooStalkBlock.java
+--- a/net/minecraft/world/level/block/BambooStalkBlock.java
++++ b/net/minecraft/world/level/block/BambooStalkBlock.java
+@@ -109,6 +109,10 @@ public class BambooStalkBlock extends Block implements BonemealableBlock {
+         if (!state.canSurvive(level, pos)) {
+             level.destroyBlock(pos, true);
+         }
++            // Leaves start - zero tick plants
++        } else if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.zeroTickPlants) {
++            this.randomTick(state, level, pos, random);
++            // Leaves end - zero tick plants
+     }
+ 
+     @Override
+diff --git a/net/minecraft/world/level/block/CactusBlock.java b/net/minecraft/world/level/block/CactusBlock.java
+--- a/net/minecraft/world/level/block/CactusBlock.java
++++ b/net/minecraft/world/level/block/CactusBlock.java
+@@ -48,6 +48,10 @@ public class CactusBlock extends Block {
+         if (!state.canSurvive(level, pos)) {
+             level.destroyBlock(pos, true);
+         }
++            // Leaves start - zero tick plants
++        } else if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.zeroTickPlants) {
++            this.randomTick(state, level, pos, random);
++            // Leaves end - zero tick plants
+     }
+ 
+     @Override
+diff --git a/net/minecraft/world/level/block/ChorusFlowerBlock.java b/net/minecraft/world/level/block/ChorusFlowerBlock.java
+--- a/net/minecraft/world/level/block/ChorusFlowerBlock.java
++++ b/net/minecraft/world/level/block/ChorusFlowerBlock.java
+@@ -48,6 +48,9 @@ public class ChorusFlowerBlock extends Block {
+         if (!state.canSurvive(level, pos)) {
+             level.destroyBlock(pos, true);
+         }
++        } else if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.zeroTickPlants) {
++            this.randomTick(state, level, pos, random);
++            // Leaves end - zero tick plants
+     }
+ 
+     @Override
+diff --git a/net/minecraft/world/level/block/GrowingPlantHeadBlock.java b/net/minecraft/world/level/block/GrowingPlantHeadBlock.java
+--- a/net/minecraft/world/level/block/GrowingPlantHeadBlock.java
++++ b/net/minecraft/world/level/block/GrowingPlantHeadBlock.java
+@@ -160,4 +160,15 @@ public abstract class GrowingPlantHeadBlock extends GrowingPlantBlock implements
+     protected GrowingPlantHeadBlock getHeadBlock() {
+         return this;
+     }
++
++    // Leaves start - zero tick plants
++    @Override
++    public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
++        if (!state.canSurvive(world, pos)) {
++            world.destroyBlock(pos, true);
++        } else if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.zeroTickPlants) {
++            this.randomTick(state, world, pos, random);
++        }
++    }
++    // Leaves end - zero tick plants
+ }
+diff --git a/net/minecraft/world/level/block/SugarCaneBlock.java b/net/minecraft/world/level/block/SugarCaneBlock.java
+--- a/net/minecraft/world/level/block/SugarCaneBlock.java
++++ b/net/minecraft/world/level/block/SugarCaneBlock.java
+@@ -44,6 +44,10 @@ public class SugarCaneBlock extends Block {
+         if (!state.canSurvive(level, pos)) {
+             level.destroyBlock(pos, true);
+         }
++            // Leaves start - zero tick plants
++        } else if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.zeroTickPlants) {
++            this.randomTick(state, level, pos, random);
++            // Leaves end - zero tick plants
+     }
+ 
+     @Override
+

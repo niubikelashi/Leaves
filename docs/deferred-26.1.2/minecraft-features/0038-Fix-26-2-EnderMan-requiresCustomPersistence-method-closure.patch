@@ -1,0 +1,18 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] Fix 26.2 EnderMan requiresCustomPersistence method closure
+
+
+diff --git a/net/minecraft/world/entity/monster/EnderMan.java b/net/minecraft/world/entity/monster/EnderMan.java
+--- a/net/minecraft/world/entity/monster/EnderMan.java
++++ b/net/minecraft/world/entity/monster/EnderMan.java
+@@ -431,6 +431,7 @@ public class EnderMan extends Monster implements NeutralMob {
+     @Override
+     public boolean requiresCustomPersistence() {
+         return super.requiresCustomPersistence() || (!org.leavesmc.leaves.LeavesConfig.modify.despawnEndermanWithBlock && this.getCarriedBlock() != null); // Leaves - despawn enderman with block
++    }
+ 
+     private static class EndermanFreezeWhenLookedAt extends Goal {
+         private final EnderMan enderman;
+

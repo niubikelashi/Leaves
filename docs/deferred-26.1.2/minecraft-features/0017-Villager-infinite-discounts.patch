@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] Villager infinite discounts
+
+
+diff --git a/net/minecraft/world/entity/ai/gossip/GossipType.java b/net/minecraft/world/entity/ai/gossip/GossipType.java
+--- a/net/minecraft/world/entity/ai/gossip/GossipType.java
++++ b/net/minecraft/world/entity/ai/gossip/GossipType.java
+@@ -16,9 +16,9 @@ public enum GossipType implements StringRepresentable {
+     public final String id;
+     public final int weight;
+     public final int max;
+-    public final int decayPerDay;
++    public int max; // Leaves - not final
+     public final int decayPerTransfer;
+-    public static final Codec<GossipType> CODEC = StringRepresentable.fromEnum(GossipType::values);
++    public int decayPerTransfer; // Leaves - not final
+ 
+     GossipType(final String id, final int weight, final int max, final int decayPerDay, final int decayPerTransfer) {
+         this.id = id;
+

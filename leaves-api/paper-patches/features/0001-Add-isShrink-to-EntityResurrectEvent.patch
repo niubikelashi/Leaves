@@ -1,0 +1,60 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] [PATCH] Add isShrink to EntityResurrectEvent
+
+
+diff --git a/src/main/java/org/bukkit/event/entity/EntityResurrectEvent.java b/src/main/java/org/bukkit/event/entity/EntityResurrectEvent.java
+--- a/src/main/java/org/bukkit/event/entity/EntityResurrectEvent.java
++++ b/src/main/java/org/bukkit/event/entity/EntityResurrectEvent.java
+@@ -17,22 +17,46 @@ public class EntityResurrectEvent extends EntityEvent implements Cancellable {
+ 
+     private static final HandlerList HANDLER_LIST = new HandlerList();
+ 
+-    private final EquipmentSlot hand;
+-
+     private boolean cancelled;
++    private boolean shrink;
++
++    private final EquipmentSlot hand;
+ 
+     @ApiStatus.Internal
+-    public EntityResurrectEvent(@NotNull LivingEntity livingEntity, @Nullable EquipmentSlot hand) {
++    public EntityResurrectEvent(@NotNull LivingEntity livingEntity, @Nullable EquipmentSlot hand, boolean shrink) {
+         super(livingEntity);
++        this.shrink = shrink;
+         this.hand = hand;
+     }
+ 
++    public EntityResurrectEvent(@NotNull LivingEntity livingEntity, @Nullable EquipmentSlot hand) {
++        this(livingEntity, hand, true);
++    }
++
+     @ApiStatus.Internal
+     @Deprecated(since = "1.19.2", forRemoval = true)
+     public EntityResurrectEvent(@NotNull LivingEntity livingEntity) {
+         this(livingEntity, null);
+     }
+ 
++    /**
++     * Get is shrink item
++     *
++     * @return is shrink item
++     */
++    public boolean isShrink() {
++        return shrink;
++    }
++
++    /**
++     * Set is shrink item
++     *
++     * @param shrink is shrink item
++     */
++    public void setShrink(boolean shrink) {
++        this.shrink = shrink;
++    }
++
+     @NotNull
+     @Override
+     public LivingEntity getEntity() {
+

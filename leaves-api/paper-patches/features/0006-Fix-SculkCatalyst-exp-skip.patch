@@ -1,0 +1,92 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] [PATCH] Fix SculkCatalyst exp skip
+
+
+diff --git a/src/main/java/org/bukkit/event/entity/EntityDeathEvent.java b/src/main/java/org/bukkit/event/entity/EntityDeathEvent.java
+--- a/src/main/java/org/bukkit/event/entity/EntityDeathEvent.java
++++ b/src/main/java/org/bukkit/event/entity/EntityDeathEvent.java
+@@ -28,6 +28,8 @@ public class EntityDeathEvent extends EntityEvent implements Cancellable {
+     private float deathSoundVolume;
+     private float deathSoundPitch;
+ 
++    private int rewardExp; // Leaves - exp fix
++
+     private boolean cancelled;
+ 
+     @ApiStatus.Internal
+@@ -37,12 +39,19 @@ public class EntityDeathEvent extends EntityEvent implements Cancellable {
+ 
+     @ApiStatus.Internal
+     public EntityDeathEvent(@NotNull final LivingEntity livingEntity, @NotNull DamageSource damageSource, @NotNull final List<ItemStack> drops, final int droppedExp) {
++        // Leaves start - exp fix
++        this(livingEntity, damageSource, drops, droppedExp, droppedExp);
++    }
++
++    @ApiStatus.Internal
++    public EntityDeathEvent(@NotNull final LivingEntity livingEntity, @NotNull DamageSource damageSource, @NotNull final List<ItemStack> drops, final int droppedExp, final int rewardExp) {
+         super(livingEntity);
+         this.damageSource = damageSource;
+         this.drops = drops;
+         this.dropExp = droppedExp;
++        this.rewardExp = rewardExp;
+     }
+-
++    // Leaves end - exp fix
+     @NotNull
+     @Override
+     public LivingEntity getEntity() {
+@@ -81,6 +90,7 @@ public class EntityDeathEvent extends EntityEvent implements Cancellable {
+      */
+     public void setDroppedExp(int exp) {
+         this.dropExp = exp;
++        this.rewardExp = exp; // Leaves - exp fix
+     }
+ 
+     /**
+@@ -210,6 +220,16 @@ public class EntityDeathEvent extends EntityEvent implements Cancellable {
+         this.deathSoundPitch = pitch;
+     }
+ 
++    // Leaves start - exp fix
++    public int getRewardExp() {
++        return rewardExp;
++    }
++
++    public void setRewardExp(int rewardExp) {
++        this.rewardExp = rewardExp;
++    }
++    // Leaves end - exp fix
++
+     @Override
+     public boolean isCancelled() {
+         return this.cancelled;
+diff --git a/src/main/java/org/bukkit/event/entity/PlayerDeathEvent.java b/src/main/java/org/bukkit/event/entity/PlayerDeathEvent.java
+--- a/src/main/java/org/bukkit/event/entity/PlayerDeathEvent.java
++++ b/src/main/java/org/bukkit/event/entity/PlayerDeathEvent.java
+@@ -23,6 +23,7 @@ public class PlayerDeathEvent extends EntityDeathEvent {
+     private Component deathMessage;
+     private Component deathScreenMessageOverride = null;
+     private boolean doExpDrop;
++    private boolean useApiExpDropStatus = false; // Leaves - exp fix
+     private boolean keepLevel = false;
+     private boolean keepInventory = false;
+     @Deprecated
+@@ -82,8 +83,15 @@ public class PlayerDeathEvent extends EntityDeathEvent {
+         this.showDeathMessages = true;
+         this.deathMessage = LegacyComponentSerializer.legacySection().deserializeOrNull(deathMessage);
+         this.doExpDrop = doExpDrop;
++        this.useApiExpDropStatus = true; // Leaves - exp fix
+     }
+ 
++    // Leaves start - exp fix
++    public boolean forceUseEventDropStatus() {
++        return this.useApiExpDropStatus;
++    }
++    // Leaves end - exp fix
++
+     @NotNull
+     @Override
+     public Player getEntity() {
+

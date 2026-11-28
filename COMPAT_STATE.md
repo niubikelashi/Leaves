@@ -248,3 +248,58 @@ minecraft 层漂移清单（第 10 轮，只读盘点，不改语义）：
 
 建议的人工后续：在这些语义冲突处按 Leaves 原意图重写补丁本体（不改 Paper/Spigot 层补丁），或接受上游新语义并同步调整 Leaves 功能；两者都需要作者确认，不属于可自动修的机械性偏移。Documentation / Configuration 本轮不跟进（没有成功的版本可跟随）。
 
+## 12. 26.1.2 适配链（第 44–50 轮，已全绿）
+
+上游：Minecraft 26.1.2（2026-04-09），Paper 基线 commit `76d2ac758cb3abe75aceefa88207443768f585c6`，compileClasspath root `io.papermc:mache:26.1.2+build.3`；嵌套 fork base：mc `1225544`、paper-server `8e660bef6`、paper-api `ba20fc0fe`。
+
+插件路线裁决（记错本 E055）：26.x 一律用 `org.leavesmc.leavesweight.patcher 2.2.0-SNAPSHOT` + plain 任务名 + Java 25（root `build.gradle.kts` 三处：插件版本、`JavaLanguageVersion.of(25)`、`options.release = 25`），JDK `E:\mc\tools\jdk25\jdk-25.0.5.1+2`。曾试过 leavesweight 2.1.0 + 1.21.11 参考 build → `macheRemapper` 依赖解析失败 + `forEach$iv` NPE，该路线作废。
+
+生成 build 文件（记错本 E056/E057/E058）：`patched-2612\api-build.gradle.kts` + `patched-2612\server-build.gradle.kts` 由 upstream blob（`upstream-2612\paper-api-build.gradle.kts` 9081B / `paper-server-build.gradle.kts` 12570B）+ re-anchor patch 合成，**先预写磁盘**再跑 `resetPatchTaskStatus` → `applyAllPatches`。导出补丁一律用原始 stdout（不 `.strip()`），并按 `@@ -a,n +b,m @@` 声明计数逐 hunk 校验。
+
+补丁层（tracked，已按 anchor 链顺序编号）：
+
+| 目录 | 数量 | 说明 |
+| --- | --- | --- |
+| `leaves-server/minecraft-patches/features` | 25 | union 层 20（1.21.8 replay ∪ 26.2 re-anchor）+ compat 0021/0022/0024/0025/0026 |
+| `leaves-server/paper-patches/features` | 14 | 1.21.8 层 + 26.2 变体 + compat 0013（server/bot/Server API）/0014（TimedEventExecutor 镜像 26.2） |
+| `leaves-api/paper-patches/features` | 8 | 26.2 变体层；bot/replay/photographer 接口保留（api 编译绿） |
+
+compat 语义改写清单（逐条落盘，证据在 `E:\mc\leaves-work\26.1.2-*.txt/.log`）：
+
+1. `0021-fix-compat-26.1.2-bow-ammo-spider-override-chunk-ticker-gossip-realPlayers.patch`（5 hunk，源链 `377bb97..356c9f0`）。
+2. `0022-fix-compat-26.1.2-visibility-relax-region-file-coral-packet-listener.patch`（19 hunk / 14 文件，源 `356c9f0..4817fa9`）——26.x 无 aterm/AtConfig，可见性放宽全部走源码补丁。
+3. `0024-fix-compat-26.1.2-EnderMan-requiresCustomPersistence-closure.patch`（1 hunk，源 `42d1fef..963141f`）。
+4. `0025-fix-compat-26.1.2-misanchor-commands-serverPlayer-phantom-skeleton-tnt-hopper.patch`（9 hunk / 6 文件，源 `963141f..d8d83db`）：union 层 3-way 造成的语法错位（`Commands.java:207`、`ServerPlayer.java:3157`、`Phantom.java:234` enum 越界、`Skeleton.java:155` 类提前结束、`TntBlock.java:57` 被取代的 plain 分支、`HopperBlockEntity.java:335`）逐条 re-anchor，`vanillaHopper` 语义转 deferred。
+5. `0026-fix-compat-26.1.2-PaperHooks-not-final-operation-limiter-vars-entity-type-checks.patch`（第 47 轮）：moonrise `PaperHooks` 去 `final`（记错本 E062，26.2/26.3 同写法）；`BlockItem` 局部变量按 26.1.2 实名 `placeContext`/`previousState`（1.21.8 canonical patch 用 `context`/`bukkitState`，故必须 re-anchor）；`ServerPlayerGameMode.destroyAndAck` 形参 `message`→`exitId`；`Spider`/`Skeleton` 的 `EntityTypes` 常量改 `EntityType` + `getType()`。
+6. `0014-fix-compat-26.1.2-PaperEventManager-timings-free-executors.patch`：镜像 26.2 的 timings-free 执行器（删 `new TimedEventExecutor(...)`、`EventExecutor.create(...)` 直用）。
+7. `0013-...server-bot-defer-CraftPlayer-getChannel-CraftServer-Server-API.patch`：hunk 计数改 `@@ -3367,4 +3367,16 @@`，删掉孤立 `@Override` / `updatePlayerPose()` / `}`（26.1.2 `Player.java` 无 `fixedPose`，`updatePlayerPose()` 是 protected → Pose API 转 deferred）。
+
+库源码：镜像 Leaves-26.2 特性集（`26.1.2-lib-install.txt` copy 25、`26.1.2-lib-install2.txt` delete 128），删除 bot/lithium/replay/photographer/HopperCounter/WoolUtils/ReturnPortalManager/AsyncKeepaliveManager/command-bot；直接修 `EntityUtils.java`（26.1.2 无 `EntitySpawnRequest`，改 `EntityType.create(input, world, EntitySpawnReason.LOAD)`）与 `LootTableMineableCollector.java`（import 改 `net.minecraft.advancements.criterion.ItemPredicate`）。
+
+## 13. deferred 语义债（26.1.2，全部落盘）
+
+工作目录侧 deferred（`E:\mc\leaves-work\deferred-26.1.2-*`，逐补丁含失败日志）：mc 129、mc-c 30、mc-m 1、mc-263region 1、ps 5、ps-b 4、ps-c 2、ps-262 2、ps-m 0、api 1、api-c 3。仓库侧镜像到 `docs/deferred-26.1.2/`（`minecraft-features` / `paper-server-features` / `paper-api-features` + README 记来源目录）。
+
+本轮新增裁决：
+- `deferred-26.1.2-mc-263region/0023-fix-compat-26.1.2-region-file-IRegionFile-accessors.patch` —— 来自 26.3 链（ref `3cd8557`→`aea6cf8`）的 moonrise region IO 委托；26.1.2 的 moonrise 没有 `moonrise$getRecalculateCount()` / `moonrise$recalculateHeader()`，而本版本已有 plain 实现（`oversized[]`、`writeOversizedMeta`、`getOversizedFile`、plain `getRecalculateCount`/`recalculateHeader`），搬运只会产生重复方法（记错本 E063）。证据：`26.1.2-compile-server4.err` RegionFile.java:424/428/1020/1024/1063 + :425/429。已同步删除树内该块。
+- `deferred-26.1.2-ps-c/0013-fix-compat-26-2-bot-CraftBot-aikar-timings-Leaves-API.patch` —— bot 特性整体延期（与 26.2 REMOVED-FEATURES 一致）。
+- CraftPlayer Pose API（`unsetFixedPose`）→ deferred；`vanillaHopper`（`hopperPull` 语义）→ deferred。
+- 低版本语义债仍待回补：1.21.9 `0038 PacketUtils` hunk#1、`0038 ShulkerBoxBlock` hunk#1、`0059 PalettedContainer` hunk#2/#3。
+
+## 14. 构建与可复现证据（26.1.2）
+
+流水线（每任务单独一次 gradle 调用，绝不跑 `rebuild*` / `applyAllPatchesSequentially`）：
+
+- `resetPatchTaskStatus` BUILD SUCCESSFUL（`26.1.2-apply-reset9.log`）
+- `applyAllPatches` BUILD SUCCESSFUL 2m3s（`26.1.2-apply-all9.log`，`applyPaperServerFilePatches` Applied 1 patches）
+- `:leaves-api:compileJava` + `:leaves-server:compileJava` BUILD SUCCESSFUL（`26.1.2-compile-api5.log` / `26.1.2-compile-server5.log`；第 4 轮前是 23 unique 错误站点 / 8 文件，见 `26.1.2-compile-errors4.txt`）
+- 可复现双趟：`repro-26.1.2-b`（`26.1.2-repro-*.log`）与 `repro-26.1.2-c`（`26.1.2-reproC-*.log`），两次嵌套树 tree 相同：mc `20c91c0bf1379452eb339535c69f3f533aaf43ca`、ps `94c0d707ccce0242abdab5c949d16b638ce05351`、api `34c55f0a1ebc3856bb8626c1a302a4fda9f83b50`（`26.1.2-verify-trees.txt` / `26.1.2-verify-trees-reproC.txt` ALL_MATCH=True，dirty=0；期望值已写入 `tools\expected_trees.json` 的 `26.1.2`）
+- 逐条目 CRC（排除 `META-INF/MANIFEST.MF`，`tools\crc_entries.py`，日志 `crc-compare-26.1.2-*.txt`）：
+  - api：2352 条目，聚合两侧一致 `a84249f3edc6…`，差异条目 0
+  - server：18913 条目，聚合两侧一致 `02cd5feb346f…`，唯一 DIFF = `META-INF/MANIFEST.MF`
+  - bundler：聚合不同，差异只有 2 条派生条目（`META-INF/versions.list`、内嵌 `META-INF/versions/26.1.2/leaves-26.1.2.jar`）
+  - leavesclip：聚合不同，差异只有 3 条派生条目（`META-INF/patches.list`、`META-INF/versions.list`、`META-INF/versions/26.1.2/server-26.1.2.jar.patch`）
+- 产物（`repro-26.1.2-c` 为发布集）：api 2901994B、server 29634651B、bundler 106916361B、leavesclip 68899688B。
+
+底线复核：`Leaves-base-1218` detached `d93e976` dirty=0 只读；4 个 1.21.8 jar 字节不变；未 success 不合并 master；已有 Release/asset 不删不覆盖，只新增。
+

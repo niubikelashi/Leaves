@@ -1,0 +1,286 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] [PATCH] [PATCH] Redstone Shears Wrench
+
+
+diff --git a/ca/spottedleaf/moonrise/paper/PaperHooks.java b/ca/spottedleaf/moonrise/paper/PaperHooks.java
+--- a/ca/spottedleaf/moonrise/paper/PaperHooks.java
++++ b/ca/spottedleaf/moonrise/paper/PaperHooks.java
+@@ -29,7 +29,7 @@ import net.minecraft.world.phys.AABB;
+ import java.util.List;
+ import java.util.function.Predicate;
+ 
+-public class PaperHooks extends BaseChunkSystemHooks implements PlatformHooks { // Leaves - not final
++public final class PaperHooks extends BaseChunkSystemHooks implements PlatformHooks {
+ 
+     private static final org.slf4j.Logger LOGGER = com.mojang.logging.LogUtils.getLogger();
+ 
+diff --git a/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java b/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java
+--- a/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java
++++ b/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java
+@@ -2022,7 +2022,7 @@ public final class CollisionUtil {
+                                                 continue;
+                                             }
+                                         } else {
+-                                            if (shouldSkip(aabb, singleAABB)) { // Leaves - Configurable collision behavior
++                                            if (!voxelShapeIntersect(aabb, singleAABB)) {
+                                                 continue;
+                                             }
+                                         }
+@@ -2076,16 +2076,6 @@ public final class CollisionUtil {
+         return ret;
+     }
+ 
+-    // Leaves start - Configurable collision behavior
+-    private static boolean shouldSkip(net.minecraft.world.phys.AABB aabb, net.minecraft.world.phys.AABB singleAABB) {
+-        return switch (org.leavesmc.leaves.LeavesConfig.fix.collisionBehavior) {
+-            // Paper has changed to block shape vanilla, so we only check fully vanilla here
+-            case PAPER -> !voxelShapeIntersect(aabb, singleAABB);
+-            case VANILLA -> !aabb.intersects(singleAABB);
+-        };
+-    }
+-    // Leaves end - Configurable collision behavior
+-
+     public static boolean getEntityHardCollisions(final Level world, final Entity entity, AABB aabb,
+                                                   final List<AABB> into, final int collisionFlags, final Predicate<Entity> predicate) {
+         final boolean checkOnly = (collisionFlags & COLLISION_FLAG_CHECK_ONLY) != 0;
+diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
+--- a/net/minecraft/server/MinecraftServer.java
++++ b/net/minecraft/server/MinecraftServer.java
+@@ -1317,7 +1317,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+                 LOGGER.info("*************************************************************************************");
+                 LOGGER.info("This is the first time you're starting this server.");
+                 LOGGER.info("It's recommended you read our 'Getting Started' documentation for guidance.");
+-                LOGGER.info("View this and more helpful information here: https://docs.leavesmc.org/leaves/guides/next-steps"); // Leaves - change
++                LOGGER.info("View this and more helpful information here: https://docs.papermc.io/paper/next-steps");
+                 LOGGER.info("*************************************************************************************");
+             }
+             // Paper end - Add onboarding message for initial server start
+@@ -1975,7 +1975,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+     public String getServerModName() {
+         return io.papermc.paper.ServerBuildInfo.buildInfo().brandName(); // Paper
+     }
+-        return org.leavesmc.leaves.LeavesConfig.mics.serverModName; // Leaves - Custom // Paper
++
+     public ServerClockManager clockManager() {
+         return this.clockManager;
+     }
+diff --git a/net/minecraft/server/ServerTickRateManager.java b/net/minecraft/server/ServerTickRateManager.java
+--- a/net/minecraft/server/ServerTickRateManager.java
++++ b/net/minecraft/server/ServerTickRateManager.java
+@@ -133,10 +133,4 @@ public class ServerTickRateManager extends TickRateManager {
+         player.connection.send(ClientboundTickingStatePacket.from(this));
+         player.connection.send(ClientboundTickingStepPacket.from(this));
+     }
+-
+-    // Leaves start - servux
+-    public long getRemainingSprintTicks() {
+-        return remainingSprintTicks;
+-    }
+-    // Leaves end - servux
+ }
+diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
+--- a/net/minecraft/server/dedicated/DedicatedServer.java
++++ b/net/minecraft/server/dedicated/DedicatedServer.java
+@@ -289,10 +289,9 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+         io.papermc.paper.command.PaperCommands.registerCommands(this); // Paper - setup /paper command
+         this.server.spark.registerCommandBeforePlugins(this.server); // Paper - spark
+         com.destroystokyo.paper.Metrics.PaperMetrics.startMetrics(); // Paper - start metrics
++        com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
+ 
+         // this.worldData.setGameType(properties.gameMode.get()); // CraftBukkit - moved to world loading
+-        com.destroystokyo.paper.Metrics.PaperMetrics.startMetrics(); // Paper - start metrics // Leaves - down
+-
+         LOGGER.info("Default game type: {}", properties.gameMode.get());
+         // Paper start - Unix domain socket support
+         java.net.SocketAddress bindAddress;
+@@ -343,7 +342,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+         String proxyFlavor = (io.papermc.paper.configuration.GlobalConfiguration.get().proxies.velocity.enabled) ? "Velocity" : "BungeeCord";
+         String proxyLink = (io.papermc.paper.configuration.GlobalConfiguration.get().proxies.velocity.enabled) ? "https://docs.papermc.io/velocity/security" : "http://www.spigotmc.org/wiki/firewall-guide/";
+         // Paper end - Add Velocity IP Forwarding Support
+-        if (!io.papermc.paper.configuration.GlobalConfiguration.get().proxies.isProxyOnlineMode()) { // Leaves - bungee or velocity
++        if (!this.usesAuthentication()) {
+             LOGGER.warn("**** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!");
+             LOGGER.warn("The server will make no attempt to authenticate usernames. Beware.");
+             // Spigot start
+diff --git a/net/minecraft/server/gui/MinecraftServerGui.java b/net/minecraft/server/gui/MinecraftServerGui.java
+--- a/net/minecraft/server/gui/MinecraftServerGui.java
++++ b/net/minecraft/server/gui/MinecraftServerGui.java
+@@ -183,7 +183,7 @@ public class MinecraftServerGui extends JComponent {
+ 
+     // Paper start - Add onboarding message for initial server start
+     private JComponent buildOnboardingPanel() {
+-        String onboardingLink = "https://docs.leavesmc.org/leaves/guides/next-steps"; // Leaves - change
++        String onboardingLink = "https://docs.papermc.io/paper/next-steps";
+         JPanel jPanel = new JPanel();
+ 
+         javax.swing.JLabel jLabel = new javax.swing.JLabel("If you need help setting up your server you can visit:");
+diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
+--- a/net/minecraft/server/level/ServerLevel.java
++++ b/net/minecraft/server/level/ServerLevel.java
+@@ -2351,21 +2351,9 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+         // Paper end
+     }
+ 
+-
+     @Override
+     public LevelData.RespawnData getRespawnData() {
+         return this.getServer().getRespawnData();
+-        // TODO: 1.21.9 removed spawn chunk, should we keep this?
+-        // int i = this.getGameRules().getInt(GameRules.RULE_SPAWN_CHUNK_RADIUS) + 1;
+-        // if (i > 1) {
+-        //     // Paper start - allow disabling gamerule limits
+-        //     for (ChunkPos chunkPos : io.papermc.paper.util.MCUtil.getSpiralOutChunks(pos, i - 2)) {
+-        //         this.getChunkSource().addTicketAtLevel(TicketType.START, chunkPos, ChunkLevel.ENTITY_TICKING_LEVEL);
+-        //     }
+-        //     // Paper end - allow disabling gamerule limits
+-        // }
+-        // this.lastSpawnChunkRadius = i;
+-        // org.leavesmc.leaves.protocol.servux.ServuxHudDataProtocol.refreshSpawnMetadata = true; // Leaves - servux
+     }
+ 
+     public LongSet getForceLoadedChunks() {
+diff --git a/net/minecraft/server/network/ServerStatusPacketListenerImpl.java b/net/minecraft/server/network/ServerStatusPacketListenerImpl.java
+--- a/net/minecraft/server/network/ServerStatusPacketListenerImpl.java
++++ b/net/minecraft/server/network/ServerStatusPacketListenerImpl.java
+@@ -37,12 +37,6 @@ public class ServerStatusPacketListenerImpl implements ServerStatusPacketListene
+         } else {
+             this.hasRequestedStatus = true;
+             // this.connection.send(new ClientboundStatusResponsePacket(this.status)); // Paper
+-            // Leaves start - dont respond it before start full
+-            var status = net.minecraft.server.MinecraftServer.getServer().getStatus();
+-            if (org.leavesmc.leaves.LeavesConfig.mics.dontRespondPingBeforeStart && (status == null || status.version().isEmpty())) {
+-                return;
+-            }
+-            // Leaves end - dont respond it before start full
+             com.destroystokyo.paper.network.StandardPaperServerListPingEventImpl.processRequest(net.minecraft.server.MinecraftServer.getServer(), this.connection); // Paper - handle status request
+         }
+     }
+diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
+--- a/net/minecraft/server/players/PlayerList.java
++++ b/net/minecraft/server/players/PlayerList.java
+@@ -997,9 +997,6 @@ public abstract class PlayerList {
+         //player.connection.send(new ClientboundSetChunkCacheRadiusPacket(io.papermc.paper.FeatureHooks.getViewDistance(level))); // Paper - rewrite chunk system
+         //player.connection.send(new ClientboundSetSimulationDistancePacket(io.papermc.paper.FeatureHooks.getSimulationDistance(level))); // Paper - rewrite chunk system
+         // Paper end - view distances
+-
+-        org.leavesmc.leaves.protocol.XaeroMapProtocol.onSendWorldInfo(player); // Leaves - xaero map protocol
+-
+         if (level.isRaining()) {
+             // CraftBukkit start - handle player weather
+             // player.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.START_RAINING, 0.0F));
+diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
+--- a/net/minecraft/world/entity/Entity.java
++++ b/net/minecraft/world/entity/Entity.java
+@@ -862,7 +862,6 @@ public abstract class Entity
+ 
+     // CraftBukkit start
+     public void postTick() {
+-        if (org.leavesmc.leaves.LeavesConfig.fix.vanillaPortalHandle) return; // Leaves - vanilla
+         // No clean way to break out of ticking once the entity has been copied to a new world, so instead we move the portalling later in the tick cycle
+         if (!(this instanceof ServerPlayer) && this.isAlive()) { // Paper - don't attempt to teleport dead entities
+             this.handlePortal();
+@@ -884,7 +883,7 @@ public abstract class Entity
+             this.boardingCooldown--;
+         }
+ 
+-        if (org.leavesmc.leaves.LeavesConfig.fix.vanillaPortalHandle || this instanceof ServerPlayer) this.handlePortal(); // CraftBukkit - Moved up to postTick // Leaves - vanilla
++        if (this instanceof ServerPlayer) this.handlePortal(); // CraftBukkit - Moved up to postTick
+         if (this.canSpawnSprintParticle()) {
+             this.spawnSprintParticle();
+         }
+diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
+--- a/net/minecraft/world/entity/LivingEntity.java
++++ b/net/minecraft/world/entity/LivingEntity.java
+@@ -3428,7 +3428,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+             }
+         }
+ 
+-        if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.disableLivingEntityAiStepAliveCheck || !this.isRemoved()) { // Leaves - can disable check
++        if (!this.isRemoved()) {
+             this.aiStep();
+         }
+ 
+diff --git a/net/minecraft/world/entity/item/ItemEntity.java b/net/minecraft/world/entity/item/ItemEntity.java
+--- a/net/minecraft/world/entity/item/ItemEntity.java
++++ b/net/minecraft/world/entity/item/ItemEntity.java
+@@ -127,9 +127,6 @@ public class ItemEntity extends Entity implements TraceableEntity {
+     // Paper start - EAR 2
+     @Override
+     public void inactiveTick() {
+-        // Leaves start - vanilla
+-        this.tick();
+-        /*
+         super.inactiveTick();
+         if (this.pickupDelay > 0 && this.pickupDelay != 32767) {
+             this.pickupDelay--;
+@@ -147,8 +144,6 @@ public class ItemEntity extends Entity implements TraceableEntity {
+             // CraftBukkit end
+             this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.DESPAWN); // CraftBukkit - add Bukkit remove cause
+         }
+-         */
+-        // Leaves end - vanilla
+     }
+     // Paper end - EAR 2
+ 
+diff --git a/net/minecraft/world/entity/monster/zombie/ZombifiedPiglin.java b/net/minecraft/world/entity/monster/zombie/ZombifiedPiglin.java
+--- a/net/minecraft/world/entity/monster/zombie/ZombifiedPiglin.java
++++ b/net/minecraft/world/entity/monster/zombie/ZombifiedPiglin.java
+@@ -113,9 +113,6 @@ public class ZombifiedPiglin extends Zombie implements NeutralMob {
+             this.maybeAlertOthers();
+         }
+ 
+-
+-        if (org.leavesmc.leaves.LeavesConfig.modify.oldMC.oldZombiePiglinDrop && this.isAngry()) this.lastHurtByPlayerMemoryTime = this.tickCount; // Leaves - old zombie piglin drop
+-
+         super.customServerAiStep(level);
+     }
+ 
+diff --git a/net/minecraft/world/entity/player/Inventory.java b/net/minecraft/world/entity/player/Inventory.java
+--- a/net/minecraft/world/entity/player/Inventory.java
++++ b/net/minecraft/world/entity/player/Inventory.java
+@@ -175,13 +175,6 @@ public class Inventory implements Container, Nameable {
+     // CraftBukkit start - Watch method above! :D
+     public int canHold(ItemStack itemStack) {
+         int remains = itemStack.getCount();
+-
+-        // Leaves start - vanilla creative pickup behavior
+-        if (player.hasInfiniteMaterials()) {
+-            return remains;
+-        }
+-        // Leaves end - vanilla creative pickup behavior
+-
+         for (int slot = 0; slot < this.items.size(); ++slot) {
+             ItemStack itemInSlot = this.getItem(slot);
+             if (itemInSlot.isEmpty()) {
+diff --git a/net/minecraft/world/entity/vehicle/minecart/AbstractMinecart.java b/net/minecraft/world/entity/vehicle/minecart/AbstractMinecart.java
+--- a/net/minecraft/world/entity/vehicle/minecart/AbstractMinecart.java
++++ b/net/minecraft/world/entity/vehicle/minecart/AbstractMinecart.java
+@@ -307,7 +307,7 @@ public abstract class AbstractMinecart extends VehicleEntity {
+ 
+         this.checkBelowWorld();
+         this.computeSpeed();
+-        if (org.leavesmc.leaves.LeavesConfig.fix.vanillaPortalHandle) this.handlePortal(); // CraftBukkit - handled in postTick // Leaves - vanilla
++        // this.handlePortal(); // CraftBukkit - handled in postTick
+         this.behavior.tick();
+         // CraftBukkit start
+         org.bukkit.World bworld = this.level().getWorld();
+diff --git a/net/minecraft/world/entity/vehicle/minecart/MinecartHopper.java b/net/minecraft/world/entity/vehicle/minecart/MinecartHopper.java
+--- a/net/minecraft/world/entity/vehicle/minecart/MinecartHopper.java
++++ b/net/minecraft/world/entity/vehicle/minecart/MinecartHopper.java
+@@ -102,13 +102,6 @@ public class MinecartHopper extends AbstractMinecartContainer implements Hopper
+         }
+     }
+ 
+-    // Leaves start - tick every
+-    @Override
+-    public void inactiveTick() {
+-        this.tick();
+-    }
+-    // Leaves start - tick every
+-
+     public boolean suckInItems() {
+         if (HopperBlockEntity.suckInItems(this.level(), this)) {
+             this.immunize(); // Paper
+

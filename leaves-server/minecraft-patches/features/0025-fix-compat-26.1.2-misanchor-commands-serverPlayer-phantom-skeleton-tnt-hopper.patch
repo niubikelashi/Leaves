@@ -1,0 +1,171 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] fix(compat): 26.1.2 repair mis-anchored Leaves blocks (commands, server player, phantom, skeleton, tnt, hopper)
+
+--- a/net/minecraft/commands/Commands.java
++++ b/net/minecraft/commands/Commands.java
+@@ -186,8 +186,6 @@ public class Commands {
+             return !requirement.test(this.noPermissionSource);
+         }
+     };
+-    private final CommandDispatcher<CommandSourceStack> dispatcher = new CommandDispatcher<>();
+-
+     // Leaves start - force minecraft command
+     private final CommandDispatcher<CommandSourceStack> dispatcher = new CommandDispatcher<>() {
+ 
+@@ -203,6 +201,8 @@ public class Commands {
+         }
+     };
+     // Leaves end - force minecraft command
++
++    public Commands(final Commands.CommandSelection commandSelection, final CommandBuildContext context) {
+     // Paper start - Brigadier API - modern minecraft overloads that do not use redirects but are copies instead
+         this(commandSelection, context, false);
+     }
+--- a/net/minecraft/server/level/ServerPlayer.java
++++ b/net/minecraft/server/level/ServerPlayer.java
+@@ -3152,6 +3152,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+     @Override
+     public org.bukkit.craftbukkit.entity.CraftPlayer getBukkitEntity() {
+         return (org.bukkit.craftbukkit.entity.CraftPlayer) super.getBukkitEntity();
++    }
+ 
+     // Leaves start - player operation limiter
+     protected void resetOperationCountPerTick() {
+@@ -3179,6 +3180,5 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+         return (instaBreakCountPerTick == 0 || placeBlockCountPerTick == 0) && (instaBreakCountPerTick <= 1 && placeBlockCountPerTick <= 2);
+     }
+     // Leaves end - player operation limiter
+-    }
+     // CraftBukkit end
+ }
+--- a/net/minecraft/world/entity/monster/Phantom.java
++++ b/net/minecraft/world/entity/monster/Phantom.java
+@@ -228,8 +228,6 @@ public class Phantom extends Mob implements Enemy {
+         return targetConditions.test(level, this, target);
+     }
+ 
+-    private enum AttackPhase {
+-        CIRCLE,
+     // Leaves start - renewable elytra
+     @Override
+     protected void dropFromLootTable(ServerLevel level, DamageSource source, boolean causedByPlayer) {
+@@ -244,6 +242,8 @@ public class Phantom extends Mob implements Enemy {
+     }
+     // Leaves end - renewable elytra
+ 
++    private enum AttackPhase {
++        CIRCLE,
+         SWOOP;
+     }
+ 
+--- a/net/minecraft/world/entity/monster/skeleton/Skeleton.java
++++ b/net/minecraft/world/entity/monster/skeleton/Skeleton.java
+@@ -130,7 +130,6 @@ public class Skeleton extends AbstractSkeleton {
+     SoundEvent getStepSound() {
+         return SoundEvents.SKELETON_STEP;
+     }
+-}
+ 
+     // Leaves start - spider jockeys drop gapples
+     @Override
+--- a/net/minecraft/world/level/block/TntBlock.java
++++ b/net/minecraft/world/level/block/TntBlock.java
+@@ -47,9 +47,10 @@ public class TntBlock extends Block {
+     @Override
+     protected void onPlace(final BlockState state, final Level level, final BlockPos pos, final BlockState oldState, final boolean movedByPiston) {
+         if (!oldState.is(state.getBlock())) {
+-            if (level.hasNeighborSignal(pos) && prime(level, pos, () -> org.bukkit.craftbukkit.event.CraftEventFactory.callTNTPrimeEvent(level, pos, org.bukkit.event.block.TNTPrimeEvent.PrimeCause.REDSTONE, null, null))) { // CraftBukkit - TNTPrimeEvent
+                 level.removeBlock(pos, false);
+             if (level.hasNeighborSignal(pos) && !org.leavesmc.leaves.LeavesConfig.modify.noTNTPlaceUpdate && prime(level, pos, () -> org.bukkit.craftbukkit.event.CraftEventFactory.callTNTPrimeEvent(level, pos, org.bukkit.event.block.TNTPrimeEvent.PrimeCause.REDSTONE, null, null))) { // CraftBukkit - TNTPrimeEvent // Leaves - prevent update
++                level.removeBlock(pos, false);
++            }
+         }
+     }
+ 
+--- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
++++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+@@ -273,58 +273,36 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+         final int movedItemCount = Math.min(level.spigotConfig.hopperAmount, originalItemCount);
+         container.setChanged(); // original logic always marks source inv as changed even if no move happens.
+         movedItem.setCount(movedItemCount);
+-        // Leaves start - fix vanilla
+-        if (org.leavesmc.leaves.LeavesConfig.fix.vanillaHopper && movedItem.getCount() <= movedItemCount) {
+-            if (!skipPullModeEventFire) {
+-                movedItem = callPullMoveEvent(hopper, container, movedItem);
+-                if (movedItem == null) { // cancelled
+-                    origItemStack.setCount(originalItemCount);
+-                    // Drastically improve performance by returning true.
+-                    // No plugin could have relied on the behavior of false as the other call
+-                    // site for IMIE did not exhibit the same behavior
+-                    return true;
+-                }
++
++        if (!skipPullModeEventFire) {
++            movedItem = callPullMoveEvent(hopper, container, movedItem);
++            if (movedItem == null) { // cancelled
++                origItemStack.setCount(originalItemCount);
++                // Drastically improve performance by returning true.
++                // No plugin could have relied on the behavior of false as the other call
++                // site for IMIE did not exhibit the same behavior
++                return true;
+             }
+-            movedItem = origItemStack.copy();
+-            final ItemStack remainingItem = addItem(container, hopper,  container.removeItem(i, movedItemCount), null);
+-            if (remainingItem.isEmpty()) {
+-                container.setChanged();
+         }
+ 
+-            container.setItem(i, movedItem);
+-        } else {
+-            container.setChanged(); // original logic always marks source inv as changed even if no move happens.
+-            movedItem.setCount(movedItemCount);
++        final ItemStack remainingItem = addItem(container, hopper, movedItem, null);
+         final int remainingItemCount = remainingItem.getCount();
+-            if (!skipPullModeEventFire) {
+-                movedItem = callPullMoveEvent(hopper, container, movedItem);
+-                if (movedItem == null) { // cancelled
+-                    origItemStack.setCount(originalItemCount);
+-                    // Drastically improve performance by returning true.
+-                    // No plugin could have relied on the behavior of false as the other call
+-                    // site for IMIE did not exhibit the same behavior
+-                    return true;
+-                }
++        if (remainingItemCount != movedItemCount) {
++            origItemStack = origItemStack.copy(true);
++            origItemStack.setCount(originalItemCount);
++            if (!origItemStack.isEmpty()) {
++                origItemStack.setCount(originalItemCount - movedItemCount + remainingItemCount);
++            }
++
+             ignoreBlockEntityUpdates = true;
+             container.setItem(i, origItemStack);
+-            final ItemStack remainingItem = addItem(container, hopper, movedItem, null);
+-            final int remainingItemCount = remainingItem.getCount();
+-            if (remainingItemCount != movedItemCount) {
+-                origItemStack = origItemStack.copy(true);
+-                origItemStack.setCount(originalItemCount);
+-                if (!origItemStack.isEmpty()) {
+-                    origItemStack.setCount(originalItemCount - movedItemCount + remainingItemCount);
+-                }
+-
+-                ignoreBlockEntityUpdates = true;
+-                container.setItem(i, origItemStack);
+-                ignoreBlockEntityUpdates = false;
+-                container.setChanged();
+-                return true;
+-            }
+-            origItemStack.setCount(originalItemCount);
++            ignoreBlockEntityUpdates = false;
++            container.setChanged();
++            return true;
++        }
++        origItemStack.setCount(originalItemCount);
+ 
+-        // Leaves end - fix vanilla
++        if (level.paperConfig().hopper.cooldownWhenFull) {
+             applyCooldown(hopper);
+         }
+ 
+
