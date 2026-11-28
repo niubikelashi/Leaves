@@ -290,7 +290,7 @@ compat/26.1.2 第 1 轮证据（分支 `compat/26.1.2`，从 `8ba0135` 切出并
 
 用户指令（原话要点）：「一路构建到最新版本，先适配版本再回来修改」→ 先把版本适配跑通，低版本语义债之后再回补。
 
-- 目标版本：Minecraft / Paper **26.3**。基线 Paper 主干提交 `894b2e1eafd3630abe89d9701508834aa5a33977`（见 §3 的授权偏离说明）。分支 `compat/26.3`（从 `compat/26.2` 的 `6f2d7e6` 切出）。
+- 目标版本：Minecraft / Paper **26.3**。基线 Paper 主干提交 `894b2e1eafd3630abe89d9701508834aa5a33977`（见 §3 的授权偏离说明）。分支 `compat/26.3`（从 `compat/26.2` 的 `6f2d7e6` 切出），外层最终 commit **`e549c5eda5c33b2678cfd20504a1d74280c3c78f`**，已 push origin（GitHub API 复核 remote `compat/26.3` = `e549c5e…`），tag `leaves-26.3-compat`（annotated object `603932cd…`，指向 `e549c5e`）已 push。产物构建后重跑了一次（`26.3-gradle-final.log`，BUILD SUCCESSFUL in 3m 9s），使 jar 内嵌 `Git-Branch: compat/26.3` / `Git-Commit: e549c5e` 与实际 ref 一致。
 - 配置：`gradle.properties` `version=26.3-R0.1-SNAPSHOT` / `mcVersion=26.3` / `paperRef=894b2e1ea…` / `apiVersion=26.3`；wrapper `gradle-9.8.0-bin.zip`（`GradleWrapperMain` 不受 `org.gradle.jvmargs` 影响，TLS 靠 cmd 环境 `JAVA_OPTS=-Djavax.net.ssl.trustStore=…`）；JDK 25（`languageVersion=JavaLanguageVersion.of(25)`、`options.release=25`）；插件 `org.leavesmc.leavesweight.{core,patcher}` 2.2.0-SNAPSHOT、`org.leavesmc:leavesclip:3.0.10`。
 - 补丁层重建：`tools/chain_gen.py`（base：mc fork `8dc1e41`「leaves File Patches」、paper-server `7d6d0fbf4`「leaves paperServer File Patches」；orig 层传 baseline 原始目录）。结果 mc **43 patch / deferred 109**（日志 `26.3-chain-mc6.txt`，层 `mc-layer-263e`，延期 `deferred-26.3-mc-e`）；paper-server **15 / deferred 5**（`26.3-chain-ps.txt`）；paper-api **9 / deferred 0**。
   - 坑：base 提交 `8dc1e41` 自身生成的补丁是空补丁，`git am` 报 `Patch is empty.` → 从层里删掉（`0001-leaves-File-Patches.patch`），43 个补丁才可通过。
