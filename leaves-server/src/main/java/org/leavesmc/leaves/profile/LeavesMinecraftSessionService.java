@@ -1,17 +1,17 @@
 package org.leavesmc.leaves.profile;
 
 import com.destroystokyo.paper.profile.PaperMinecraftSessionService;
-import com.mojang.authlib.Environment;
+import com.destroystokyo.paper.profile.PaperServicesDiscoveryService;
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.HttpAuthenticationService;
-import com.mojang.authlib.minecraft.client.MinecraftClient;
+import com.mojang.authlib.HttpDiscoveryService; // Leaves - 26.3 compat: authlib 10 moved constantURL/buildQuery/concatenateURL onto HttpDiscoveryService
 import com.mojang.authlib.exceptions.AuthenticationUnavailableException;
 import com.mojang.authlib.exceptions.MinecraftClientException;
-import com.mojang.authlib.yggdrasil.ProfileActionType;
-import com.mojang.authlib.yggdrasil.ProfileResult;
-import com.mojang.authlib.yggdrasil.ServicesKeySet;
-import com.mojang.authlib.yggdrasil.response.HasJoinedMinecraftServerResponse;
-import com.mojang.authlib.yggdrasil.response.ProfileAction;
+import com.mojang.authlib.minecraft.client.MinecraftClient;
+import com.mojang.authlib.services.ProfileActionType;
+import com.mojang.authlib.services.ProfileResult;
+import com.mojang.authlib.services.ServicesKeySet;
+import com.mojang.authlib.services.response.HasJoinedMinecraftServerResponse;
+import com.mojang.authlib.services.response.ProfileAction;
 import io.papermc.paper.profile.MutablePropertyMap;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -32,12 +32,12 @@ import java.util.stream.Collectors;
 
 public class LeavesMinecraftSessionService extends PaperMinecraftSessionService {
 
-    protected LeavesMinecraftSessionService(ServicesKeySet keySet, Proxy authenticationService, Environment environment) {
-        super(keySet, authenticationService, environment);
-        this.leavesClient = new MinecraftClient("Leaves/ExtraYggdrasil", authenticationService);
+    protected LeavesMinecraftSessionService(ServicesKeySet keySet, Proxy proxy, PaperServicesDiscoveryService discoveryService) {
+        super(keySet, proxy, discoveryService); // Leaves - 26.3 compat: the ctor takes the discovery service, not Environment
+        this.leavesClient = new MinecraftClient("Leaves/ExtraYggdrasil", proxy);
     }
 
-    // Leaves - 26.2 compat: authlib 9.x 的 YggdrasilMinecraftSessionService.client 不再可见，改用自建 MinecraftClient
+    // Leaves - 26.3 compat: authlib 10 no longer exposes the session service's HTTP client, so Leaves keeps its own
     private final MinecraftClient leavesClient;
 
     private static List<URL> extraYggdrasilList = List.of();
@@ -45,7 +45,7 @@ public class LeavesMinecraftSessionService extends PaperMinecraftSessionService 
     public static void initExtraYggdrasilList(List<String> extraYggdrasilServiceList) {
         List<URL> list = new ArrayList<>();
         for (String str : extraYggdrasilServiceList) {
-            list.add(HttpAuthenticationService.constantURL(str + "/sessionserver/session/minecraft/hasJoined"));
+            list.add(HttpDiscoveryService.constantURL(str + "/sessionserver/session/minecraft/hasJoined"));
         }
         extraYggdrasilList = Collections.unmodifiableList(list);
     }
@@ -69,13 +69,14 @@ public class LeavesMinecraftSessionService extends PaperMinecraftSessionService 
                 arguments.put("ip", address.getHostAddress());
             }
 
+            // Leaves - 26.3 compat: nameToIdCache exposes get(name) -> Optional<NameAndId>; getIfCached is gone
             NameAndId cache = null;
             if (LeavesConfig.mics.yggdrasil.loginProtect) {
-                cache = MinecraftServer.getServer().services().nameToIdCache().getIfCached(profileName);
+                cache = MinecraftServer.getServer().services().nameToIdCache().get(profileName).orElse(null);
             }
 
             for (URL checkUrl : extraYggdrasilList) {
-                URL url = HttpAuthenticationService.concatenateURL(checkUrl, HttpAuthenticationService.buildQuery(arguments));
+                URL url = HttpDiscoveryService.concatenateURL(checkUrl, HttpDiscoveryService.buildQuery(arguments));
                 try {
                     final HasJoinedMinecraftServerResponse response = leavesClient.get(url, HasJoinedMinecraftServerResponse.class);
                     if (response != null && response.id() != null) {

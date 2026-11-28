@@ -7,7 +7,7 @@ Subject: [PATCH] Disable offline warn if use proxy
 diff --git a/ca/spottedleaf/moonrise/paper/PaperHooks.java b/ca/spottedleaf/moonrise/paper/PaperHooks.java
 --- a/ca/spottedleaf/moonrise/paper/PaperHooks.java
 +++ b/ca/spottedleaf/moonrise/paper/PaperHooks.java
-@@ -29,7 +29,7 @@ import net.minecraft.world.phys.AABB;
+@@ -30,7 +30,7 @@ import net.minecraft.world.phys.AABB;
  import java.util.List;
  import java.util.function.Predicate;
  
@@ -45,22 +45,10 @@ diff --git a/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java b/ca/
      public static boolean getEntityHardCollisions(final Level world, final Entity entity, AABB aabb,
                                                    final List<AABB> into, final int collisionFlags, final Predicate<Entity> predicate) {
          final boolean checkOnly = (collisionFlags & COLLISION_FLAG_CHECK_ONLY) != 0;
-diff --git a/net/minecraft/advancements/Advancement.java b/net/minecraft/advancements/Advancement.java
---- a/net/minecraft/advancements/Advancement.java
-+++ b/net/minecraft/advancements/Advancement.java
-@@ -64,7 +64,7 @@ public record Advancement(
-     ) {
-         this(parent, display, rewards, Map.copyOf(criteria), requirements, sendsTelemetryEvent, display.map(Advancement::decorateName));
-     }
--        this(parent, display, rewards, !org.leavesmc.leaves.LeavesConfig.performance.skipCloningAdvancementCriteria ? Map.copyOf(criteria) : criteria, requirements, sendsTelemetryEvent, display.map(Advancement::decorateName)); // Leaves - skip cloning advancement criteria
-+
-     private static DataResult<Advancement> validate(final Advancement advancement) {
-         return advancement.requirements().validate(advancement.criteria().keySet()).map(r -> advancement);
-     }
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1292,7 +1292,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1276,7 +1276,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                  LOGGER.info("*************************************************************************************");
                  LOGGER.info("This is the first time you're starting this server.");
                  LOGGER.info("It's recommended you read our 'Getting Started' documentation for guidance.");
@@ -69,7 +57,7 @@ diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/Mi
                  LOGGER.info("*************************************************************************************");
              }
              // Paper end - Add onboarding message for initial server start
-@@ -1950,7 +1950,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1934,7 +1934,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      public String getServerModName() {
          return io.papermc.paper.ServerBuildInfo.buildInfo().brandName(); // Paper
      }
@@ -122,7 +110,7 @@ diff --git a/net/minecraft/server/gui/MinecraftServerGui.java b/net/minecraft/se
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
-@@ -2362,21 +2362,9 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+@@ -2629,21 +2629,9 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
          // Paper end
      }
  
@@ -147,7 +135,7 @@ diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -1000,9 +1000,6 @@ public abstract class PlayerList {
+@@ -1005,9 +1005,6 @@ public abstract class PlayerList {
          //player.connection.send(new ClientboundSetChunkCacheRadiusPacket(io.papermc.paper.FeatureHooks.getViewDistance(level))); // Paper - rewrite chunk system
          //player.connection.send(new ClientboundSetSimulationDistancePacket(io.papermc.paper.FeatureHooks.getSimulationDistance(level))); // Paper - rewrite chunk system
          // Paper end - view distances
@@ -160,7 +148,7 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -868,7 +868,6 @@ public abstract class Entity
+@@ -889,7 +889,6 @@ public abstract class Entity
  
      // CraftBukkit start
      public void postTick() {
@@ -168,7 +156,7 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
          // No clean way to break out of ticking once the entity has been copied to a new world, so instead we move the portalling later in the tick cycle
          if (!(this instanceof ServerPlayer) && this.isAlive()) { // Paper - don't attempt to teleport dead entities
              this.handlePortal();
-@@ -890,7 +889,7 @@ public abstract class Entity
+@@ -911,7 +910,7 @@ public abstract class Entity
              this.boardingCooldown--;
          }
  
@@ -180,7 +168,7 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
 diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
-@@ -3433,7 +3433,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+@@ -3440,7 +3440,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
              }
          }
  
@@ -207,7 +195,7 @@ diff --git a/net/minecraft/world/entity/ai/gossip/GossipType.java b/net/minecraf
 diff --git a/net/minecraft/world/entity/item/ItemEntity.java b/net/minecraft/world/entity/item/ItemEntity.java
 --- a/net/minecraft/world/entity/item/ItemEntity.java
 +++ b/net/minecraft/world/entity/item/ItemEntity.java
-@@ -128,9 +128,6 @@ public class ItemEntity extends Entity implements TraceableEntity {
+@@ -121,9 +121,6 @@ public class ItemEntity extends Entity implements TraceableEntity {
      // Paper start - EAR 2
      @Override
      public void inactiveTick() {
@@ -217,7 +205,7 @@ diff --git a/net/minecraft/world/entity/item/ItemEntity.java b/net/minecraft/wor
          super.inactiveTick();
          if (this.pickupDelay > 0 && this.pickupDelay != 32767) {
              this.pickupDelay--;
-@@ -148,8 +145,6 @@ public class ItemEntity extends Entity implements TraceableEntity {
+@@ -141,8 +138,6 @@ public class ItemEntity extends Entity implements TraceableEntity {
              // CraftBukkit end
              this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.DESPAWN); // CraftBukkit - add Bukkit remove cause
          }
@@ -226,22 +214,10 @@ diff --git a/net/minecraft/world/entity/item/ItemEntity.java b/net/minecraft/wor
      }
      // Paper end - EAR 2
  
-diff --git a/net/minecraft/world/entity/monster/EnderMan.java b/net/minecraft/world/entity/monster/EnderMan.java
---- a/net/minecraft/world/entity/monster/EnderMan.java
-+++ b/net/minecraft/world/entity/monster/EnderMan.java
-@@ -431,7 +431,7 @@ public class EnderMan extends Monster implements NeutralMob {
-     @Override
-     public boolean requiresCustomPersistence() {
-         return super.requiresCustomPersistence() || this.getCarriedBlock() != null;
--        return super.requiresCustomPersistence() || (!org.leavesmc.leaves.LeavesConfig.modify.despawnEndermanWithBlock && this.getCarriedBlock() != null); // Leaves - despawn enderman with block
-+    }
- 
-     private static class EndermanFreezeWhenLookedAt extends Goal {
-         private final EnderMan enderman;
 diff --git a/net/minecraft/world/entity/monster/skeleton/Skeleton.java b/net/minecraft/world/entity/monster/skeleton/Skeleton.java
 --- a/net/minecraft/world/entity/monster/skeleton/Skeleton.java
 +++ b/net/minecraft/world/entity/monster/skeleton/Skeleton.java
-@@ -132,25 +132,3 @@ public class Skeleton extends AbstractSkeleton {
+@@ -83,25 +83,3 @@ public class Skeleton extends AbstractSkeleton {
          return SoundEvents.SKELETON_STEP;
      }
  }
@@ -305,7 +281,7 @@ diff --git a/net/minecraft/world/entity/monster/zombie/ZombifiedPiglin.java b/ne
 diff --git a/net/minecraft/world/entity/player/Inventory.java b/net/minecraft/world/entity/player/Inventory.java
 --- a/net/minecraft/world/entity/player/Inventory.java
 +++ b/net/minecraft/world/entity/player/Inventory.java
-@@ -175,13 +175,6 @@ public class Inventory implements Container, Nameable {
+@@ -177,13 +177,6 @@ public class Inventory implements Container, Nameable {
      // CraftBukkit start - Watch method above! :D
      public int canHold(ItemStack itemStack) {
          int remains = itemStack.getCount();
@@ -322,7 +298,7 @@ diff --git a/net/minecraft/world/entity/player/Inventory.java b/net/minecraft/wo
 diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
-@@ -2078,10 +2078,8 @@ public abstract class Player extends Avatar implements ContainerUser {
+@@ -2073,10 +2073,8 @@ public abstract class Player extends Avatar implements ContainerUser {
  
          if (anyEventCancelled.booleanValue() && !this.abilities.instabuild && this instanceof final ServerPlayer player) this.resyncUsingItem(player); // Paper - resync if no item matched the Predicate
          return this.hasInfiniteMaterials() ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
@@ -338,7 +314,7 @@ diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world
 diff --git a/net/minecraft/world/entity/vehicle/minecart/AbstractMinecart.java b/net/minecraft/world/entity/vehicle/minecart/AbstractMinecart.java
 --- a/net/minecraft/world/entity/vehicle/minecart/AbstractMinecart.java
 +++ b/net/minecraft/world/entity/vehicle/minecart/AbstractMinecart.java
-@@ -307,7 +307,7 @@ public abstract class AbstractMinecart extends VehicleEntity {
+@@ -308,7 +308,7 @@ public abstract class AbstractMinecart extends VehicleEntity {
  
          this.checkBelowWorld();
          this.computeSpeed();
@@ -350,7 +326,7 @@ diff --git a/net/minecraft/world/entity/vehicle/minecart/AbstractMinecart.java b
 diff --git a/net/minecraft/world/level/block/BambooStalkBlock.java b/net/minecraft/world/level/block/BambooStalkBlock.java
 --- a/net/minecraft/world/level/block/BambooStalkBlock.java
 +++ b/net/minecraft/world/level/block/BambooStalkBlock.java
-@@ -109,10 +109,6 @@ public class BambooStalkBlock extends Block implements BonemealableBlock {
+@@ -102,10 +102,6 @@ public class BambooStalkBlock extends Block implements BonemealableBlock {
          if (!state.canSurvive(level, pos)) {
              level.destroyBlock(pos, true);
          }
@@ -364,7 +340,7 @@ diff --git a/net/minecraft/world/level/block/BambooStalkBlock.java b/net/minecra
 diff --git a/net/minecraft/world/level/block/CactusBlock.java b/net/minecraft/world/level/block/CactusBlock.java
 --- a/net/minecraft/world/level/block/CactusBlock.java
 +++ b/net/minecraft/world/level/block/CactusBlock.java
-@@ -48,10 +48,6 @@ public class CactusBlock extends Block {
+@@ -41,10 +41,6 @@ public class CactusBlock extends Block {
          if (!state.canSurvive(level, pos)) {
              level.destroyBlock(pos, true);
          }
@@ -378,7 +354,7 @@ diff --git a/net/minecraft/world/level/block/CactusBlock.java b/net/minecraft/wo
 diff --git a/net/minecraft/world/level/block/ChorusFlowerBlock.java b/net/minecraft/world/level/block/ChorusFlowerBlock.java
 --- a/net/minecraft/world/level/block/ChorusFlowerBlock.java
 +++ b/net/minecraft/world/level/block/ChorusFlowerBlock.java
-@@ -48,9 +48,6 @@ public class ChorusFlowerBlock extends Block {
+@@ -37,9 +37,6 @@ public class ChorusFlowerBlock extends Block {
          if (!state.canSurvive(level, pos)) {
              level.destroyBlock(pos, true);
          }
@@ -391,7 +367,7 @@ diff --git a/net/minecraft/world/level/block/ChorusFlowerBlock.java b/net/minecr
 diff --git a/net/minecraft/world/level/block/GrowingPlantHeadBlock.java b/net/minecraft/world/level/block/GrowingPlantHeadBlock.java
 --- a/net/minecraft/world/level/block/GrowingPlantHeadBlock.java
 +++ b/net/minecraft/world/level/block/GrowingPlantHeadBlock.java
-@@ -160,15 +160,4 @@ public abstract class GrowingPlantHeadBlock extends GrowingPlantBlock implements
+@@ -156,15 +156,4 @@ public abstract class GrowingPlantHeadBlock extends GrowingPlantBlock implements
      protected GrowingPlantHeadBlock getHeadBlock() {
          return this;
      }
@@ -410,7 +386,7 @@ diff --git a/net/minecraft/world/level/block/GrowingPlantHeadBlock.java b/net/mi
 diff --git a/net/minecraft/world/level/block/SugarCaneBlock.java b/net/minecraft/world/level/block/SugarCaneBlock.java
 --- a/net/minecraft/world/level/block/SugarCaneBlock.java
 +++ b/net/minecraft/world/level/block/SugarCaneBlock.java
-@@ -44,10 +44,6 @@ public class SugarCaneBlock extends Block {
+@@ -37,10 +37,6 @@ public class SugarCaneBlock extends Block {
          if (!state.canSurvive(level, pos)) {
              level.destroyBlock(pos, true);
          }
@@ -424,7 +400,7 @@ diff --git a/net/minecraft/world/level/block/SugarCaneBlock.java b/net/minecraft
 diff --git a/net/minecraft/world/level/chunk/LevelChunk.java b/net/minecraft/world/level/chunk/LevelChunk.java
 --- a/net/minecraft/world/level/chunk/LevelChunk.java
 +++ b/net/minecraft/world/level/chunk/LevelChunk.java
-@@ -751,11 +751,6 @@ public class LevelChunk extends ChunkAccess implements DebugValueSource, ca.spot
+@@ -753,11 +753,6 @@ public class LevelChunk extends ChunkAccess implements DebugValueSource, ca.spot
          this.loaded = loaded;
      }
  

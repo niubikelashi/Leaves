@@ -174,7 +174,7 @@ public abstract class Display {
             case SlotDisplay.Empty ignored -> EntryIngredient.empty();
             case SlotDisplay.ItemSlotDisplay s -> EntryIngredient.of(s.item().value());
             case SlotDisplay.ItemStackSlotDisplay s -> EntryIngredient.of(s.stack().create());
-            case SlotDisplay.TagSlotDisplay s -> ofItemTag(s.tag());
+            case SlotDisplay.TagSlotDisplay s -> ofItemTagHolders(s.tag()); // Leaves - 26.3 compat: TagSlotDisplay now carries HolderSet<Item>, not TagKey
             case SlotDisplay.Composite s -> {
                 ArrayList<ItemStack> list = new ArrayList<>();
                 for (SlotDisplay slotDisplay : s.contents()) {
@@ -187,9 +187,9 @@ public abstract class Display {
             default -> {
                 RegistryAccess access = MinecraftServer.getServer().registryAccess();
                 try {
-                    List<ItemStack> stacks = slot.resolveForStacks(new ContextMap.Builder()
-                        .withParameter(SlotDisplayContext.REGISTRIES, access)
-                        .create(SlotDisplayContext.CONTEXT));
+                    List<ItemStack> stacks = slot.resolveForStacks(ContextMap.builder() // Leaves - 26.3 compat: ContextMap.Builder()/withParameter/create replaced by builder().set().buildAndValidate()
+                        .set(SlotDisplayContext.REGISTRIES, access)
+                        .buildAndValidate(SlotDisplayContext.CONTEXT));
                     yield EntryIngredient.of(stacks.toArray(new ItemStack[0]));
                 } catch (Exception e) {
                     MinecraftServer.LOGGER.warn("Failed to resolve slot display: {}", slot, e);
@@ -228,6 +228,25 @@ public abstract class Display {
         List<ItemStack> stackList = new ArrayList<>();
         for (Holder<T> t : holders) {
             ItemStack stack = new ItemStack(t.value());
+            if (!stack.isEmpty()) {
+                stackList.add(stack);
+            }
+        }
+        return EntryIngredient.of(stackList.toArray(new ItemStack[0]));
+    }
+
+    // Leaves - 26.3 compat: SlotDisplay.TagSlotDisplay hands back a HolderSet<Item> directly
+    public static EntryIngredient ofItemTagHolders(HolderSet<Item> holders) {
+        int size = holders.size();
+        if (size == 0) {
+            return EntryIngredient.empty();
+        }
+        if (size == 1) {
+            return EntryIngredient.of(new ItemStack(holders.get(0).value()));
+        }
+        List<ItemStack> stackList = new ArrayList<>();
+        for (Holder<Item> holder : holders) {
+            ItemStack stack = new ItemStack(holder.value());
             if (!stack.isEmpty()) {
                 stackList.add(stack);
             }

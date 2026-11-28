@@ -7,7 +7,7 @@ Subject: [PATCH] fix(compat): 26.2 修正 bow 弹药参数/蜘蛛重复注解/�
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
-@@ -2397,6 +2397,13 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+@@ -2664,6 +2664,13 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
          return this.players;
      }
  
@@ -51,7 +51,7 @@ diff --git a/net/minecraft/world/entity/monster/spider/Spider.java b/net/minecra
 diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
-@@ -2078,7 +2078,7 @@ public abstract class Player extends Avatar implements ContainerUser {
+@@ -2073,7 +2073,7 @@ public abstract class Player extends Avatar implements ContainerUser {
  
          // Leaves start - bow infinity fix
          if ((org.leavesmc.leaves.LeavesConfig.modify.bowInfinityFix || anyEventCancelled.booleanValue()) && !this.abilities.instabuild && this instanceof final ServerPlayer player) this.resyncUsingItem(player); // Paper - resync if no item matched the Predicate
@@ -63,7 +63,7 @@ diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world
 diff --git a/net/minecraft/world/level/chunk/LevelChunk.java b/net/minecraft/world/level/chunk/LevelChunk.java
 --- a/net/minecraft/world/level/chunk/LevelChunk.java
 +++ b/net/minecraft/world/level/chunk/LevelChunk.java
-@@ -1016,10 +1016,11 @@ public class LevelChunk extends ChunkAccess implements DebugValueSource, ca.spot
+@@ -1018,10 +1018,11 @@ public class LevelChunk extends ChunkAccess implements DebugValueSource, ca.spot
          void run(LevelChunk levelChunk);
      }
  

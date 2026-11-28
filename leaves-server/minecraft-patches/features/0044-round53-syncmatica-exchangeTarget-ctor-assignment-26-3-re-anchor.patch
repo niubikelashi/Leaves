@@ -1,20 +1,18 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Leaves compat <compat@leavesmc.org>
 Date: Mon, 1 Jan 2024 00:00:00 +0000
-Subject: [PATCH] Syncmatica Protocol
+Subject: [PATCH] [PATCH] round53: syncmatica exchangeTarget ctor assignment (26.3 re-anchor)
 
 
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -339,6 +339,9 @@ public class ServerGamePacketListenerImpl
-         player.connection = this;
-         player.getTextFilter().join();
-         this.signedMessageDecoder = SignedMessageChain.Decoder.unsigned(player.getUUID(), server::enforceSecureProfile);
-+        this.exchangeTarget = new org.leavesmc.leaves.protocol.syncmatica.exchange.ExchangeTarget(this); // Leaves - Syncmatica Protocol
-+    public final org.leavesmc.leaves.protocol.syncmatica.exchange.ExchangeTarget exchangeTarget; // Leaves - Syncmatica Protocol
-+
-         this.chatMessageChain = new FutureChain(server.chatExecutor); // CraftBukkit - async chat
+@@ -351,6 +351,7 @@ public class ServerGamePacketListenerImpl
+         this.commandSuggestionsProvider = new ServerCommandSuggestionsProvider(player);
          this.tickEndEvent = new io.papermc.paper.event.packet.ClientTickEndEvent(player.getBukkitEntity()); // Paper - add client tick end event
          this.playerGameConnection = new io.papermc.paper.connection.PaperPlayerGameConnection(this); // Paper
++        this.exchangeTarget = new org.leavesmc.leaves.protocol.syncmatica.exchange.ExchangeTarget(this); // Leaves - Syncmatica Protocol (26.3 re-anchor: ctor assignment was mis-anchored in round50)
+     }
+ 
+     // Paper start - configuration phase API
 

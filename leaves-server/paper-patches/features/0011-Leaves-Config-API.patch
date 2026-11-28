@@ -1,13 +1,13 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Leaves compat <compat@leavesmc.org>
 Date: Mon, 1 Jan 2024 00:00:00 +0000
-Subject: [PATCH] Leaves Config API
+Subject: [PATCH] [PATCH] Leaves Config API
 
 
 diff --git a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
 --- a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
 +++ b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
-@@ -320,7 +320,11 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -322,7 +322,11 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
          try {
              return super.createWorldConfig(contextMap);
          } catch (IOException exception) {
@@ -20,7 +20,7 @@ diff --git a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.ja
          }
      }
  
-@@ -336,6 +340,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -338,6 +342,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
              for (ServerLevel level : server.getAllLevels()) {
                  this.createWorldConfig(createWorldContextMap(level), reloader(this.worldConfigClass, level.paperConfig()));
              }
@@ -31,7 +31,7 @@ diff --git a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.ja
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -415,6 +415,8 @@ public final class CraftServer implements Server {
+@@ -398,6 +398,8 @@ public final class CraftServer implements Server {
  
          CraftRegistry.setMinecraftRegistry(console.registryAccess());
  
@@ -40,7 +40,7 @@ diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/ja
          if (!Main.useConsole) {
              this.getLogger().info("Console input is disabled due to --noconsole command argument");
          }
-@@ -2981,3 +2983,18 @@ public final class CraftServer implements Server {
+@@ -2992,3 +2994,18 @@ public final class CraftServer implements Server {
      }
      // Leaves end - Bot API
  }
@@ -90,7 +90,7 @@ diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftComplexPart.java b
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -3310,6 +3310,18 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
+@@ -3322,6 +3322,18 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
              }
          }
  

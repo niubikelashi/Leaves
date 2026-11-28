@@ -7,7 +7,7 @@ Subject: [PATCH] Renewable Elytra
 diff --git a/net/minecraft/world/entity/monster/Phantom.java b/net/minecraft/world/entity/monster/Phantom.java
 --- a/net/minecraft/world/entity/monster/Phantom.java
 +++ b/net/minecraft/world/entity/monster/Phantom.java
-@@ -230,6 +230,20 @@ public class Phantom extends Mob implements Enemy {
+@@ -223,6 +223,20 @@ public class Phantom extends Mob implements Enemy {
  
      private enum AttackPhase {
          CIRCLE,

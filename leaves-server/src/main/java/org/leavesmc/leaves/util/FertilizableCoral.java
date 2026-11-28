@@ -1,5 +1,6 @@
 package org.leavesmc.leaves.util;
 
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
@@ -9,46 +10,49 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.BaseCoralPlantTypeBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BonemealableBlock;
+import net.minecraft.world.level.block.BonemealSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.CoralClawFeature;
-import net.minecraft.world.level.levelgen.feature.CoralFeature;
-import net.minecraft.world.level.levelgen.feature.CoralMushroomFeature;
 import net.minecraft.world.level.levelgen.feature.CoralTreeFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.CuboidPlacement;
+import net.minecraft.world.level.levelgen.feature.SimpleBlockFeature;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
+import net.minecraft.world.level.levelgen.placement.OffsetPlacement;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.minecraft.world.level.levelgen.placement.RandomChancePlacement;
 import net.minecraft.world.level.material.MapColor;
 import org.jetbrains.annotations.NotNull;
 
 // Powered by fabric-carpet/src/main/java/carpet/helpers/FertilizableCoral.java
+// Leaves - 26.3 adaptation: vanilla rewrote coral worldgen. CoralClawFeature/CoralTreeFeature are now
+// records holding a Holder<PlacedFeature> (the coral block feature), CoralMushroomFeature/NoneFeatureConfiguration
+// are gone, and BonemealableBlock gained the BonemealSource parameter. The block colour the old code picked is now
+// fed to the inner block feature, so the colour-matching semantics are preserved; the third variant is rebuilt from
+// vanilla's own placement stack (vertical offset + cuboid + 0.9 chance).
 public interface FertilizableCoral extends BonemealableBlock {
 
     boolean isEnabled();
 
     @Override
-    default boolean isValidBonemealTarget(@NotNull LevelReader world, @NotNull BlockPos pos, @NotNull BlockState state) {
+    default boolean isValidBonemealTarget(@NotNull LevelReader world, @NotNull BlockPos pos, @NotNull BlockState state, BonemealSource source) {
         return isEnabled() && state.getValue(BaseCoralPlantTypeBlock.WATERLOGGED) && world.getFluidState(pos.above()).is(FluidTags.WATER);
     }
 
     @Override
-    default boolean isBonemealSuccess(@NotNull Level world, RandomSource random, @NotNull BlockPos pos, @NotNull BlockState state) {
+    default boolean isBonemealSuccess(@NotNull Level world, RandomSource random, @NotNull BlockPos pos, @NotNull BlockState state, BonemealSource source) {
         ((ServerLevel) world).sendParticles(ParticleTypes.HAPPY_VILLAGER, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 8, 0.3, 0.5, 0.3, 0.0);
         return random.nextFloat() < 0.15D;
     }
 
     @Override
-    default void performBonemeal(@NotNull ServerLevel worldIn, RandomSource random, @NotNull BlockPos pos, @NotNull BlockState blockUnder) {
-        int variant = random.nextInt(3);
-        CoralFeature coral = switch (variant) {
-            case 0 -> new CoralClawFeature(NoneFeatureConfiguration.CODEC);
-            case 1 -> new CoralTreeFeature(NoneFeatureConfiguration.CODEC);
-            default -> new CoralMushroomFeature(NoneFeatureConfiguration.CODEC);
-        };
-
+    default void performBonemeal(@NotNull ServerLevel worldIn, RandomSource random, @NotNull BlockPos pos, @NotNull BlockState blockUnder, BonemealSource source) {
         MapColor color = blockUnder.getMapColor(worldIn, pos);
         BlockState properBlock = blockUnder;
         HolderSet.Named<Block> coralBlocks = worldIn.registryAccess().lookupOrThrow(Registries.BLOCK).getOrThrow(BlockTags.CORAL_BLOCKS);
@@ -58,9 +62,27 @@ public interface FertilizableCoral extends BonemealableBlock {
                 break;
             }
         }
+
+        int variant = random.nextInt(3);
+        SimpleBlockFeature coralBlockFeature = new SimpleBlockFeature(Holder.direct(BlockStateProvider.of(properBlock)));
+        PlacedFeature coralBlockPlaced = new PlacedFeature(Holder.direct(coralBlockFeature), List.of());
+        PlacedFeature coral = switch (variant) {
+            case 0 -> new PlacedFeature(Holder.direct(new CoralClawFeature(Holder.direct(coralBlockPlaced))), List.of());
+            case 1 -> new PlacedFeature(Holder.direct(new CoralTreeFeature(Holder.direct(coralBlockPlaced))), List.of());
+            // Leaves - vanilla "coral hill"/mushroom shape, rebuilt from the vanilla placement stack
+            default -> new PlacedFeature(
+                Holder.direct(coralBlockFeature),
+                List.of(
+                    OffsetPlacement.vertical(UniformInt.of(-3, -1)),
+                    new CuboidPlacement(UniformInt.of(3, 5), UniformInt.of(3, 5), false, false),
+                    new RandomChancePlacement(0.9F)
+                )
+            );
+        };
+
         worldIn.setBlock(pos, Blocks.WATER.defaultBlockState(), Block.UPDATE_NONE);
 
-        if (!coral.placeFeature(worldIn, random, pos, properBlock)) {
+        if (!coral.place(worldIn, worldIn.getChunkSource().getGenerator(), random, pos)) {
             worldIn.setBlock(pos, blockUnder, 3);
         } else {
             if (worldIn.getRandom().nextInt(10) == 0) {

@@ -51,7 +51,8 @@ public class ElytraAeronauticsHelper {
                     lookAngle.y * 0.1 + (lookAngle.y * 1.5 - deltaMovement.y) * 0.5,
                     lookAngle.z * 0.1 + (lookAngle.z * 1.5 - deltaMovement.z) * 0.5
                 ));
-                firework.attachedToEntity.hurtMarked = true;
+                // Leaves - 26.3 compat: Entity.hurtMarked was removed; the motion packet above (players) plus
+                // ServerEntity's per-tick motion sync covers the same client-side update.
                 handHoldingItemAngle = firework.attachedToEntity.getHandHoldingItemAngle(Items.FIREWORK_ROCKET);
             } else {
                 handHoldingItemAngle = Vec3.ZERO;

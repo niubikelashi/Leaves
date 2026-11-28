@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Leaves compat <compat@leavesmc.org>
 Date: Mon, 1 Jan 2024 00:00:00 +0000
-Subject: [PATCH] Leaves Extra Yggdrasil Service
+Subject: [PATCH] [PATCH] Leaves Extra Yggdrasil Service
 
 
 diff --git a/src/main/java/io/papermc/paper/command/PaperPluginsCommand.java b/src/main/java/io/papermc/paper/command/PaperPluginsCommand.java
@@ -82,7 +82,7 @@ diff --git a/src/main/java/io/papermc/paper/command/brigadier/bukkit/BukkitBrigF
 diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 --- a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 +++ b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
-@@ -261,7 +261,7 @@ public class GlobalConfiguration extends ConfigurationPart {
+@@ -263,7 +263,7 @@ public class GlobalConfiguration extends ConfigurationPart {
              }
  
              public boolean isEnabled() {
@@ -94,7 +94,7 @@ diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.ja
 diff --git a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
 --- a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
 +++ b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
-@@ -320,11 +320,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -322,11 +322,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
          try {
              return super.createWorldConfig(contextMap);
          } catch (IOException exception) {
@@ -107,7 +107,7 @@ diff --git a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.ja
          }
      }
  
-@@ -340,7 +336,6 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -342,7 +338,6 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
              for (ServerLevel level : server.getAllLevels()) {
                  this.createWorldConfig(createWorldContextMap(level), reloader(this.worldConfigClass, level.paperConfig()));
              }
@@ -288,7 +288,7 @@ diff --git a/src/main/java/io/papermc/paper/plugin/storage/SimpleProviderStorage
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -2967,13 +2967,6 @@ public final class CraftServer implements Server {
+@@ -2978,13 +2978,6 @@ public final class CraftServer implements Server {
          this.console.addPluginAllowingSleep(plugin.getName(), value);
      }
  

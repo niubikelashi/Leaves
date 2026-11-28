@@ -1,7 +1,8 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: compat-bot <compat-bot@localhost>
-Date: Fri, 27 Nov 2026 07:09:58 +0000
-Subject: [PATCH] Delete Timings
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] [PATCH] Delete Timings
+
 
 diff --git a/src/main/java/co/aikar/timings/FullServerTickHandler.java b/src/main/java/co/aikar/timings/FullServerTickHandler.java
 deleted file mode 100644
@@ -2855,7 +2856,7 @@ deleted file mode 100644
 diff --git a/src/main/java/org/bukkit/command/Command.java b/src/main/java/org/bukkit/command/Command.java
 --- a/src/main/java/org/bukkit/command/Command.java
 +++ b/src/main/java/org/bukkit/command/Command.java
-@@ -32,16 +32,6 @@ public abstract class Command {
+@@ -38,16 +38,6 @@ public abstract class Command {
      protected String usageMessage;
      private String permission;
      private net.kyori.adventure.text.Component permissionMessage; // Paper
@@ -2875,7 +2876,7 @@ diff --git a/src/main/java/org/bukkit/command/Command.java b/src/main/java/org/b
 diff --git a/src/main/java/org/bukkit/command/FormattedCommandAlias.java b/src/main/java/org/bukkit/command/FormattedCommandAlias.java
 --- a/src/main/java/org/bukkit/command/FormattedCommandAlias.java
 +++ b/src/main/java/org/bukkit/command/FormattedCommandAlias.java
-@@ -14,7 +14,6 @@ public class FormattedCommandAlias extends Command {
+@@ -21,7 +21,6 @@ public class FormattedCommandAlias extends Command {
  
      public FormattedCommandAlias(@NotNull String alias, @NotNull String[] formatStrings) {
          super(alias);
@@ -2883,7 +2884,7 @@ diff --git a/src/main/java/org/bukkit/command/FormattedCommandAlias.java b/src/m
          this.formatStrings = formatStrings;
      }
  
-@@ -122,10 +121,6 @@ public class FormattedCommandAlias extends Command {
+@@ -129,10 +128,6 @@ public class FormattedCommandAlias extends Command {
          return formatString.trim(); // Paper - Causes an extra space at the end, breaks with brig commands
      }
  
@@ -2897,7 +2898,7 @@ diff --git a/src/main/java/org/bukkit/command/FormattedCommandAlias.java b/src/m
 diff --git a/src/main/java/org/bukkit/command/SimpleCommandMap.java b/src/main/java/org/bukkit/command/SimpleCommandMap.java
 --- a/src/main/java/org/bukkit/command/SimpleCommandMap.java
 +++ b/src/main/java/org/bukkit/command/SimpleCommandMap.java
-@@ -34,7 +34,6 @@ public class SimpleCommandMap implements CommandMap {
+@@ -41,7 +41,6 @@ public class SimpleCommandMap implements CommandMap {
          final ReloadCommand reload = new ReloadCommand("reload");
          this.knownCommands.put("bukkit:reload", reload);
          this.knownCommands.put("bukkit:rl", reload);
@@ -2905,7 +2906,7 @@ diff --git a/src/main/java/org/bukkit/command/SimpleCommandMap.java b/src/main/j
      }
  
      public void setFallbackCommands() {
-@@ -66,7 +65,6 @@ public class SimpleCommandMap implements CommandMap {
+@@ -73,7 +72,6 @@ public class SimpleCommandMap implements CommandMap {
       */
      @Override
      public boolean register(@NotNull String label, @NotNull String fallbackPrefix, @NotNull Command command) {
@@ -2913,7 +2914,7 @@ diff --git a/src/main/java/org/bukkit/command/SimpleCommandMap.java b/src/main/j
          label = label.toLowerCase(Locale.ROOT).trim();
          fallbackPrefix = fallbackPrefix.toLowerCase(Locale.ROOT).trim();
          boolean registered = register(label, command, false, fallbackPrefix);
-@@ -148,17 +146,9 @@ public class SimpleCommandMap implements CommandMap {
+@@ -155,17 +153,9 @@ public class SimpleCommandMap implements CommandMap {
              return false;
          }
  
@@ -2958,7 +2959,7 @@ diff --git a/src/main/java/org/spigotmc/CustomTimingsHandler.java b/src/main/jav
 deleted file mode 100644
 --- a/src/main/java/org/spigotmc/CustomTimingsHandler.java
 +++ /dev/null
-@@ -1,67 +0,0 @@
+@@ -1,71 +0,0 @@
 -/*
 - * This file is licensed under the MIT License (MIT).
 - *
@@ -2985,7 +2986,6 @@ deleted file mode 100644
 -package org.spigotmc;
 -
 -import org.bukkit.Bukkit;
--import org.jetbrains.annotations.NotNull;
 -import org.bukkit.plugin.AuthorNagException;
 -import co.aikar.timings.Timing;
 -import co.aikar.timings.Timings;
@@ -2996,33 +2996,39 @@ deleted file mode 100644
 -
 -/**
 - * This is here for legacy purposes incase any plugin used it.
-- *
+- * <p>
 - * If you use this, migrate ASAP as this will be removed in the future!
 - *
-- * @deprecated
 - * @see co.aikar.timings.Timings#of
+- * @deprecated Timings has been removed
 - */
 -@Deprecated(forRemoval = true)
 -public final class CustomTimingsHandler {
 -    private final Timing handler;
 -
--    public CustomTimingsHandler(@NotNull String name) {
+-    public CustomTimingsHandler(final String name) {
 -        Timing timing;
 -
 -        new AuthorNagException("Deprecated use of CustomTimingsHandler. Timings has been removed.").printStackTrace();
 -        try {
 -            final Method ofSafe = TimingsManager.class.getDeclaredMethod("getHandler", String.class, String.class, Timing.class);
 -            ofSafe.setAccessible(true);
--            timing = (Timing) ofSafe.invoke(null,"Minecraft", "(Deprecated API) " + name, null);
--        } catch (Exception e) {
+-            timing = (Timing) ofSafe.invoke(null, "Minecraft", "(Deprecated API) " + name, null);
+-        } catch (final Exception e) {
 -            e.printStackTrace();
 -            Bukkit.getLogger().log(Level.SEVERE, "This handler could not be registered");
 -            timing = Timings.NULL_HANDLER;
 -        }
--        handler = timing;
+-        this.handler = timing;
 -    }
 -
--    public void startTiming() { handler.startTiming(); }
--    public void stopTiming() { handler.stopTiming(); }
+-    public void startTiming() {
+-        this.handler.startTiming();
+-    }
+-
+-    public void stopTiming() {
+-        this.handler.stopTiming();
+-    }
 -
 -}
+

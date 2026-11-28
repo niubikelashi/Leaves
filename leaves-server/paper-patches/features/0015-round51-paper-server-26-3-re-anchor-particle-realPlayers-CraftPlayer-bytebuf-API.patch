@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] [PATCH] round51: paper-server 26.3 re-anchor（particle realPlayers + CraftPlayer bytebuf API）
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
+--- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
+@@ -1808,7 +1808,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+             Preconditions.checkArgument(particle.getDataType().isInstance(data), "data (%s) should be %s", data.getClass(), particle.getDataType());
+         }
+         this.getHandle().sendParticlesSource(
+-            receivers == null ? this.getHandle().players() : Lists.transform(receivers, player -> ((CraftPlayer) player).getHandle()),
++            receivers == null ? this.getHandle().realPlayers() : Lists.transform(receivers, player -> ((CraftPlayer) player).getHandle()), // Leaves - Fakeplayer: skip fake players
+             sender != null ? ((CraftPlayer) sender).getHandle() : null,
+             CraftParticle.createParticleParam(particle, data),
+             force,
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -3405,4 +3405,16 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
+     public PlayerPostEffects postEffects() {
+         return new PaperPlayerPostEffects(this.getHandle());
+     }
++
++    // Leaves start - Bytebuf API
++    @Override
++    public void send(org.leavesmc.leaves.bytebuf.PacketType packetType, org.leavesmc.leaves.bytebuf.Bytebuf bytebuf) {
++        org.leavesmc.leaves.bytebuf.internal.InternalBytebufHandler.sendPacket(this, packetType, bytebuf);
++    }
++
++    @Override
++    public @org.jetbrains.annotations.NotNull Object getChannel() {
++        return getHandle().connection.connection.channel;
++    }
++    // Leaves end - Bytebuf API
+ }
+

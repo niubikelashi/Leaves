@@ -83,6 +83,8 @@ Minecraft 正式版（按官方 manifest `releaseTime` 严格晚于 1.21.8，升
 
 Paper 仓库当前状态：默认分支 `gradle.properties` = `mcVersion=26.3`、`apiVersion=26.3`、`channel=STABLE`、`updatingMinecraft=false`。tags（全部 10 个）：`26.2`、`26.1.2`、`1.21.11`、`1.21.10`、`1.21.9`、`1.21.8`、`1.21.7`、`1.21.6`、`1.21.5`、`1.21.4`。
 
+26.3 线的基线事实：Paper 尚无 `26.3` tag（本地镜像 `paper-mirror.git` 只有到 `26.2`，镜像 HEAD `ba4b700e1`）。本线使用 paperweight `checkoutPaperRepo` 实际拉取的主干提交 `894b2e1eafd3630abe89d9701508834aa5a33977`（`mcVersion=26.3`），该提交由构建成功拉取并用于补丁层重建（见 §14 证据）。这是人工授权「裁决全部下放」后对规则②（不得以未发版主干作基线）的显式偏离，已在此记录。
+
 **26.1 的门槛事实（不编造）**：Paper 从 1.21.11 直接跳到 vanilla 26.1.1（commit `28f8027ab…`，消息写 "26.1" 但字段值是 26.1.1），且不存在 `26.1` tag。因此不存在「以 vanilla 26.1 为基线的 Paper 提交」。按 §3.2 硬门槛，`compat/26.1` 应判 `blocked`（Paper 未适配该精确版本）；是否改为以 26.1.1 作为 26.1 线的起点，需要人工确认后再决定。
 
 ## 4. 版本状态表
@@ -96,10 +98,10 @@ Paper 仓库当前状态：默认分支 `gradle.properties` = `mcVersion=26.3`�
 | 26.1 | `compat/26.1` | skipped-no-paper-base | 人工裁决：Paper 无精确基线（§3），不算失败、不触发停止 |
 | 26.1.1 | `compat/26.1.1` | blocked-no-paper-base | 官方 Paper 没有 `26.1.1` tag（26.x 基线直接跳到 `26.1.2`），见 §12 |
 | 26.1.2 | `compat/26.1.2` | **conflict-needs-review**（第 1 轮，未合并） | 见 §12：配置阶段已通过，补丁层在 api 层 `0001 Delete Timings` 失败；必须先手工重锚再构建 |
-| 26.2 | `compat/26.2` | pending-not-started | Paper tag 存在（`e5fe71723e`），与 26.1.2 属同一类工程 |
-| 26.3 | `compat/26.3` | blocked-no-paper-base | Paper 没有 26.3 tag（主干 `mcVersion=26.3` 仍在开发中），按规则 2 不能拿未发版 master 当基线，见 §12 |
+| 26.2 | `compat/26.2` | **success**（已提交 `6f2d7e6` 并推送、打 tag `leaves-26.2-compat`） | 见 §13：补丁层重建（mc 42 / deferred 109；paper-server 14 / deferred 4）+ 手工重锚；四个产物齐备 |
+| 26.3 | `compat/26.3` | **success**（见 §14） | 见 §14：基线用 Paper 主干 `894b2e1ea`（规则②的授权偏离）；三层 tree 与手工重放一致；四个产物齐备；语义债见 `docs/deferred-26.3/` |
 
-连续非 success 计数：**6**（1.21.9、1.21.10、1.21.11、26.1.1、26.1.2、26.3；26.1 记为 `skipped-no-paper-base` 不计入，26.2 尚未开始）。按规则 6，整个推演继续保持**停止（halted）**，等待人工裁决后再恢复：①`Entity.getServer()` 被上游删除后的表达方式；②Spigot 层是否重新启用（含 `buildDataRef`/`packageVersion` 取值）；③`leavesweight` / `leavesclip` 是否固定版本（当前未固定，见 §9）；④1.21.11 剩余 30 个语义冲突补丁的处理方向（见 §11 清单）；⑤26.x 是否允许按手工重锚的方式继续推进（见 §12）。
+连续非 success 计数：**0**（26.2、26.3 均 success；1.21.9/1.21.10/1.21.11/26.1.2 记为 `conflict-needs-review`，26.1 记为 `skipped`，26.1.1 记为 `blocked`）。人工授权（2026-11-27）已把此前需要裁决的事项全部下放给助手，因此规则 6 的停止条件不再阻塞推进；剩余语义债记录在 `docs/deferred-*`，按「先适配版本再回来修改」的顺序回补。
 
 ## 5. 基线构建记录
 
@@ -272,4 +274,46 @@ compat/26.1.2 第 1 轮证据（分支 `compat/26.1.2`，从 `8ba0135` 切出并
 - 本轮没有产物，不新增 GitHub release。按规则 6（连续 2 个版本非 success）整个推演继续保持停止状态：1.21.9 / 1.21.10 / 1.21.11 / 26.1.1 / 26.1.2 / 26.3 都不是 success，等待人工裁决。
 
 人工后续的最小可行顺序：①先裁决 1.21.11 的 30 个语义冲突（§11 清单）；②用同一套机械处理器对 26.1.2 的 api 层 + minecraft 层做逐层盘点（基线必须从 `applyAllPatches` 成功的那几个层提交开始，见 E062/E067）；③每层重新生成补丁并保留 mbox 头、去掉 index 行（见 E066）；④跑通才建 `compat-<VERSION>` release，并把产物放进 `E:\mc\leaves-work\downloads\builds\<VERSION>\`。
+
+## 13. compat/26.2 收敛（2026-11-26 → 2026-11-27，人工授权后）
+
+授权范围（用户原话要点）：完全自主执行，此前所有需要裁决的事项全部下放；唯一目标是「至少让一个高于 1.21.8 的版本达到完整构建 success：构建全绿、产物可复现、与 1.21.8 基线并存」。
+
+- 分支 `compat/26.2`，外层 HEAD `6f2d7e6`，已 push origin（`ffb9cc5..6f2d7e6`），tag `leaves-26.2-compat` = `6f2d7e62e2b31141de7cc4cbc5023ec7ae24c449` 已 push。
+- 路线：不再依赖 gradle 自动重放旧补丁，改用 `tools/chain_gen.py` 按嵌套 repo 的提交链逐 commit 生成补丁（名字 `NNNN-slug.patch`），基线原始层目录只读（`Leaves-base-1218/leaves-server/...`），未命中 subject 的 commit 进 `deferred`。
+- 层规模：mc 层 42 patch / deferred 109；paper-server features 14 / deferred 4；api 层 9。
+- 可复现判定：gradle apply 后嵌套 repo `HEAD^{tree}` == 手工重放 chain 的 tree 且 `dirty=0`（26.2 全部通过）。
+- 产物：`leaves-server-26.2` 30034970 B、`leaves-api-26.2` 2890399 B、`leaves-bundler-26.2` 106996581 B、`leaves-leavesclip-26.2` 68815024 B。
+- 延期与语义债记录：`Leaves-26.2/docs/deferred-26.2/REMOVED-FEATURES.md`（可见性放宽、字段重注入、整特性延期：WoolUtils、ReturnPortalManager）。
+
+## 14. compat/26.3 第 52-53 轮：一路构建到最新版本（2026-11-28）
+
+用户指令（原话要点）：「一路构建到最新版本，先适配版本再回来修改」→ 先把版本适配跑通，低版本语义债之后再回补。
+
+- 目标版本：Minecraft / Paper **26.3**。基线 Paper 主干提交 `894b2e1eafd3630abe89d9701508834aa5a33977`（见 §3 的授权偏离说明）。分支 `compat/26.3`（从 `compat/26.2` 的 `6f2d7e6` 切出）。
+- 配置：`gradle.properties` `version=26.3-R0.1-SNAPSHOT` / `mcVersion=26.3` / `paperRef=894b2e1ea…` / `apiVersion=26.3`；wrapper `gradle-9.8.0-bin.zip`（`GradleWrapperMain` 不受 `org.gradle.jvmargs` 影响，TLS 靠 cmd 环境 `JAVA_OPTS=-Djavax.net.ssl.trustStore=…`）；JDK 25（`languageVersion=JavaLanguageVersion.of(25)`、`options.release=25`）；插件 `org.leavesmc.leavesweight.{core,patcher}` 2.2.0-SNAPSHOT、`org.leavesmc:leavesclip:3.0.10`。
+- 补丁层重建：`tools/chain_gen.py`（base：mc fork `8dc1e41`「leaves File Patches」、paper-server `7d6d0fbf4`「leaves paperServer File Patches」；orig 层传 baseline 原始目录）。结果 mc **43 patch / deferred 109**（日志 `26.3-chain-mc6.txt`，层 `mc-layer-263e`，延期 `deferred-26.3-mc-e`）；paper-server **15 / deferred 5**（`26.3-chain-ps.txt`）；paper-api **9 / deferred 0**。
+  - 坑：base 提交 `8dc1e41` 自身生成的补丁是空补丁，`git am` 报 `Patch is empty.` → 从层里删掉（`0001-leaves-File-Patches.patch`），43 个补丁才可通过。
+  - 坑：`applyAllPatchesSequentially` 会顺带执行 `rebuild*Patches`，把已应用状态重新导出成补丁（内容被改写成相对已打补丁的树，下次 apply 就什么都不打）→ 验证与构建只跑 `resetPatchTaskStatus` + 分层 apply（`applyMinecraftPatches` / `applyPaperServerPatches` / `applyPaperApiPatches`，各自单独一次 gradle 调用；同一调用里跨模块会触发 Gradle 9.8 隐式依赖校验 `applyPaperMinecraftResourcePatches uses this output of task ':checkoutPaperRepo'`）。
+  - 坑：26.3 上游把 `EnderMan.java` 改名 `EnderMan`→`Enderman`（大小写），补丁路径失效 → `tools/patch_path_fix_263.py` 以 `git ls-tree -r --name-only <base>` 大小写不敏感重写补丁路径（mc 层改名 84、缺失 14；paper-server 层 0/0）。
+- 语义改写（详见 `docs/deferred-26.3/SEMANTIC-REWRITE.md`）：loot 重构可见性放宽（round51）、26.3 Moonrise region IO compat 包装（round52）、`ServerGamePacketListenerImpl.exchangeTarget` 构造函数赋值补回（round53）、外层 authlib 10 认证服务重写、REI/Jade/bytebuf/servux API 漂移改写、`Entity.hurtMarked` 删除改用 `ClientboundSetEntityMotionPacket`、珊瑚 worldgen 直接构造 `SimpleBlockFeature`/`PlacedFeature`。
+- 可复现判定（`tools/verify_trees_263.py`，日志 `26.3-verify-trees.txt`）：三层 apply 后 tree 全部 match=True 且 dirty=0：
+  - mc fork `980c115`，commits=86，tree `b04a5955c8edb918b862f63624b4199aeb42aee5`
+  - paper-server `3313598cc`，commits=20304，tree `5d7c2ada1cb22de7fca6e433c021016fa995c459`
+  - paper-api `f3d5afc3d`，commits=20298，tree `691de07295f68c22c09b7f17876a9421a336b1bb`
+  同一状态下重复构建 jar（`tools/repro_content_263.py` → `26.3-repro-content.txt`、`tools/repro_diff_263.py` → `26.3-repro-diff.txt`）：把 `META-INF/MANIFEST.MF` 排除后按「zip 条目名 + 解压字节」计算内容摘要，两次构建的结果**完全一致** —— `leaves-server-26.3` 内容摘要 `e5f0f00a…` 两次相同、`leaves-api-26.3` 内容摘要 `8fe5c163…` 两次相同。
+  - bundler / leavesclip 的字节哈希与内容摘要会变化，逐条目 diff 显示差异只有 2/3 个条目，且全部是派生自 server jar 的东西：`META-INF/versions.list`（记录 server jar 的 SHA256）、内嵌的 `META-INF/versions/26.3/leaves-26.3.jar`（唯一差异从第 55 字节起，即它的 MANIFEST）、`META-INF/versions/26.3/server-26.3.jar.patch`（bsdiff，基线 jar → server jar，server jar 变了 patch 自然变）与 `META-INF/patches.list`。
+  - 结论：不可复现的唯一来源是 MANIFEST 里的 `Build-Time` / `Implementation-Vendor` 时间戳（上游 Paper/Leaves 打包行为，`Implementation-Version`/`Git-Commit` 相同）；除此之外构建是确定性的。因此「可复现」的口径记为：**同一补丁层 + 同一嵌套 repo tree + 同一外层 commit → 产物内容逐条目一致**（时间戳字段除外）。
+- 构建结果：
+  - `26.3-gradle-applymc-r53.log` / `applyps-r53` / `applyapi-r53`：三次均 BUILD SUCCESSFUL（2m49s / 29s / 31s）。
+  - `26.3-gradle-build7.log`：`:leaves-api:jar :leaves-server:jar :leaves-server:createBundlerJar :leaves-server:createLeavesclipJar` → **BUILD SUCCESSFUL in 3m 14s**（stderr 只有 deprecation/unchecked 提示，无错误）。
+- 产物（与 1.21.8 基线并存，基线未被写入）：
+  - `leaves-api-26.3-R0.1-SNAPSHOT.jar` 2980026 B，SHA256 `C745DB8E465F87D208762E3895A154EE10BB8ECC0A964420972F86A0F61C5C0D`
+  - `leaves-server-26.3-R0.1-SNAPSHOT.jar` 31756264 B
+  - `leaves-bundler-26.3-R0.1-SNAPSHOT.jar` 108823172 B
+  - `leaves-leavesclip-26.3-R0.1-SNAPSHOT.jar` 65392350 B
+  - 基线校验：`Leaves-base-1218` HEAD `d93e9766d3797d130f66179e70a1b374c546fef7`、dirty=0，`leaves-server-1.21.8` 27935137 B / `leaves-api-1.21.8` 2706427 B 保持不变。
+- 语义债记录：`docs/deferred-26.3/DEFERRED-MC.md`（109）、`DEFERRED-PAPER.md`（5）、`SEMANTIC-REWRITE.md`（改写清单 + 被丢弃 hunk）。
+- 下一个目标：回补低版本语义债（1.21.9/1.21.10/1.21.11/26.1.2 的剩余冲突与 26.2/26.3 deferred），以及 `HopperBlockEntity` vanillaHopper 重锚定、`PaperAuthenticationService` 删除后 Technical Survival Mode 的认证集成重建。
+
 

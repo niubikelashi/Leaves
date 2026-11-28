@@ -785,6 +785,27 @@ public class LinearRegionFile implements IRegionFile {
         return false;
     }
 
+    // Leaves start - moonrise compat (26.3: IRegionFile extends ChunkSystemRegionFile)
+    @Override
+    public int moonrise$getRecalculateCount() {
+        return this.getRecalculateCount();
+    }
+
+    @Override
+    public boolean moonrise$recalculateHeader() throws java.io.IOException {
+        return this.recalculateHeader();
+    }
+
+    @Override
+    public @org.jetbrains.annotations.Nullable Boolean moonrise$tryRecalcHeader(final int expectedRecalcCount) throws java.io.IOException {
+        // LinearRegionFile has no recoverable header; report false (meaning "recalc attempted, failed").
+        return Boolean.valueOf(this.recalculateHeader());
+    }
+
+    // moonrise$startWrite is already implemented above (Leaves - 26.2 compat, via LinearRegionFile's own stream)
+    // Leaves end - moonrise compat
+
+    
     public Path getPath() {
         return this.regionFile;
     }

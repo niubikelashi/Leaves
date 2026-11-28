@@ -117,7 +117,7 @@ public class ServuxHudDataProtocol implements LeavesProtocol {
         ListTag list = new ListTag();
 
         recipes.forEach((recipeEntry -> {
-            DataResult<Tag> dr = Recipe.CODEC.encodeStart(NbtOps.INSTANCE, recipeEntry.value());
+            DataResult<Tag> dr = Recipe.CODEC.encodeStart(NbtOps.INSTANCE, net.minecraft.core.Holder.direct(recipeEntry.value())); // Leaves - 26.3 compat: Recipe.CODEC encodes Holder<Recipe<?>>; RecipeHolder<?> only yields Holder<capture>
 
             if (dr.result().isPresent()) {
                 CompoundTag entry = new CompoundTag();

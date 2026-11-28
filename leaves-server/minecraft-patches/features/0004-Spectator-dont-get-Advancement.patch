@@ -7,7 +7,7 @@ Subject: [PATCH] Spectator dont get Advancement
 diff --git a/ca/spottedleaf/moonrise/paper/PaperHooks.java b/ca/spottedleaf/moonrise/paper/PaperHooks.java
 --- a/ca/spottedleaf/moonrise/paper/PaperHooks.java
 +++ b/ca/spottedleaf/moonrise/paper/PaperHooks.java
-@@ -29,7 +29,7 @@ import net.minecraft.world.phys.AABB;
+@@ -30,7 +30,7 @@ import net.minecraft.world.phys.AABB;
  import java.util.List;
  import java.util.function.Predicate;
  
@@ -45,22 +45,10 @@ diff --git a/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java b/ca/
      public static boolean getEntityHardCollisions(final Level world, final Entity entity, AABB aabb,
                                                    final List<AABB> into, final int collisionFlags, final Predicate<Entity> predicate) {
          final boolean checkOnly = (collisionFlags & COLLISION_FLAG_CHECK_ONLY) != 0;
-diff --git a/net/minecraft/advancements/Advancement.java b/net/minecraft/advancements/Advancement.java
---- a/net/minecraft/advancements/Advancement.java
-+++ b/net/minecraft/advancements/Advancement.java
-@@ -64,7 +64,7 @@ public record Advancement(
-     ) {
-         this(parent, display, rewards, Map.copyOf(criteria), requirements, sendsTelemetryEvent, display.map(Advancement::decorateName));
-     }
--
-+        this(parent, display, rewards, !org.leavesmc.leaves.LeavesConfig.performance.skipCloningAdvancementCriteria ? Map.copyOf(criteria) : criteria, requirements, sendsTelemetryEvent, display.map(Advancement::decorateName)); // Leaves - skip cloning advancement criteria
-     private static DataResult<Advancement> validate(final Advancement advancement) {
-         return advancement.requirements().validate(advancement.criteria().keySet()).map(r -> advancement);
-     }
 diff --git a/net/minecraft/commands/Commands.java b/net/minecraft/commands/Commands.java
 --- a/net/minecraft/commands/Commands.java
 +++ b/net/minecraft/commands/Commands.java
-@@ -189,7 +189,21 @@ public class Commands {
+@@ -197,7 +197,21 @@ public class Commands {
      };
      private final CommandDispatcher<CommandSourceStack> dispatcher = new CommandDispatcher<>();
  
@@ -86,7 +74,7 @@ diff --git a/net/minecraft/commands/Commands.java b/net/minecraft/commands/Comma
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1292,7 +1292,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1276,7 +1276,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                  LOGGER.info("*************************************************************************************");
                  LOGGER.info("This is the first time you're starting this server.");
                  LOGGER.info("It's recommended you read our 'Getting Started' documentation for guidance.");
@@ -95,7 +83,7 @@ diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/Mi
                  LOGGER.info("*************************************************************************************");
              }
              // Paper end - Add onboarding message for initial server start
-@@ -1950,7 +1950,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1934,7 +1934,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      public String getServerModName() {
          return io.papermc.paper.ServerBuildInfo.buildInfo().brandName(); // Paper
      }
@@ -107,7 +95,7 @@ diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/Mi
 diff --git a/net/minecraft/server/PlayerAdvancements.java b/net/minecraft/server/PlayerAdvancements.java
 --- a/net/minecraft/server/PlayerAdvancements.java
 +++ b/net/minecraft/server/PlayerAdvancements.java
-@@ -173,6 +173,11 @@ public class PlayerAdvancements {
+@@ -174,6 +174,11 @@ public class PlayerAdvancements {
              // Paper start - Add PlayerAdvancementCriterionGrantEvent
              if (!new com.destroystokyo.paper.event.player.PlayerAdvancementCriterionGrantEvent(this.player.getBukkitEntity(), holder.toBukkit(), criterion).callEvent()) {
                  progress.revokeProgress(criterion);
@@ -172,7 +160,7 @@ diff --git a/net/minecraft/server/gui/MinecraftServerGui.java b/net/minecraft/se
 diff --git a/net/minecraft/server/level/ServerEntity.java b/net/minecraft/server/level/ServerEntity.java
 --- a/net/minecraft/server/level/ServerEntity.java
 +++ b/net/minecraft/server/level/ServerEntity.java
-@@ -359,7 +359,7 @@ public class ServerEntity {
+@@ -395,7 +395,7 @@ public class ServerEntity {
              }
              ((LivingEntity) this.entity).detectEquipmentUpdates(); // CraftBukkit - SPIGOT-3789: sync again immediately after sending
          }
@@ -184,7 +172,7 @@ diff --git a/net/minecraft/server/level/ServerEntity.java b/net/minecraft/server
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
-@@ -2362,9 +2362,21 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+@@ -2629,9 +2629,21 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
          // Paper end
      }
  
@@ -225,7 +213,7 @@ diff --git a/net/minecraft/server/network/ServerStatusPacketListenerImpl.java b/
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -1000,6 +1000,9 @@ public abstract class PlayerList {
+@@ -1005,6 +1005,9 @@ public abstract class PlayerList {
          //player.connection.send(new ClientboundSetChunkCacheRadiusPacket(io.papermc.paper.FeatureHooks.getViewDistance(level))); // Paper - rewrite chunk system
          //player.connection.send(new ClientboundSetSimulationDistancePacket(io.papermc.paper.FeatureHooks.getSimulationDistance(level))); // Paper - rewrite chunk system
          // Paper end - view distances
@@ -238,7 +226,7 @@ diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -868,6 +868,7 @@ public abstract class Entity
+@@ -889,6 +889,7 @@ public abstract class Entity
  
      // CraftBukkit start
      public void postTick() {
@@ -246,7 +234,7 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
          // No clean way to break out of ticking once the entity has been copied to a new world, so instead we move the portalling later in the tick cycle
          if (!(this instanceof ServerPlayer) && this.isAlive()) { // Paper - don't attempt to teleport dead entities
              this.handlePortal();
-@@ -889,7 +890,7 @@ public abstract class Entity
+@@ -910,7 +911,7 @@ public abstract class Entity
              this.boardingCooldown--;
          }
  
@@ -258,7 +246,7 @@ diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity
 diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
-@@ -3433,7 +3433,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
+@@ -3440,7 +3440,7 @@ public abstract class LivingEntity extends Entity implements Attackable, Waypoin
              }
          }
  
@@ -310,7 +298,7 @@ diff --git a/net/minecraft/world/entity/ai/gossip/GossipType.java b/net/minecraf
 diff --git a/net/minecraft/world/entity/item/ItemEntity.java b/net/minecraft/world/entity/item/ItemEntity.java
 --- a/net/minecraft/world/entity/item/ItemEntity.java
 +++ b/net/minecraft/world/entity/item/ItemEntity.java
-@@ -128,6 +128,9 @@ public class ItemEntity extends Entity implements TraceableEntity {
+@@ -121,6 +121,9 @@ public class ItemEntity extends Entity implements TraceableEntity {
      // Paper start - EAR 2
      @Override
      public void inactiveTick() {
@@ -320,7 +308,7 @@ diff --git a/net/minecraft/world/entity/item/ItemEntity.java b/net/minecraft/wor
          super.inactiveTick();
          if (this.pickupDelay > 0 && this.pickupDelay != 32767) {
              this.pickupDelay--;
-@@ -145,6 +148,8 @@ public class ItemEntity extends Entity implements TraceableEntity {
+@@ -138,6 +141,8 @@ public class ItemEntity extends Entity implements TraceableEntity {
              // CraftBukkit end
              this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.DESPAWN); // CraftBukkit - add Bukkit remove cause
          }
@@ -329,22 +317,10 @@ diff --git a/net/minecraft/world/entity/item/ItemEntity.java b/net/minecraft/wor
      }
      // Paper end - EAR 2
  
-diff --git a/net/minecraft/world/entity/monster/EnderMan.java b/net/minecraft/world/entity/monster/EnderMan.java
---- a/net/minecraft/world/entity/monster/EnderMan.java
-+++ b/net/minecraft/world/entity/monster/EnderMan.java
-@@ -431,7 +431,7 @@ public class EnderMan extends Monster implements NeutralMob {
-     @Override
-     public boolean requiresCustomPersistence() {
-         return super.requiresCustomPersistence() || this.getCarriedBlock() != null;
--    }
-+        return super.requiresCustomPersistence() || (!org.leavesmc.leaves.LeavesConfig.modify.despawnEndermanWithBlock && this.getCarriedBlock() != null); // Leaves - despawn enderman with block
- 
-     private static class EndermanFreezeWhenLookedAt extends Goal {
-         private final EnderMan enderman;
 diff --git a/net/minecraft/world/entity/monster/skeleton/Skeleton.java b/net/minecraft/world/entity/monster/skeleton/Skeleton.java
 --- a/net/minecraft/world/entity/monster/skeleton/Skeleton.java
 +++ b/net/minecraft/world/entity/monster/skeleton/Skeleton.java
-@@ -132,3 +132,25 @@ public class Skeleton extends AbstractSkeleton {
+@@ -83,3 +83,25 @@ public class Skeleton extends AbstractSkeleton {
          return SoundEvents.SKELETON_STEP;
      }
  }
@@ -408,7 +384,7 @@ diff --git a/net/minecraft/world/entity/monster/zombie/ZombifiedPiglin.java b/ne
 diff --git a/net/minecraft/world/entity/player/Inventory.java b/net/minecraft/world/entity/player/Inventory.java
 --- a/net/minecraft/world/entity/player/Inventory.java
 +++ b/net/minecraft/world/entity/player/Inventory.java
-@@ -175,6 +175,13 @@ public class Inventory implements Container, Nameable {
+@@ -177,6 +177,13 @@ public class Inventory implements Container, Nameable {
      // CraftBukkit start - Watch method above! :D
      public int canHold(ItemStack itemStack) {
          int remains = itemStack.getCount();
@@ -425,7 +401,7 @@ diff --git a/net/minecraft/world/entity/player/Inventory.java b/net/minecraft/wo
 diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
-@@ -2078,8 +2078,10 @@ public abstract class Player extends Avatar implements ContainerUser {
+@@ -2073,8 +2073,10 @@ public abstract class Player extends Avatar implements ContainerUser {
  
          if (anyEventCancelled.booleanValue() && !this.abilities.instabuild && this instanceof final ServerPlayer player) this.resyncUsingItem(player); // Paper - resync if no item matched the Predicate
          return this.hasInfiniteMaterials() ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
@@ -441,7 +417,7 @@ diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world
 diff --git a/net/minecraft/world/entity/vehicle/minecart/AbstractMinecart.java b/net/minecraft/world/entity/vehicle/minecart/AbstractMinecart.java
 --- a/net/minecraft/world/entity/vehicle/minecart/AbstractMinecart.java
 +++ b/net/minecraft/world/entity/vehicle/minecart/AbstractMinecart.java
-@@ -307,7 +307,7 @@ public abstract class AbstractMinecart extends VehicleEntity {
+@@ -308,7 +308,7 @@ public abstract class AbstractMinecart extends VehicleEntity {
  
          this.checkBelowWorld();
          this.computeSpeed();
@@ -502,7 +478,7 @@ diff --git a/net/minecraft/world/item/crafting/SmithingTrimRecipe.java b/net/min
 diff --git a/net/minecraft/world/level/block/BambooStalkBlock.java b/net/minecraft/world/level/block/BambooStalkBlock.java
 --- a/net/minecraft/world/level/block/BambooStalkBlock.java
 +++ b/net/minecraft/world/level/block/BambooStalkBlock.java
-@@ -109,6 +109,10 @@ public class BambooStalkBlock extends Block implements BonemealableBlock {
+@@ -102,6 +102,10 @@ public class BambooStalkBlock extends Block implements BonemealableBlock {
          if (!state.canSurvive(level, pos)) {
              level.destroyBlock(pos, true);
          }
@@ -516,7 +492,7 @@ diff --git a/net/minecraft/world/level/block/BambooStalkBlock.java b/net/minecra
 diff --git a/net/minecraft/world/level/block/CactusBlock.java b/net/minecraft/world/level/block/CactusBlock.java
 --- a/net/minecraft/world/level/block/CactusBlock.java
 +++ b/net/minecraft/world/level/block/CactusBlock.java
-@@ -48,6 +48,10 @@ public class CactusBlock extends Block {
+@@ -41,6 +41,10 @@ public class CactusBlock extends Block {
          if (!state.canSurvive(level, pos)) {
              level.destroyBlock(pos, true);
          }
@@ -530,7 +506,7 @@ diff --git a/net/minecraft/world/level/block/CactusBlock.java b/net/minecraft/wo
 diff --git a/net/minecraft/world/level/block/ChorusFlowerBlock.java b/net/minecraft/world/level/block/ChorusFlowerBlock.java
 --- a/net/minecraft/world/level/block/ChorusFlowerBlock.java
 +++ b/net/minecraft/world/level/block/ChorusFlowerBlock.java
-@@ -48,6 +48,9 @@ public class ChorusFlowerBlock extends Block {
+@@ -37,6 +37,9 @@ public class ChorusFlowerBlock extends Block {
          if (!state.canSurvive(level, pos)) {
              level.destroyBlock(pos, true);
          }
@@ -543,7 +519,7 @@ diff --git a/net/minecraft/world/level/block/ChorusFlowerBlock.java b/net/minecr
 diff --git a/net/minecraft/world/level/block/GrowingPlantHeadBlock.java b/net/minecraft/world/level/block/GrowingPlantHeadBlock.java
 --- a/net/minecraft/world/level/block/GrowingPlantHeadBlock.java
 +++ b/net/minecraft/world/level/block/GrowingPlantHeadBlock.java
-@@ -160,4 +160,15 @@ public abstract class GrowingPlantHeadBlock extends GrowingPlantBlock implements
+@@ -156,4 +156,15 @@ public abstract class GrowingPlantHeadBlock extends GrowingPlantBlock implements
      protected GrowingPlantHeadBlock getHeadBlock() {
          return this;
      }
@@ -562,7 +538,7 @@ diff --git a/net/minecraft/world/level/block/GrowingPlantHeadBlock.java b/net/mi
 diff --git a/net/minecraft/world/level/block/SugarCaneBlock.java b/net/minecraft/world/level/block/SugarCaneBlock.java
 --- a/net/minecraft/world/level/block/SugarCaneBlock.java
 +++ b/net/minecraft/world/level/block/SugarCaneBlock.java
-@@ -44,6 +44,10 @@ public class SugarCaneBlock extends Block {
+@@ -37,6 +37,10 @@ public class SugarCaneBlock extends Block {
          if (!state.canSurvive(level, pos)) {
              level.destroyBlock(pos, true);
          }
@@ -576,7 +552,7 @@ diff --git a/net/minecraft/world/level/block/SugarCaneBlock.java b/net/minecraft
 diff --git a/net/minecraft/world/level/block/TntBlock.java b/net/minecraft/world/level/block/TntBlock.java
 --- a/net/minecraft/world/level/block/TntBlock.java
 +++ b/net/minecraft/world/level/block/TntBlock.java
-@@ -49,7 +49,7 @@ public class TntBlock extends Block {
+@@ -45,7 +45,7 @@ public class TntBlock extends Block {
          if (!oldState.is(state.getBlock())) {
              if (level.hasNeighborSignal(pos) && prime(level, pos, () -> org.bukkit.craftbukkit.event.CraftEventFactory.callTNTPrimeEvent(level, pos, org.bukkit.event.block.TNTPrimeEvent.PrimeCause.REDSTONE, null, null))) { // CraftBukkit - TNTPrimeEvent
                  level.removeBlock(pos, false);
@@ -585,95 +561,10 @@ diff --git a/net/minecraft/world/level/block/TntBlock.java b/net/minecraft/world
          }
      }
  
-diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
---- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-+++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -273,36 +273,58 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
-         final int movedItemCount = Math.min(level.spigotConfig.hopperAmount, originalItemCount);
-         container.setChanged(); // original logic always marks source inv as changed even if no move happens.
-         movedItem.setCount(movedItemCount);
--
--        if (!skipPullModeEventFire) {
--            movedItem = callPullMoveEvent(hopper, container, movedItem);
--            if (movedItem == null) { // cancelled
--                origItemStack.setCount(originalItemCount);
--                // Drastically improve performance by returning true.
--                // No plugin could have relied on the behavior of false as the other call
--                // site for IMIE did not exhibit the same behavior
--                return true;
-+        // Leaves start - fix vanilla
-+        if (org.leavesmc.leaves.LeavesConfig.fix.vanillaHopper && movedItem.getCount() <= movedItemCount) {
-+            if (!skipPullModeEventFire) {
-+                movedItem = callPullMoveEvent(hopper, container, movedItem);
-+                if (movedItem == null) { // cancelled
-+                    origItemStack.setCount(originalItemCount);
-+                    // Drastically improve performance by returning true.
-+                    // No plugin could have relied on the behavior of false as the other call
-+                    // site for IMIE did not exhibit the same behavior
-+                    return true;
-+                }
-             }
-+            movedItem = origItemStack.copy();
-+            final ItemStack remainingItem = addItem(container, hopper,  container.removeItem(i, movedItemCount), null);
-+            if (remainingItem.isEmpty()) {
-+                container.setChanged();
-         }
- 
--        final ItemStack remainingItem = addItem(container, hopper, movedItem, null);
-+            container.setItem(i, movedItem);
-+        } else {
-+            container.setChanged(); // original logic always marks source inv as changed even if no move happens.
-+            movedItem.setCount(movedItemCount);
-         final int remainingItemCount = remainingItem.getCount();
--        if (remainingItemCount != movedItemCount) {
--            origItemStack = origItemStack.copy(true);
--            origItemStack.setCount(originalItemCount);
--            if (!origItemStack.isEmpty()) {
--                origItemStack.setCount(originalItemCount - movedItemCount + remainingItemCount);
--            }
--
-+            if (!skipPullModeEventFire) {
-+                movedItem = callPullMoveEvent(hopper, container, movedItem);
-+                if (movedItem == null) { // cancelled
-+                    origItemStack.setCount(originalItemCount);
-+                    // Drastically improve performance by returning true.
-+                    // No plugin could have relied on the behavior of false as the other call
-+                    // site for IMIE did not exhibit the same behavior
-+                    return true;
-+                }
-             ignoreBlockEntityUpdates = true;
-             container.setItem(i, origItemStack);
--            ignoreBlockEntityUpdates = false;
--            container.setChanged();
--            return true;
--        }
--        origItemStack.setCount(originalItemCount);
-+            final ItemStack remainingItem = addItem(container, hopper, movedItem, null);
-+            final int remainingItemCount = remainingItem.getCount();
-+            if (remainingItemCount != movedItemCount) {
-+                origItemStack = origItemStack.copy(true);
-+                origItemStack.setCount(originalItemCount);
-+                if (!origItemStack.isEmpty()) {
-+                    origItemStack.setCount(originalItemCount - movedItemCount + remainingItemCount);
-+                }
-+
-+                ignoreBlockEntityUpdates = true;
-+                container.setItem(i, origItemStack);
-+                ignoreBlockEntityUpdates = false;
-+                container.setChanged();
-+                return true;
-+            }
-+            origItemStack.setCount(originalItemCount);
- 
--        if (level.paperConfig().hopper.cooldownWhenFull) {
-+        // Leaves end - fix vanilla
-             applyCooldown(hopper);
-         }
- 
 diff --git a/net/minecraft/world/level/chunk/LevelChunk.java b/net/minecraft/world/level/chunk/LevelChunk.java
 --- a/net/minecraft/world/level/chunk/LevelChunk.java
 +++ b/net/minecraft/world/level/chunk/LevelChunk.java
-@@ -751,6 +751,11 @@ public class LevelChunk extends ChunkAccess implements DebugValueSource, ca.spot
+@@ -753,6 +753,11 @@ public class LevelChunk extends ChunkAccess implements DebugValueSource, ca.spot
          this.loaded = loaded;
      }
  

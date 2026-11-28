@@ -1,9 +1,12 @@
 package org.leavesmc.leaves.protocol.jade.util;
 
 import com.google.common.collect.Lists;
+import java.util.List;
+import java.util.Optional;
 import net.minecraft.advancements.predicates.ItemPredicate;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -18,10 +21,12 @@ import net.minecraft.world.level.storage.loot.predicates.MatchTool;
 import org.jetbrains.annotations.NotNull;
 import org.leavesmc.leaves.protocol.jade.tool.ShearsToolHandler;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
-
+// Leaves - 26.3 adaptation: vanilla reworked the loot objects.
+//   LootPoolEntryContainer.conditions (List) -> condition (Optional<Holder<LootItemCondition>>)
+//   CompositeLootItemCondition.terms (List)  -> terms (HolderSet<LootItemCondition>)
+//   NestedLootTable.contents (Optional<ResourceKey>) -> value (HolderSet<LootTable>, already resolved holders)
+//   LootPool.entries / LootTable.pools stayed lists but became private, so the mc-side patch relaxes them to public.
+// A nested table no longer needs a registry lookup: vanilla hands us resolved holders.
 public class LootTableMineableCollector {
 
     private final HolderGetter<LootTable> lootRegistry;
@@ -50,18 +55,18 @@ public class LootTableMineableCollector {
         return list;
     }
 
-    public static boolean isCorrectConditions(@NotNull List<LootItemCondition> conditions, ItemStack toolItem) {
-        if (conditions.size() != 1) {
+    public static boolean isCorrectConditions(@NotNull Optional<Holder<LootItemCondition>> condition, ItemStack toolItem) {
+        if (condition.isEmpty()) {
             return false;
         }
 
-        LootItemCondition condition = conditions.getFirst();
-        if (condition instanceof MatchTool(Optional<ItemPredicate> predicate)) {
+        LootItemCondition lootCondition = condition.get().value();
+        if (lootCondition instanceof MatchTool(Optional<ItemPredicate> predicate)) {
             ItemPredicate itemPredicate = predicate.orElse(null);
             return itemPredicate != null && itemPredicate.test(toolItem);
-        } else if (condition instanceof AnyOfCondition anyOfCondition) {
-            for (LootItemCondition child : anyOfCondition.terms) {
-                if (isCorrectConditions(List.of(child), toolItem)) {
+        } else if (lootCondition instanceof AnyOfCondition anyOfCondition) {
+            for (Holder<LootItemCondition> child : anyOfCondition.terms) {
+                if (isCorrectConditions(Optional.of(child), toolItem)) {
                     return true;
                 }
             }
@@ -99,10 +104,13 @@ public class LootTableMineableCollector {
                 }
             }
         } else if (entry instanceof NestedLootTable nestedLootTable) {
-            LootTable lootTable = nestedLootTable.contents.map($ -> lootRegistry.get($).map(Holder::value).orElse(null), Function.identity());
-            return doLootTable(lootTable);
+            for (Holder<LootTable> table : nestedLootTable.value) {
+                if (doLootTable(table.value())) {
+                    return true;
+                }
+            }
         } else {
-            return isCorrectConditions(entry.conditions, toolItem);
+            return isCorrectConditions(entry.condition, toolItem);
         }
         return false;
     }

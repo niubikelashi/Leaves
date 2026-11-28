@@ -1,13 +1,13 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Leaves compat <compat@leavesmc.org>
 Date: Mon, 1 Jan 2024 00:00:00 +0000
-Subject: [PATCH] fix compat 26.2: CraftServer implements Server.getBytebufAllocator
+Subject: [PATCH] [PATCH] fix compat 26.2: CraftServer implements Server.getBytebufAllocator
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -2996,4 +2996,11 @@ public final class CraftServer implements Server {
+@@ -3007,4 +3007,11 @@ public final class CraftServer implements Server {
          return org.leavesmc.leaves.config.InternalConfigProvider.INSTANCE;
      }
      // Leaves end - Config API

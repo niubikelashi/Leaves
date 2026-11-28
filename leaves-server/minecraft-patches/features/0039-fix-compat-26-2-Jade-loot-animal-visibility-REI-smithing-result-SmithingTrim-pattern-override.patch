@@ -1,0 +1,57 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leaves compat <compat@leavesmc.org>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] fix compat 26.2: Jade loot/animal visibility, REI smithing result, SmithingTrim pattern override
+
+
+diff --git a/net/minecraft/world/entity/animal/armadillo/Armadillo.java b/net/minecraft/world/entity/animal/armadillo/Armadillo.java
+--- a/net/minecraft/world/entity/animal/armadillo/Armadillo.java
++++ b/net/minecraft/world/entity/animal/armadillo/Armadillo.java
+@@ -75,7 +75,7 @@ public class Armadillo extends Animal {
+     public final AnimationState rollOutAnimationState = new AnimationState();
+     public final AnimationState rollUpAnimationState = new AnimationState();
+     public final AnimationState peekAnimationState = new AnimationState();
+-    private int scuteTime;
++    public int scuteTime; // Leaves - Jade 下次掉落
+     private boolean peekReceivedClient = false;
+ 
+     public Armadillo(final EntityType<? extends Animal> type, final Level level) {
+diff --git a/net/minecraft/world/entity/animal/frog/Tadpole.java b/net/minecraft/world/entity/animal/frog/Tadpole.java
+--- a/net/minecraft/world/entity/animal/frog/Tadpole.java
++++ b/net/minecraft/world/entity/animal/frog/Tadpole.java
+@@ -256,7 +256,7 @@ public class Tadpole extends AbstractFish {
+         }
+     }
+ 
+-    private int getTicksLeftUntilAdult() {
++    public int getTicksLeftUntilAdult() { // Leaves - Jade 成长进度
+         return Math.max(0, ticksToBeFrog - this.age);
+     }
+ 
+diff --git a/net/minecraft/world/item/crafting/SmithingTransformRecipe.java b/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
+--- a/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
++++ b/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
+@@ -117,7 +117,7 @@ public class SmithingTransformRecipe extends SimpleSmithingRecipe {
+ 
+     // Leaves start - REI
+     public SlotDisplay getResult() {
+-        return this.result.display();
++        return new SlotDisplay.ItemStackSlotDisplay(this.result); // Leaves - 26.2 result 为 ItemStackTemplate
+     }
+     // Leaves end - REI
+ 
+diff --git a/net/minecraft/world/item/crafting/SmithingTrimRecipe.java b/net/minecraft/world/item/crafting/SmithingTrimRecipe.java
+--- a/net/minecraft/world/item/crafting/SmithingTrimRecipe.java
++++ b/net/minecraft/world/item/crafting/SmithingTrimRecipe.java
+@@ -109,9 +109,8 @@ public class SmithingTrimRecipe extends SimpleSmithingRecipe {
+         return Optional.of(this.addition);
+     }
+ 
+-    @Override
+     // Leaves start
+-    public Holder<TrimPattern> pattern() {
++    public Holder<TrimPattern> pattern() { // Leaves - 26.2 超类不再声明 pattern()
+         return pattern;
+     }
+     // Leaves end
+

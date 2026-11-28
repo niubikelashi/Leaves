@@ -7,7 +7,7 @@ Subject: [PATCH] Zero tick plants
 diff --git a/net/minecraft/world/level/block/BambooStalkBlock.java b/net/minecraft/world/level/block/BambooStalkBlock.java
 --- a/net/minecraft/world/level/block/BambooStalkBlock.java
 +++ b/net/minecraft/world/level/block/BambooStalkBlock.java
-@@ -109,6 +109,10 @@ public class BambooStalkBlock extends Block implements BonemealableBlock {
+@@ -102,6 +102,10 @@ public class BambooStalkBlock extends Block implements BonemealableBlock {
          if (!state.canSurvive(level, pos)) {
              level.destroyBlock(pos, true);
          }
@@ -21,7 +21,7 @@ diff --git a/net/minecraft/world/level/block/BambooStalkBlock.java b/net/minecra
 diff --git a/net/minecraft/world/level/block/CactusBlock.java b/net/minecraft/world/level/block/CactusBlock.java
 --- a/net/minecraft/world/level/block/CactusBlock.java
 +++ b/net/minecraft/world/level/block/CactusBlock.java
-@@ -48,6 +48,10 @@ public class CactusBlock extends Block {
+@@ -41,6 +41,10 @@ public class CactusBlock extends Block {
          if (!state.canSurvive(level, pos)) {
              level.destroyBlock(pos, true);
          }
@@ -35,7 +35,7 @@ diff --git a/net/minecraft/world/level/block/CactusBlock.java b/net/minecraft/wo
 diff --git a/net/minecraft/world/level/block/ChorusFlowerBlock.java b/net/minecraft/world/level/block/ChorusFlowerBlock.java
 --- a/net/minecraft/world/level/block/ChorusFlowerBlock.java
 +++ b/net/minecraft/world/level/block/ChorusFlowerBlock.java
-@@ -48,6 +48,9 @@ public class ChorusFlowerBlock extends Block {
+@@ -37,6 +37,9 @@ public class ChorusFlowerBlock extends Block {
          if (!state.canSurvive(level, pos)) {
              level.destroyBlock(pos, true);
          }
@@ -48,7 +48,7 @@ diff --git a/net/minecraft/world/level/block/ChorusFlowerBlock.java b/net/minecr
 diff --git a/net/minecraft/world/level/block/GrowingPlantHeadBlock.java b/net/minecraft/world/level/block/GrowingPlantHeadBlock.java
 --- a/net/minecraft/world/level/block/GrowingPlantHeadBlock.java
 +++ b/net/minecraft/world/level/block/GrowingPlantHeadBlock.java
-@@ -160,4 +160,15 @@ public abstract class GrowingPlantHeadBlock extends GrowingPlantBlock implements
+@@ -156,4 +156,15 @@ public abstract class GrowingPlantHeadBlock extends GrowingPlantBlock implements
      protected GrowingPlantHeadBlock getHeadBlock() {
          return this;
      }
@@ -67,7 +67,7 @@ diff --git a/net/minecraft/world/level/block/GrowingPlantHeadBlock.java b/net/mi
 diff --git a/net/minecraft/world/level/block/SugarCaneBlock.java b/net/minecraft/world/level/block/SugarCaneBlock.java
 --- a/net/minecraft/world/level/block/SugarCaneBlock.java
 +++ b/net/minecraft/world/level/block/SugarCaneBlock.java
-@@ -44,6 +44,10 @@ public class SugarCaneBlock extends Block {
+@@ -37,6 +37,10 @@ public class SugarCaneBlock extends Block {
          if (!state.canSurvive(level, pos)) {
              level.destroyBlock(pos, true);
          }

@@ -107,7 +107,7 @@ public class BlockAccessor extends Accessor<BlockHitResult> {
         public static final StreamCodec<RegistryFriendlyByteBuf, SyncData> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.BOOL,
             SyncData::showDetails,
-            StreamCodec.of(FriendlyByteBuf::writeBlockHitResult, FriendlyByteBuf::readBlockHitResult),
+            BlockHitResult.STREAM_CODEC, // Leaves - 26.3 compat: FriendlyByteBuf write/readBlockHitResult were removed
             SyncData::hit,
             ItemStack.OPTIONAL_STREAM_CODEC,
             SyncData::serversideRep,

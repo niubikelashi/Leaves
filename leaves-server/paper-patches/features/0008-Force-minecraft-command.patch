@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Leaves compat <compat@leavesmc.org>
 Date: Mon, 1 Jan 2024 00:00:00 +0000
-Subject: [PATCH] Force minecraft command
+Subject: [PATCH] [PATCH] Force minecraft command
 
 
 diff --git a/src/main/java/io/papermc/paper/command/brigadier/bukkit/BukkitBrigForwardingMap.java b/src/main/java/io/papermc/paper/command/brigadier/bukkit/BukkitBrigForwardingMap.java

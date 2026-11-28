@@ -19,7 +19,7 @@ diff --git a/net/minecraft/locale/Language.java b/net/minecraft/locale/Language.
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -328,6 +328,7 @@ public class ServerGamePacketListenerImpl
+@@ -335,6 +335,7 @@ public class ServerGamePacketListenerImpl
      private static final int MAX_SIGN_LINE_LENGTH = Integer.getInteger("Paper.maxSignLength", 80); // Paper - Limit client sign length
      private final io.papermc.paper.event.packet.ClientTickEndEvent tickEndEvent; // Paper - add client tick end event
      public final io.papermc.paper.connection.PaperPlayerGameConnection playerGameConnection; // Paper
@@ -27,18 +27,10 @@ diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/ne
  
      public ServerGamePacketListenerImpl(final MinecraftServer server, final Connection connection, final ServerPlayer player, final CommonListenerCookie cookie) {
          super(server, connection, cookie);
-@@ -342,6 +343,7 @@ public class ServerGamePacketListenerImpl
-         this.chatMessageChain = new FutureChain(server.chatExecutor); // CraftBukkit - async chat
-         this.tickEndEvent = new io.papermc.paper.event.packet.ClientTickEndEvent(player.getBukkitEntity()); // Paper - add client tick end event
-         this.playerGameConnection = new io.papermc.paper.connection.PaperPlayerGameConnection(this); // Paper
-+        this.exchangeTarget = new org.leavesmc.leaves.protocol.syncmatica.exchange.ExchangeTarget(this); // Leaves - Syncmatica Protocol
-     }
- 
-     // Paper start - configuration phase API
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -201,7 +201,7 @@ public abstract class Entity
+@@ -203,7 +203,7 @@ public abstract class Entity
      // Paper end - Share random for entities to make them more random
      public org.bukkit.event.entity.CreatureSpawnEvent.@Nullable SpawnReason spawnReason; // Paper - Entity#getEntitySpawnReason
  
@@ -75,7 +67,7 @@ diff --git a/net/minecraft/world/entity/monster/Creeper.java b/net/minecraft/wor
 diff --git a/net/minecraft/world/entity/monster/skeleton/Skeleton.java b/net/minecraft/world/entity/monster/skeleton/Skeleton.java
 --- a/net/minecraft/world/entity/monster/skeleton/Skeleton.java
 +++ b/net/minecraft/world/entity/monster/skeleton/Skeleton.java
-@@ -146,7 +146,7 @@ public class Skeleton extends AbstractSkeleton {
+@@ -97,7 +97,7 @@ public class Skeleton extends AbstractSkeleton {
      protected void dropFromLootTable(net.minecraft.server.level.ServerLevel level, DamageSource damageSource, boolean causedByPlayer) {
          super.dropFromLootTable(level, damageSource, causedByPlayer);
          if (org.leavesmc.leaves.LeavesConfig.modify.spiderJockeysDropGapples > 0.0D) {
@@ -99,7 +91,7 @@ diff --git a/net/minecraft/world/entity/monster/spider/Spider.java b/net/minecra
 diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
-@@ -133,6 +133,7 @@ public abstract class Player extends Avatar implements ContainerUser {
+@@ -132,6 +132,7 @@ public abstract class Player extends Avatar implements ContainerUser {
      public static final int CRAFTING_SLOT_OFFSET = 500;
      public static final float DEFAULT_BLOCK_INTERACTION_RANGE = 4.5F;
      public static final float DEFAULT_ENTITY_INTERACTION_RANGE = 3.0F;
@@ -143,16 +135,7 @@ diff --git a/net/minecraft/world/level/chunk/storage/RegionFile.java b/net/minec
      private static final Logger LOGGER = LogUtils.getLogger();
      public static final int MAX_CHUNK_SIZE = 500 * 1024 * 1024; // Paper - don't write garbage data to disk if writing serialization fails
      private static final int SECTOR_BYTES = 4096;
-@@ -130,7 +130,7 @@ public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patche
-         return this.recalculateCount.get();
-     }
- 
--    boolean recalculateHeader() throws IOException {
-+    public boolean recalculateHeader() throws IOException { // Leaves - more region format
-         if (!this.canRecalcHeader) {
-             return false;
-         }
-@@ -789,7 +789,7 @@ public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patche
+@@ -776,7 +776,7 @@ public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patche
          }
      }
  
@@ -161,75 +144,4 @@ diff --git a/net/minecraft/world/level/chunk/storage/RegionFile.java b/net/minec
          int offsetIndex = getOffsetIndex(pos);
          int offset = this.offsets.get(offsetIndex);
          int sectorNumber = getSectorNumber(offset);
-@@ -973,11 +973,11 @@ public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patche
-         return (x & 31) + (z & 31) * 32;
-     }
- 
--    synchronized boolean isOversized(int x, int z) {
-+    public synchronized boolean isOversized(int x, int z) { // Leaves - more region format
-         return this.oversized[getChunkIndex(x, z)] == 1;
-     }
- 
--    synchronized void setOversized(int x, int z, boolean oversized) throws IOException {
-+    public synchronized void setOversized(int x, int z, boolean oversized) throws IOException { // Leaves - more region format
-         final int offset = getChunkIndex(x, z);
-         boolean previous = this.oversized[offset] == 1;
-         this.oversized[offset] = (byte) (oversized ? 1 : 0);
-@@ -1016,7 +1016,7 @@ public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patche
-         return this.path.getParent().resolve(this.path.getFileName().toString().replaceAll("\\.mca$", "") + "_oversized_" + x + "_" + z + ".nbt");
-     }
- 
--    synchronized net.minecraft.nbt.CompoundTag getOversizedData(int x, int z) throws IOException {
-+    public synchronized net.minecraft.nbt.CompoundTag getOversizedData(int x, int z) throws IOException { // Leaves - more region format
-         Path file = getOversizedFile(x, z);
-         try (DataInputStream out = new DataInputStream(new java.io.BufferedInputStream(new java.util.zip.InflaterInputStream(Files.newInputStream(file))))) {
-             return net.minecraft.nbt.NbtIo.read((java.io.DataInput) out);
-diff --git a/net/minecraft/world/level/levelgen/feature/CoralClawFeature.java b/net/minecraft/world/level/levelgen/feature/CoralClawFeature.java
---- a/net/minecraft/world/level/levelgen/feature/CoralClawFeature.java
-+++ b/net/minecraft/world/level/levelgen/feature/CoralClawFeature.java
-@@ -17,7 +17,7 @@ public class CoralClawFeature extends CoralFeature {
-     }
- 
-     @Override
--    protected boolean placeFeature(final LevelAccessor level, final RandomSource random, final BlockPos origin, final BlockState state) {
-+    public boolean placeFeature(final LevelAccessor level, final RandomSource random, final BlockPos origin, final BlockState state) { // Leaves - protected -> public
-         if (!this.placeCoralBlock(level, random, origin, state)) {
-             return false;
-         }
-diff --git a/net/minecraft/world/level/levelgen/feature/CoralFeature.java b/net/minecraft/world/level/levelgen/feature/CoralFeature.java
---- a/net/minecraft/world/level/levelgen/feature/CoralFeature.java
-+++ b/net/minecraft/world/level/levelgen/feature/CoralFeature.java
-@@ -31,7 +31,7 @@ public abstract class CoralFeature extends Feature<NoneFeatureConfiguration> {
-         return !coral.isEmpty() && this.placeFeature(level, random, origin, coral.get().defaultBlockState());
-     }
- 
--    protected abstract boolean placeFeature(final LevelAccessor level, final RandomSource random, final BlockPos origin, final BlockState state);
-+    public abstract boolean placeFeature(final LevelAccessor level, final RandomSource random, final BlockPos origin, final BlockState state); // Leaves - protected -> public
- 
-     protected boolean placeCoralBlock(final LevelAccessor level, final RandomSource random, final BlockPos pos, final BlockState state) {
-         BlockPos above = pos.above();
-diff --git a/net/minecraft/world/level/levelgen/feature/CoralMushroomFeature.java b/net/minecraft/world/level/levelgen/feature/CoralMushroomFeature.java
---- a/net/minecraft/world/level/levelgen/feature/CoralMushroomFeature.java
-+++ b/net/minecraft/world/level/levelgen/feature/CoralMushroomFeature.java
-@@ -14,7 +14,7 @@ public class CoralMushroomFeature extends CoralFeature {
-     }
- 
-     @Override
--    protected boolean placeFeature(final LevelAccessor level, final RandomSource random, final BlockPos origin, final BlockState state) {
-+    public boolean placeFeature(final LevelAccessor level, final RandomSource random, final BlockPos origin, final BlockState state) { // Leaves - protected -> public
-         int height = random.nextInt(3) + 3;
-         int width = random.nextInt(3) + 3;
-         int length = random.nextInt(3) + 3;
-diff --git a/net/minecraft/world/level/levelgen/feature/CoralTreeFeature.java b/net/minecraft/world/level/levelgen/feature/CoralTreeFeature.java
---- a/net/minecraft/world/level/levelgen/feature/CoralTreeFeature.java
-+++ b/net/minecraft/world/level/levelgen/feature/CoralTreeFeature.java
-@@ -15,7 +15,7 @@ public class CoralTreeFeature extends CoralFeature {
-     }
- 
-     @Override
--    protected boolean placeFeature(final LevelAccessor level, final RandomSource random, final BlockPos origin, final BlockState state) {
-+    public boolean placeFeature(final LevelAccessor level, final RandomSource random, final BlockPos origin, final BlockState state) { // Leaves - protected -> public
-         BlockPos.MutableBlockPos mutPos = origin.mutable();
-         int trunckHeight = random.nextInt(3) + 1;
- 
 
