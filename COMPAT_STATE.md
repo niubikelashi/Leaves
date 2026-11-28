@@ -335,3 +335,36 @@ compat/26.1.2 第 1 轮证据（分支 `compat/26.1.2`，从 `8ba0135` 切出并
 - 语义：本轮没有改写任何补丁或源码，因此不产生新的语义债；已发布产物与干净重建在「排除 MANIFEST 时间戳」口径下内容逐条目一致，说明 26.2 / 26.3 / 1.21.9 的补丁层与源码是确定性的。
 - 记错本：新增 E044–E051（Gradle 9.8 隐式依赖、空补丁、rebuild 污染层、上游改名、jar 哈希不一致→逐条目 CRC、push Basic auth、chain_gen 累积与 orig 目录错误、产物任务名随版本变化），索引表同步。
 - 下一个目标：`compat/26.1.2`（该工作树脏 172，且 `leaves-server/src/minecraft/java`、`paper-server` 两个嵌套 repo 目录缺失，需要按提交链重建层后跑全绿）；之后回补低版本语义债（1.21.9 的 `0038 PacketUtils`、`0038 ShulkerBoxBlock`、`0059 PalettedContainer`）。
+
+
+## 16. 第 55 轮：1.21.10 / 1.21.11 干净重建复核 + 构建时 Maven group 口径 + provenance 修复（2026-11-28）
+
+本轮不改补丁层、不改源码，只做复核与证据补齐；1.21.10 / 1.21.11 的分支 HEAD、tag、嵌套 repo tree 全部保持原样。
+
+- 干净重建（`tools/repro_version.ps1`，三次单模块 apply，绝不跑 rebuild / `applyAllPatchesSequentially`）：
+  - **1.21.10**（分支 `compat/1.21.10` = `0155e2d`，tag `leaves-1.21.10-compat` = `6a63f73`）：apply 13m11s / 59s / 49s 均 BUILD SUCCESSFUL；三层 tree 与期望一致（mc `d5a5adf4d4a1…`、paper-server `94c0c95b0a4c…`、paper-api `ae069fef1629…`），`ALL_MATCH=True`；产物 `createMojmapBundlerJar`/`createMojmapLeavesclipJar` BUILD SUCCESSFUL in 7m21s，jar api 2752395 / server 28656209 / bundler-mojmap 109009747 / leavesclip-mojmap 64917092。
+  - **1.21.11**（分支 `compat/1.21.11` = `1ceb95c`，tag `leaves-1.21.11-compat` = `34c9920`）：apply 1m44s / 29s / 40s 均 BUILD SUCCESSFUL；三层 tree match=True（mc `3ecb298a61c7…`、paper-server `4090c17cb1db…`、paper-api `e8aac3267809…`）；产物 BUILD SUCCESSFUL in 2m52s，jar api 2801720 / server 28157715 / bundler-mojmap 106368612 / leavesclip-mojmap 64754372。
+  - 与已发布 asset 逐条目 CRC（`crc-compare-12110-*`、`crc-compare-12111-*`）：server 聚合两侧相同（1.21.10 `980b5f7e284a…`、1.21.11 `7b64f3fca566…`），唯一差异条目 `META-INF/MANIFEST.MF`；api 差异条目含 `META-INF/maven/**/pom.properties` 路径（见下条口径）。
+- **构建时 Maven group 口径（新坑，记错本 E053）**：bundler/leavesclip 里 `META-INF/libraries/<group>/<artifact>/…` 的条目路径取决于构建时项目的 Maven group。默认构建用的是仓库里的 `group=org.leavesmc.leaves`，而已发布产物是在 `group=Leaves` 下打的（该值未入库，只在发布时临时设置）。因此复核必须加 `-Pgroup=Leaves`（`tools/build_group.ps1 -Ver <ver> -Group Leaves`）：加之后 **api 差异条目 0**（1.21.11 聚合两侧同为 `2ebd661fcfa8…`），bundler 只剩 2 条派生差异（`META-INF/versions.list`、内嵌 `META-INF/versions/<ver>/leaves-<ver>.jar`）、leavesclip 只剩 3 条派生差异（`patches.list`、`versions.list`、`server-<ver>.jar.patch`），`only-in-A/B=0`。不加 `-Pgroup` 时这些库路径会整批出现在 only-in-A/only-in-B，属于构建参数差异，不是内容不可复现。
+- **provenance 漂移核查**：已发布 asset 的内嵌 commit 与 release tag 不一致——
+  - 1.21.11 已发布 server jar：`Git-Commit: 045009e` / `Implementation-Version: 1.21.11-DEV-045009e`，而 tag `leaves-1.21.11-compat` = `34c9920`；tag..head 的差异只是 11 个构建基建/docs 文件。
+  - 1.21.10 已发布 server jar：`Git-Commit: 4f6cf0f` / `Implementation-Version: 1.21.10-DEV-4f6cf0f`，而 tag = `6a63f73`；tag..head 差异只有 `plugin-pin/SHA256.txt` + `verify_plugin_pin.py`。
+  - 1.21.9 已发布 server jar：`Git-Commit: bb11710`，而 tag `leaves-1.21.9-compat` = `eac71f4`（= 分支 HEAD）。
+  - 26.2 / 26.3 已发布 server jar 内嵌 commit 与 tag 一致（`6f2d7e6` / `63cbded`），无漂移。
+- **provenance 修复（只新增 asset，不删除/覆盖既有 asset）**：在 detached tag commit 上用 `-Pgroup=Leaves` 重建四个产物，产物内嵌 `Git-Commit` 等于 tag（detached 构建的 `Git-Branch: HEAD`，只影响 MANIFEST，而 MANIFEST 不在逐条目聚合口径内）：
+  - 1.21.11 @ `34c9920`（`repro-1.21.11-tag`，BUILD SUCCESSFUL）：server 聚合两侧同为 `7b64f3fca566…`（唯一差异 MANIFEST）、api 聚合两侧同为 `2ebd661fcfa8…`（差异条目 0）、bundler/leavesclip 只有派生条目差异（`crc-compare-12111tag-*`）。新增 asset 4 个到 release 458297960：`leaves-server-1.21.11-tagcommit-34c9920.jar`(28157715)、`leaves-api-1.21.11-tagcommit-34c9920.jar`(2801720)、`leaves-bundler-1.21.11-mojmap-tagcommit-34c9920.jar`(106368612)、`leaves-leavesclip-1.21.11-mojmap-tagcommit-34c9920.jar`(64754372)，final assets=16（原 12 个未动，`upload-leaves-1.21.11-compat.txt`）。
+  - 1.21.10 @ `6a63f73`（`repro-1.21.10-tag`，BUILD SUCCESSFUL）：server 聚合两侧同为 `980b5f7e284a…`（唯一差异 MANIFEST）、api 聚合两侧同为 `b316714f2451…`（差异条目 0）、bundler/leavesclip 只有派生条目差异（`crc-compare-12110tag-*`）。新增 asset 4 个到 release 458635670：`leaves-server-1.21.10-tagcommit-6a63f73.jar`(28656207)、`leaves-api-1.21.10-tagcommit-6a63f73.jar`(2752317)、`leaves-bundler-1.21.10-mojmap-tagcommit-6a63f73.jar`(109060085)、`leaves-leavesclip-1.21.10-mojmap-tagcommit-6a63f73.jar`(64985585)，final assets=8（原 4 个未动，`upload-leaves-1.21.10-compat.txt`）。
+  - 1.21.9 @ `eac71f4`（同口径重建与上传，见 §17）。
+- 语义：本轮没有任何补丁/源码改写，因此没有新增语义债；结论只是「已发布产物在排除 MANIFEST 时间戳、并以 `group=Leaves` 构建时，内容逐条目可复现」，以及「1.21.9/1.21.10/1.21.11 的既有 asset 内嵌 commit 早于 tag，已用新增 asset 补上 tag-commit 版本」。
+- 记错本：E051（产物任务名随版本变化）、E052（构建失败却复制旧 jar → 强制断言 BUILD SUCCESSFUL）、E053（bundler/leavesclip 库路径随构建时 Maven group，解法 `-Pgroup=Leaves`）已写入并同步索引表。
+- 下一个目标：`compat/26.1.2`（脏 172、`leaves-server/src/minecraft/java` 与 `paper-server` 缺失、插件是 paperweight-patcher v2.1.0：无 `applyMinecraftPatches`，api feature 补丁 `0001 Delete Timings` 在 3-way 下报 `sha1 information is lacking or useless (src/main/java/co/aikar/timings/FullServerTickHandler.java)`，需要按提交链重锚定）；之后回补低版本语义债（1.21.9 的 `0038 PacketUtils`、`0038 ShulkerBoxBlock`、`0059 PalettedContainer` hunk#2/#3）。
+
+
+## 17. 第 56 轮：1.21.9 tag-commit 复核与 provenance 修复收尾（2026-11-28）
+
+- 1.21.9 在 detached tag commit `eac71f4`（= `compat/1.21.9` HEAD，工作树 dirty=0）上用 `tools/build_group.ps1 -Ver 1.21.9 -Group Leaves` 重建四个产物：BUILD SUCCESSFUL，jar api 2747419 / server 28537309 / bundler-mojmap 107902286 / leavesclip-mojmap 63795980；产物内嵌 `Implementation-Version: 1.21.9-DEV-eac71f4`、`Git-Commit: eac71f4`、`Git-Branch: HEAD`（detached 构建，只影响 MANIFEST）。
+- 与已发布 asset 逐条目 CRC（`crc-compare-1219tag-*`）：server 聚合两侧同为 `2832f59cef2d…`（唯一差异条目 `META-INF/MANIFEST.MF`）、api 聚合两侧同为 `84762adfe82c…`（差异条目 0）、bundler 差异只有 `versions.list` + 内嵌 `leaves-1.21.9.jar`、leavesclip 差异只有 `patches.list` + `versions.list` + `server-1.21.9.jar.patch`（bsdiff），`only-in-A/B=0`。即 §15 那次干净重建的内容与已发布产物一致，只是内嵌 commit 早于 tag。
+- 新增 asset 到 release 460204880（原 4 个未动）：`leaves-server-1.21.9-tagcommit-eac71f4.jar`(28537309)、`leaves-api-1.21.9-tagcommit-eac71f4.jar`(2747419)、`leaves-bundler-1.21.9-mojmap-tagcommit-eac71f4.jar`(107902286)、`leaves-leavesclip-1.21.9-mojmap-tagcommit-eac71f4.jar`(63795980)，final assets=8（`upload-leaves-1.21.9-compat.txt`）。
+- 至此 1.21.9 / 1.21.10 / 1.21.11 三个 release 都同时具备「原始 asset」与「tag-commit 重建 asset」；26.2 / 26.3 的原始 asset 内嵌 commit 本来就和 tag 一致，无需补。所有操作都是新增，未删除或覆盖任何既有 asset；三个版本的工作树都切回各自 `compat/*` 分支且 dirty=0（1.21.9 `eac71f4`、1.21.10 `0155e2d`、1.21.11 `1ceb95c`）。
+- 语义：本轮无补丁/源码改写，无新增语义债。
+- 下一个目标：`compat/26.1.2` 适配（同上 §16 末行）。
